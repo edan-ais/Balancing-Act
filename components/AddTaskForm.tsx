@@ -9,12 +9,11 @@ interface AddTaskFormProps {
   onSubmit: (task: {
     title: string;
     isHabit: boolean;
-    location: string;
     priority: string;
-    isQuickWin: boolean;
     isDelegated: boolean;
     delegatedTo: string;
     subtasks: { title: string }[];
+    habitGoal?: number;
     // New fields
     mealType?: string;
     dayOfWeek?: string;
@@ -35,9 +34,8 @@ interface AddTaskFormProps {
 export default function AddTaskForm({ visible, onClose, onSubmit, category, selectedDate }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
-  const [location, setLocation] = useState('anywhere');
+  const [habitGoal, setHabitGoal] = useState(1);
   const [priority, setPriority] = useState('medium');
-  const [isQuickWin, setIsQuickWin] = useState(false);
   const [isDelegated, setIsDelegated] = useState(false);
   const [delegatedTo, setDelegatedTo] = useState('');
   const [subtasks, setSubtasks] = useState<string[]>(['']);
@@ -58,13 +56,16 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
       const baseTask = {
         title: title.trim(),
         isHabit,
-        location,
         priority,
-        isQuickWin,
         isDelegated,
         delegatedTo: isDelegated ? delegatedTo : '',
         subtasks: subtasks.filter(s => s.trim()).map(s => ({ title: s.trim() })),
       };
+
+      // Add habit goal if it's a habit
+      if (isHabit) {
+        baseTask.habitGoal = habitGoal;
+      }
 
       // Add category-specific fields
       let taskData = { ...baseTask };
@@ -118,9 +119,8 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
       // Reset all fields
       setTitle('');
       setIsHabit(false);
-      setLocation('anywhere');
+      setHabitGoal(1);
       setPriority('medium');
-      setIsQuickWin(false);
       setIsDelegated(false);
       setDelegatedTo('');
       setSubtasks(['']);
@@ -154,14 +154,14 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
 
   const getTabColor = () => {
     switch (category) {
-      case 'daily': return '#667EEA';
+      case 'daily': return '#2B6CB0'; // Changed to dark blue
       case 'goals': return '#48BB78';
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
       case 'cleaning': return '#4299E1';
       case 'self-care': return '#F56565';
       case 'delegation': return '#38B2AC';
-      default: return '#667EEA';
+      default: return '#2B6CB0';
     }
   };
 
@@ -219,6 +219,29 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
                     <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
                   </TouchableOpacity>
                 </View>
+                
+                {isHabit && (
+                  <View style={styles.habitFrequency}>
+                    <Text style={styles.habitFrequencyLabel}>
+                      Daily goal:
+                    </Text>
+                    <View style={styles.habitGoalInput}>
+                      <TouchableOpacity 
+                        style={styles.habitGoalButton}
+                        onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
+                      >
+                        <Text style={styles.habitGoalButtonText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.habitGoalValue}>{habitGoal}</Text>
+                      <TouchableOpacity 
+                        style={styles.habitGoalButton}
+                        onPress={() => setHabitGoal(habitGoal + 1)}
+                      >
+                        <Text style={styles.habitGoalButtonText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
               </View>
 
               <View style={styles.section}>
@@ -247,7 +270,7 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Priority</Text>
                 <View style={styles.buttonRow}>
-                  {['low', 'medium', 'high'].map((prio) => (
+                  {['low', 'medium', 'high', 'quick-win'].map((prio) => (
                     <TouchableOpacity
                       key={prio}
                       style={[
@@ -257,19 +280,10 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
                       onPress={() => setPriority(prio)}
                     >
                       <Text style={[styles.optionText, priority === prio && styles.selectedText]}>
-                        {prio.charAt(0).toUpperCase() + prio.slice(1)}
+                        {prio === 'quick-win' ? 'Quick Win' : prio.charAt(0).toUpperCase() + prio.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      isQuickWin && [styles.selectedOption, {backgroundColor: getTabColor()}]
-                    ]}
-                    onPress={() => setIsQuickWin(!isQuickWin)}
-                  >
-                    <Text style={[styles.optionText, isQuickWin && styles.selectedText]}>Quick Win</Text>
-                  </TouchableOpacity>
                 </View>
               </View>
             </>
@@ -300,6 +314,29 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
                     <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
                   </TouchableOpacity>
                 </View>
+                
+                {isHabit && (
+                  <View style={styles.habitFrequency}>
+                    <Text style={styles.habitFrequencyLabel}>
+                      Daily goal:
+                    </Text>
+                    <View style={styles.habitGoalInput}>
+                      <TouchableOpacity 
+                        style={styles.habitGoalButton}
+                        onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
+                      >
+                        <Text style={styles.habitGoalButtonText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.habitGoalValue}>{habitGoal}</Text>
+                      <TouchableOpacity 
+                        style={styles.habitGoalButton}
+                        onPress={() => setHabitGoal(habitGoal + 1)}
+                      >
+                        <Text style={styles.habitGoalButtonText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
               </View>
 
               <View style={styles.section}>
@@ -352,6 +389,29 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
                     <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
                   </TouchableOpacity>
                 </View>
+                
+                {isHabit && (
+                  <View style={styles.habitFrequency}>
+                    <Text style={styles.habitFrequencyLabel}>
+                      Daily goal:
+                    </Text>
+                    <View style={styles.habitGoalInput}>
+                      <TouchableOpacity 
+                        style={styles.habitGoalButton}
+                        onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
+                      >
+                        <Text style={styles.habitGoalButtonText}>-</Text>
+                      </TouchableOpacity>
+                      <Text style={styles.habitGoalValue}>{habitGoal}</Text>
+                      <TouchableOpacity 
+                        style={styles.habitGoalButton}
+                        onPress={() => setHabitGoal(habitGoal + 1)}
+                      >
+                        <Text style={styles.habitGoalButtonText}>+</Text>
+                      </TouchableOpacity>
+                    </View>
+                  </View>
+                )}
               </View>
 
               <View style={styles.section}>
@@ -789,6 +849,47 @@ const styles = StyleSheet.create({
   },
   selectedText: {
     color: '#ffffff',
+  },
+  habitFrequency: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    marginTop: 12,
+  },
+  habitFrequencyLabel: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Medium',
+    color: '#4A5568',
+  },
+  habitGoalInput: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#ffffff',
+    borderRadius: 8,
+    padding: 4,
+    shadowColor: '#C8D0E0',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  habitGoalButton: {
+    width: 30,
+    height: 30,
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderRadius: 15,
+    backgroundColor: '#E2E8F0',
+  },
+  habitGoalButtonText: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#4A5568',
+  },
+  habitGoalValue: {
+    paddingHorizontal: 16,
+    fontSize: 16,
+    fontFamily: 'Quicksand-Bold',
+    color: '#2D3748',
   },
   subtaskRow: {
     flexDirection: 'row',
