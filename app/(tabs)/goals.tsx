@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus } from 'lucide-react-native';
+import { Plus, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
@@ -38,11 +38,11 @@ export default function LongTermGoals() {
           </Text>
         </View>
         <View style={styles.headerActions}>
-          <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+          <TouchableOpacity
+            style={[styles.emergencyButton, { backgroundColor: colors.accent }]}
             onPress={() => setShowEmergencyOverride(true)}
           >
-            <Plus size={20} color={colors.dark} />
+            <AlertTriangle size={20} color={colors.dark} />
           </TouchableOpacity>
         </View>
       </View>
@@ -72,6 +72,9 @@ export default function LongTermGoals() {
                     onMoveDown={taskManager.moveTaskDown}
                     isFirst={index === 0}
                     isLast={index === pendingTasks.length - 1}
+                    accentColor={colors.accent}
+                    borderColor={colors.dark}
+                    habitColor={colors.dark}
                   />
                 ))}
               </View>
@@ -92,6 +95,9 @@ export default function LongTermGoals() {
                     onMoveDown={taskManager.moveTaskDown}
                     isFirst={index === 0}
                     isLast={index === completedTasks.length - 1}
+                    accentColor={colors.accent}
+                    borderColor={colors.dark}
+                    habitColor={colors.dark}
                   />
                 ))}
               </View>
@@ -115,12 +121,16 @@ export default function LongTermGoals() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="goals"
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
 
       <EmergencyOverride
         visible={showEmergencyOverride}
         onClose={() => setShowEmergencyOverride(false)}
         onConfirm={handleEmergencyOverride}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );
@@ -150,18 +160,18 @@ const styles = StyleSheet.create({
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 12,
   },
-  actionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+  emergencyButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     shadowColor: '#C8D0E0',
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 6,
   },
   content: {
     flex: 1,
