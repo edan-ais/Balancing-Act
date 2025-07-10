@@ -48,7 +48,7 @@ export default function TaskItem({
 
   const getTabColor = (category: string) => {
     switch (category) {
-      case 'daily': return '#2B6CB0'; // Dark blue for habits
+      case 'daily': return '#2B6CB0'; // Changed to dark blue for habits
       case 'goals': return '#48BB78';
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
@@ -235,7 +235,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   habitCard: {
-    backgroundColor: '#BEE3F8', // Darker blue background for habits
+    backgroundColor: '#EBF8FF',
   },
   taskHeader: {
     flexDirection: 'row',
@@ -277,4 +277,85 @@ const styles = StyleSheet.create({
   },
   delegatedBadge: {
     fontSize: 12,
-    fontFamily: 'Quicksan
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#38B2AC',
+  },
+  taskMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 4,
+  },
+  priorityTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 4,
+  },
+  priorityText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontFamily: 'Quicksand-SemiBold',
+    textTransform: 'uppercase',
+  },
+  habitProgressContainer: {
+    height: 8,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 4,
+    marginVertical: 4,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  habitProgressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  habitGoalText: {
+    position: 'absolute',
+    right: 0,
+    top: -16,
+    fontSize: 10,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#4A5568',
+  },
+  subtasks: {
+    marginTop: 8,
+    paddingLeft: 4,
+  },
+  subtask: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  subtaskCheckbox: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#E2E8F0',
+    marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  subtaskCompleted: {},
+  subtaskText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Regular',
+    color: '#4A5568',
+  },
+  subtaskCompletedText: {
+    textDecorationLine: 'line-through',
+    color: '#A0AEC0',
+  },
+  actionIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  moveButton: {
+    padding: 4,
+    marginRight: 4,
+  },
+  deleteIconButton: {
+    padding: 4,
+  },
+});
