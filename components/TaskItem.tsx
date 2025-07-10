@@ -1,14 +1,6 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated as RNAnimated } from 'react-native';
-import { Check, X, GripVertical } from 'lucide-react-native';
-import { PanGestureHandler } from 'react-native-gesture-handler';
-import Animated, { 
-  useAnimatedGestureHandler,
-  useAnimatedStyle,
-  useSharedValue,
-  withSpring,
-  runOnJS
-} from 'react-native-reanimated';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
+import { Check, X, ChevronUp, ChevronDown } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
@@ -31,10 +23,10 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onHabitIncrement?: (id: string) => void;
   onSubtaskToggle?: (taskId: string, subtaskId: string) => void;
-  onMoveStart?: () => void;
-  isDragging?: boolean;
-  onLayout?: (layout: { x: number; y: number; width: number; height: number }) => void;
-  onDragEnd?: (position: { y: number }) => void;
+  onMoveUp?: (id: string) => void;
+  onMoveDown?: (id: string) => void;
+  isFirst?: boolean;
+  isLast?: boolean;
 }
 
 export default function TaskItem({ 
@@ -43,62 +35,12 @@ export default function TaskItem({
   onDelete, 
   onHabitIncrement, 
   onSubtaskToggle,
-  onMoveStart,
-  isDragging,
-  onLayout,
-  onDragEnd
+  onMoveUp,
+  onMoveDown,
+  isFirst,
+  isLast
 }: TaskItemProps) {
-  const [scaleAnim] = useState(new RNAnimated.Value(1));
-  
-  // Gesture handler setup
-  const translateY = useSharedValue(0);
-  const translateX = useSharedValue(0);
-  const scale = useSharedValue(1);
-  const zIndex = useSharedValue(1);
-  const opacity = useSharedValue(1);
-  
-  // Handle the drag gesture
-  const panGestureEvent = useAnimatedGestureHandler({
-    onStart: (_, context: any) => {
-      context.startY = translateY.value;
-      runOnJS(onMoveStart)();
-      scale.value = withSpring(1.03);
-      zIndex.value = 100;
-    },
-    onActive: (event, context) => {
-      translateY.value = context.startY + event.translationY;
-      translateX.value = event.translationX;
-    },
-    onEnd: () => {
-      if (onDragEnd) {
-        runOnJS(onDragEnd)({ y: translateY.value });
-      }
-      
-      // Reset position with animation
-      translateY.value = withSpring(0);
-      translateX.value = withSpring(0);
-      scale.value = withSpring(1);
-      
-      // Delay resetting z-index until animation completes
-      setTimeout(() => {
-        zIndex.value = 1;
-      }, 300);
-    },
-  });
-  
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { translateY: translateY.value },
-        { translateX: translateX.value },
-        { scale: scale.value }
-      ],
-      zIndex: zIndex.value,
-      elevation: isDragging ? 8 : 1,
-      shadowOpacity: isDragging ? 0.3 : 0.1,
-      shadowRadius: isDragging ? 10 : 3,
-    };
-  });
+  const [scaleAnim] = useState(new Animated.Value(1));
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
@@ -112,7 +54,7 @@ export default function TaskItem({
 
   const getTabColor = (category: string) => {
     switch (category) {
-      case 'daily': return '#2B6CB0'; // Changed to dark blue for habits
+      case 'daily': return '#2B6CB0'; 
       case 'goals': return '#48BB78';
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
@@ -125,13 +67,13 @@ export default function TaskItem({
   
   const handleToggle = () => {
     // Celebration animation
-    RNAnimated.sequence([
-      RNAnimated.timing(scaleAnim, {
+    Animated.sequence([
+      Animated.timing(scaleAnim, {
         toValue: 1.1,
         duration: 150,
         useNativeDriver: true,
       }),
-      RNAnimated.timing(scaleAnim, {
+      Animated.timing(scaleAnim, {
         toValue: 1,
         duration: 150,
         useNativeDriver: true,
@@ -144,13 +86,13 @@ export default function TaskItem({
   const handleHabitIncrement = () => {
     if (onHabitIncrement) {
       // Special habit animation
-      RNAnimated.sequence([
-        RNAnimated.timing(scaleAnim, {
+      Animated.sequence([
+        Animated.timing(scaleAnim, {
           toValue: 1.2,
           duration: 100,
           useNativeDriver: true,
         }),
-        RNAnimated.timing(scaleAnim, {
+        Animated.timing(scaleAnim, {
           toValue: 1,
           duration: 200,
           useNativeDriver: true,
@@ -173,145 +115,145 @@ export default function TaskItem({
     : 0;
 
   return (
-    <Animated.View 
-      style={[styles.taskContainer, animatedStyle]}
-      onLayout={(event) => onLayout && onLayout(event.nativeEvent.layout)}
-    >
-      <RNAnimated.View style={{ transform: [{ scale: scaleAnim }], width: '100%' }}>
-        <NeumorphicCard style={[
-          styles.taskCard, 
-          task.isHabit && styles.habitCard,
-        ]}>
-          <View style={styles.taskHeader}>
-            <TouchableOpacity
-              onPress={task.isHabit ? handleHabitIncrement : handleToggle}
-              style={[
-                styles.checkbox,
-                task.completed && styles.checkedBox,
-                task.isHabit && styles.habitBox,
-                { backgroundColor: task.completed ? getTabColor(task.category) : '#E2E8F0' },
-              ]}
-            >
-              {task.completed ? (
-                <Check size={16} color="#ffffff" />
-              ) : (
-                task.isHabit && task.habitCount !== undefined && (
-                  <Text style={[
-                    styles.habitCount,
-                    { color: task.completed ? '#ffffff' : getTabColor(task.category) }
-                  ]}>
-                    {task.habitCount}
+    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+      <NeumorphicCard style={[
+        styles.taskCard, 
+        task.isHabit && styles.habitCard,
+      ]}>
+        <View style={styles.taskHeader}>
+          <TouchableOpacity
+            onPress={task.isHabit ? handleHabitIncrement : handleToggle}
+            style={[
+              styles.checkbox,
+              task.completed && styles.checkedBox,
+              task.isHabit && styles.habitBox,
+              { backgroundColor: task.completed ? getTabColor(task.category) : '#E2E8F0' },
+            ]}
+          >
+            {task.completed ? (
+              <Check size={16} color="#ffffff" />
+            ) : (
+              task.isHabit && task.habitCount !== undefined && (
+                <Text style={[
+                  styles.habitCount,
+                  { color: task.completed ? '#ffffff' : getTabColor(task.category) }
+                ]}>
+                  {task.habitCount}
+                </Text>
+              )
+            )}
+          </TouchableOpacity>
+
+          <View style={styles.taskContent}>
+            <Text style={[
+              styles.taskTitle,
+              task.completed && styles.completedTitle,
+              task.isHabit && styles.habitTitle,
+            ]}>
+              {task.title}
+              {task.isDelegated && <Text style={styles.delegatedBadge}> → {task.delegatedTo}</Text>}
+            </Text>
+            
+            <View style={styles.taskMeta}>
+              {task.priority && (
+                <View style={[
+                  styles.priorityTag,
+                  { backgroundColor: getPriorityColor(task.priority) }
+                ]}>
+                  <Text style={styles.priorityText}>
+                    {task.priority === 'quick-win' ? 'QUICK WIN' : task.priority.toUpperCase()}
                   </Text>
-                )
-              )}
-            </TouchableOpacity>
-
-            <View style={styles.taskContent}>
-              <Text style={[
-                styles.taskTitle,
-                task.completed && styles.completedTitle,
-                task.isHabit && styles.habitTitle,
-              ]}>
-                {task.title}
-                {task.isDelegated && <Text style={styles.delegatedBadge}> → {task.delegatedTo}</Text>}
-              </Text>
-              
-              <View style={styles.taskMeta}>
-                {task.priority && (
-                  <View style={[
-                    styles.priorityTag,
-                    { backgroundColor: getPriorityColor(task.priority) }
-                  ]}>
-                    <Text style={styles.priorityText}>
-                      {task.priority === 'quick-win' ? 'QUICK WIN' : task.priority.toUpperCase()}
-                    </Text>
-                  </View>
-                )}
-              </View>
-
-              {task.isHabit && task.habitGoal && (
-                <View style={styles.habitProgressContainer}>
-                  <View 
-                    style={[
-                      styles.habitProgressBar, 
-                      { 
-                        width: `${habitProgress}%`,
-                        backgroundColor: getTabColor(task.category)
-                      }
-                    ]} 
-                  />
-                  <Text style={styles.habitGoalText}>
-                    {task.habitCount || 0}/{task.habitGoal}
-                  </Text>
-                </View>
-              )}
-
-              {task.subtasks && task.subtasks.length > 0 && (
-                <View style={styles.subtasks}>
-                  {task.subtasks.map(subtask => (
-                    <TouchableOpacity 
-                      key={subtask.id} 
-                      style={styles.subtask}
-                      onPress={() => handleSubtaskToggle(subtask.id)}
-                    >
-                      <View 
-                        style={[
-                          styles.subtaskCheckbox, 
-                          subtask.completed && [
-                            styles.subtaskCompleted,
-                            { backgroundColor: getTabColor(task.category) }
-                          ]
-                        ]} 
-                      >
-                        {subtask.completed && <Check size={8} color="#ffffff" />}
-                      </View>
-                      <Text style={[styles.subtaskText, subtask.completed && styles.subtaskCompletedText]}>
-                        {subtask.title}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
                 </View>
               )}
             </View>
 
-            <View style={styles.actionIcons}>
-              <PanGestureHandler onGestureEvent={panGestureEvent}>
-                <Animated.View>
-                  <TouchableOpacity
-                    style={styles.moveButton}
+            {task.isHabit && task.habitGoal && (
+              <View style={styles.habitProgressContainer}>
+                <View 
+                  style={[
+                    styles.habitProgressBar, 
+                    { 
+                      width: `${habitProgress}%`,
+                      backgroundColor: getTabColor(task.category)
+                    }
+                  ]} 
+                />
+                <Text style={styles.habitGoalText}>
+                  {task.habitCount || 0}/{task.habitGoal}
+                </Text>
+              </View>
+            )}
+
+            {task.subtasks && task.subtasks.length > 0 && (
+              <View style={styles.subtasks}>
+                {task.subtasks.map(subtask => (
+                  <TouchableOpacity 
+                    key={subtask.id} 
+                    style={styles.subtask}
+                    onPress={() => handleSubtaskToggle(subtask.id)}
                   >
-                    <GripVertical size={18} color="#A0AEC0" />
+                    <View 
+                      style={[
+                        styles.subtaskCheckbox, 
+                        subtask.completed && [
+                          styles.subtaskCompleted,
+                          { backgroundColor: getTabColor(task.category) }
+                        ]
+                      ]} 
+                    >
+                      {subtask.completed && <Check size={8} color="#ffffff" />}
+                    </View>
+                    <Text style={[styles.subtaskText, subtask.completed && styles.subtaskCompletedText]}>
+                      {subtask.title}
+                    </Text>
                   </TouchableOpacity>
-                </Animated.View>
-              </PanGestureHandler>
+                ))}
+              </View>
+            )}
+          </View>
+
+          <View style={styles.actionIcons}>
+            <View style={styles.orderButtons}>
+              <TouchableOpacity
+                onPress={() => onMoveUp && onMoveUp(task.id)}
+                style={[styles.orderButton, isFirst && styles.disabledButton]}
+                disabled={isFirst}
+              >
+                <ChevronUp size={16} color={isFirst ? '#CBD5E0' : '#718096'} />
+              </TouchableOpacity>
               
               <TouchableOpacity
-                onPress={() => onDelete(task.id)}
-                style={styles.deleteIconButton}
+                onPress={() => onMoveDown && onMoveDown(task.id)}
+                style={[styles.orderButton, isLast && styles.disabledButton]}
+                disabled={isLast}
               >
-                <X size={18} color="#FC8181" />
+                <ChevronDown size={16} color={isLast ? '#CBD5E0' : '#718096'} />
               </TouchableOpacity>
             </View>
+            
+            <TouchableOpacity
+              onPress={() => onDelete(task.id)}
+              style={styles.deleteIconButton}
+            >
+              <X size={18} color="#FC8181" />
+            </TouchableOpacity>
           </View>
-        </NeumorphicCard>
-      </RNAnimated.View>
+        </View>
+      </NeumorphicCard>
     </Animated.View>
   );
 }
 
 const styles = StyleSheet.create({
-  taskContainer: {
-    width: '100%',
-  },
   taskCard: {
     margin: 4,
     padding: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF', // Ensuring regular tasks are white
+    backgroundColor: '#FFFFFF',
   },
   habitCard: {
-    backgroundColor: '#d9e0fc', // Changed to the requested color for habits
+    backgroundColor: '#d9e0fc',
   },
   taskHeader: {
     flexDirection: 'row',
@@ -427,9 +369,16 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  moveButton: {
+  orderButtons: {
+    flexDirection: 'column',
+    marginRight: 8,
+  },
+  orderButton: {
     padding: 4,
-    marginRight: 4,
+    marginVertical: 2,
+  },
+  disabledButton: {
+    opacity: 0.5,
   },
   deleteIconButton: {
     padding: 4,
