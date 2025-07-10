@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
 import { Plus, TriangleAlert as AlertTriangle, RotateCcw } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -12,6 +12,7 @@ import { tabColors } from './_layout';
 export default function DailyTasks() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEmergencyOverride, setShowEmergencyOverride] = useState(false);
+  const [isRollingOver, setIsRollingOver] = useState(false);
   const taskManager = useTaskManager();
   const colors = tabColors.daily;
 
@@ -26,6 +27,12 @@ export default function DailyTasks() {
   const handleEmergencyOverride = () => {
     taskManager.emergencyOverride();
     setShowEmergencyOverride(false);
+  };
+
+  const handleRolloverTasks = async () => {
+    setIsRollingOver(true);
+    await taskManager.rolloverTasks();
+    setIsRollingOver(false);
   };
 
   return (
@@ -46,9 +53,14 @@ export default function DailyTasks() {
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.rolloverButton, { backgroundColor: colors.accent }]}
-            onPress={taskManager.rolloverTasks}
+            onPress={handleRolloverTasks}
+            disabled={isRollingOver}
           >
-            <RotateCcw size={20} color={colors.dark} />
+            {isRollingOver ? (
+              <ActivityIndicator size="small" color={colors.dark} />
+            ) : (
+              <RotateCcw size={20} color={colors.dark} />
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -203,7 +215,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 100,
+    bottom: 20, // Moved from 100 to 20 to be closer to footer
     right: 20,
     width: 60,
     height: 60,
