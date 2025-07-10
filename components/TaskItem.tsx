@@ -233,9 +233,10 @@ const styles = StyleSheet.create({
     padding: 12,
     borderWidth: 1,
     borderColor: '#E2E8F0',
+    backgroundColor: '#FFFFFF', // Ensuring regular tasks are white
   },
   habitCard: {
-    backgroundColor: '#EBF8FF',
+    backgroundColor: '#d9e0fc', // Changed to the requested color for habits
   },
   taskHeader: {
     flexDirection: 'row',
