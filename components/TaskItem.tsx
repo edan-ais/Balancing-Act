@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Check, X, MoveHorizontal as MoreHorizontal, GripVertical } from 'lucide-react-native';
+import { Check, X, GripVertical } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
@@ -34,7 +34,6 @@ export default function TaskItem({
   onSubtaskToggle,
   onMoveStart
 }: TaskItemProps) {
-  const [showActions, setShowActions] = useState(false);
   const [scaleAnim] = useState(new Animated.Value(1));
 
   const getPriorityColor = (priority?: string) => {
@@ -111,7 +110,10 @@ export default function TaskItem({
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-      <NeumorphicCard style={styles.taskCard}>
+      <NeumorphicCard style={[
+        styles.taskCard, 
+        task.isHabit && styles.habitCard,
+      ]}>
         <View style={styles.taskHeader}>
           <TouchableOpacity
             onPress={task.isHabit ? handleHabitIncrement : handleToggle}
@@ -122,14 +124,17 @@ export default function TaskItem({
               { backgroundColor: task.completed ? getTabColor(task.category) : '#E2E8F0' },
             ]}
           >
-            {task.completed && <Check size={16} color="#ffffff" />}
-            {task.isHabit && task.habitCount !== undefined && (
-              <Text style={[
-                styles.habitCount,
-                { color: task.completed ? '#ffffff' : getTabColor(task.category) }
-              ]}>
-                {task.habitCount}
-              </Text>
+            {task.completed ? (
+              <Check size={16} color="#ffffff" />
+            ) : (
+              task.isHabit && task.habitCount !== undefined && (
+                <Text style={[
+                  styles.habitCount,
+                  { color: task.completed ? '#ffffff' : getTabColor(task.category) }
+                ]}>
+                  {task.habitCount}
+                </Text>
+              )
             )}
           </TouchableOpacity>
 
@@ -226,6 +231,11 @@ const styles = StyleSheet.create({
   taskCard: {
     margin: 4,
     padding: 12,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+  },
+  habitCard: {
+    backgroundColor: '#EBF8FF',
   },
   taskHeader: {
     flexDirection: 'row',
@@ -347,25 +357,5 @@ const styles = StyleSheet.create({
   },
   deleteIconButton: {
     padding: 4,
-  },
-  actionButton: {
-    padding: 4,
-  },
-  actionMenu: {
-    marginTop: 8,
-    paddingTop: 8,
-    borderTopWidth: 1,
-    borderTopColor: '#E2E8F0',
-  },
-  deleteButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 8,
-  },
-  deleteText: {
-    color: '#FC8181',
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-    marginLeft: 8,
   },
 });
