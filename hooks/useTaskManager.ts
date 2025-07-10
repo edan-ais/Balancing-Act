@@ -7,57 +7,14 @@ export interface TaskManager {
   toggleTask: (id: string) => void;
   deleteTask: (id: string) => void;
   incrementHabit: (id: string) => void;
+  toggleSubtask: (taskId: string, subtaskId: string) => void;
   rolloverTasks: () => void;
   emergencyOverride: () => void;
+  reorderTasks: (startIndex: number, endIndex: number, category: string) => void;
 }
 
 export function useTaskManager(): TaskManager {
-  const [tasks, setTasks] = useState<Task[]>([
-    {
-      id: '1',
-      title: 'Morning meditation',
-      completed: false,
-      isHabit: true,
-      habitCount: 0,
-      location: 'home',
-      priority: 'high',
-      isQuickWin: false,
-      isDelegated: false,
-      subtasks: [
-        { id: '1a', title: 'Find quiet space', completed: false },
-        { id: '1b', title: 'Set timer for 10 minutes', completed: true },
-        { id: '1c', title: 'Focus on breathing', completed: false },
-      ],
-      category: 'daily',
-    },
-    {
-      id: '2',
-      title: 'Complete project proposal',
-      completed: false,
-      location: 'work',
-      priority: 'high',
-      isQuickWin: false,
-      isDelegated: false,
-      subtasks: [
-        { id: '2a', title: 'Research requirements', completed: true },
-        { id: '2b', title: 'Draft outline', completed: false },
-        { id: '2c', title: 'Review with team', completed: false },
-      ],
-      category: 'daily',
-    },
-    {
-      id: '3',
-      title: 'Drink 8 glasses of water',
-      completed: false,
-      isHabit: true,
-      habitCount: 0,
-      location: 'anywhere',
-      priority: 'medium',
-      isQuickWin: true,
-      isDelegated: false,
-      category: 'daily',
-    },
-  ]);
+  const [tasks, setTasks] = useState<Task[]>([]);
 
   const addTask = (newTask: Omit<Task, 'id' | 'completed'>) => {
     const task: Task = {
@@ -85,17 +42,49 @@ export function useTaskManager(): TaskManager {
   };
 
   const incrementHabit = (id: string) => {
-    setTasks(prev => prev.map(task => 
-      task.id === id && task.isHabit 
-        ? { ...task, habitCount: (task.habitCount || 0) + 1 }
-        : task
-    ));
+    setTasks(prev => prev.map(task => {
+      if (task.id === id && task.isHabit) {
+        const newCount = (task.habitCount || 0) + 1;
+        const isCompleted = task.habitGoal ? newCount >= task.habitGoal : false;
+        
+        return { 
+          ...task, 
+          habitCount: newCount,
+          completed: isCompleted
+        };
+      }
+      return task;
+    }));
+  };
+
+  const toggleSubtask = (taskId: string, subtaskId: string) => {
+    setTasks(prev => prev.map(task => {
+      if (task.id === taskId && task.subtasks) {
+        const updatedSubtasks = task.subtasks.map(subtask => 
+          subtask.id === subtaskId ? { ...subtask, completed: !subtask.completed } : subtask
+        );
+        
+        // Check if all subtasks are completed
+        const allSubtasksCompleted = updatedSubtasks.every(subtask => subtask.completed);
+        
+        return {
+          ...task,
+          subtasks: updatedSubtasks,
+          completed: allSubtasksCompleted && updatedSubtasks.length > 0 ? true : task.completed
+        };
+      }
+      return task;
+    }));
   };
 
   const rolloverTasks = () => {
-    setTasks(prev => prev.map(task => 
-      task.completed ? task : { ...task, completed: false }
-    ));
+    setTasks(prev => prev.map(task => {
+      // Reset habits but maintain completion status of other tasks
+      if (task.isHabit) {
+        return { ...task, habitCount: 0, completed: false };
+      }
+      return task;
+    }));
   };
 
   const emergencyOverride = () => {
@@ -106,7 +95,6 @@ export function useTaskManager(): TaskManager {
           title: 'Handle emergency situation',
           completed: false,
           priority: 'high',
-          location: 'anywhere',
           category: 'daily',
         },
         {
@@ -114,7 +102,6 @@ export function useTaskManager(): TaskManager {
           title: 'Notify relevant parties',
           completed: false,
           priority: 'high',
-          location: 'anywhere',
           category: 'daily',
         },
       ];
@@ -123,6 +110,21 @@ export function useTaskManager(): TaskManager {
         ...emergencyTasks,
         ...prev.filter(task => task.priority === 'high' || task.isHabit),
       ];
+    });
+  };
+
+  const reorderTasks = (startIndex: number, endIndex: number, category: string) => {
+    setTasks(prev => {
+      const result = [...prev];
+      const categoryTasks = result.filter(task => task.category === category);
+      const otherTasks = result.filter(task => task.category !== category);
+      
+      // Reorder within the category
+      const [removed] = categoryTasks.splice(startIndex, 1);
+      categoryTasks.splice(endIndex, 0, removed);
+      
+      // Combine and return
+      return [...categoryTasks, ...otherTasks];
     });
   };
 
@@ -138,7 +140,9 @@ export function useTaskManager(): TaskManager {
     toggleTask,
     deleteTask,
     incrementHabit,
+    toggleSubtask,
     rolloverTasks,
     emergencyOverride,
+    reorderTasks,
   };
 }
