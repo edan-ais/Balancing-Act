@@ -130,23 +130,36 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: tabColors[activeColorKey].accent,
           borderTopWidth: 0,
-          elevation: 0,
-          shadowOpacity: 0,
+          elevation: 8,
           height: 120, // Taller footer
-          paddingBottom: 30, // Bottom padding
-          paddingTop: 20, // Top padding
-          // Shadow styling similar to original but with specific shadow values
+          // Remove all padding
+          padding: 0,
+          // Add padding to center content vertically
+          paddingTop: 30, // This centers the icons vertically
+          paddingBottom: 30, // This centers the icons vertically
+          // Add shadow with color matching active tab
           shadowColor: tabColors[activeColorKey].dark,
           shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.3,
           shadowRadius: 6,
         },
         tabBarItemStyle: {
           borderRadius: 12,
           marginHorizontal: 2,
           paddingHorizontal: 2,
-          // Ensure consistent height and positioning
-          height: 75, // Fixed height for items
-          paddingTop: 12, // Top padding to position icon
+          height: 60, // Fixed height for items
+          // Center content vertically
+          alignItems: 'center',
+          justifyContent: 'center',
+        },
+        tabBarIconStyle: {
+          // Ensure icon is centered
+          marginTop: 0,
+          marginBottom: 0,
+        },
+        tabBarLabelStyle: {
+          // Position label below icon
+          marginTop: 4,
         },
         tabBarLabelPosition: 'below-icon',
       }}>
