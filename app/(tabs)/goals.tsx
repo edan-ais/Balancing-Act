@@ -5,11 +5,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
+import EmergencyOverride from '@/components/EmergencyOverride';
 import { useTaskManager } from '@/hooks/useTaskManager';
 import { tabColors } from './_layout';
 
 export default function LongTermGoals() {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEmergencyOverride, setShowEmergencyOverride] = useState(false);
   const taskManager = useTaskManager();
   const colors = tabColors.future;
 
@@ -19,6 +21,11 @@ export default function LongTermGoals() {
 
   const handleAddTask = (newTask: any) => {
     taskManager.addTask({ ...newTask, category: 'goals' });
+  };
+
+  const handleEmergencyOverride = () => {
+    taskManager.emergencyOverride();
+    setShowEmergencyOverride(false);
   };
 
   return (
@@ -31,7 +38,10 @@ export default function LongTermGoals() {
           </Text>
         </View>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            onPress={() => setShowEmergencyOverride(true)}
+          >
             <Plus size={20} color={colors.dark} />
           </TouchableOpacity>
         </View>
@@ -50,13 +60,18 @@ export default function LongTermGoals() {
             {pendingTasks.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Pending</Text>
-                {pendingTasks.map(task => (
+                {pendingTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
                     task={task}
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
                     onHabitIncrement={taskManager.incrementHabit}
+                    onSubtaskToggle={taskManager.toggleSubtask}
+                    onMoveUp={taskManager.moveTaskUp}
+                    onMoveDown={taskManager.moveTaskDown}
+                    isFirst={index === 0}
+                    isLast={index === pendingTasks.length - 1}
                   />
                 ))}
               </View>
@@ -65,13 +80,18 @@ export default function LongTermGoals() {
             {completedTasks.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Completed</Text>
-                {completedTasks.map(task => (
+                {completedTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
                     task={task}
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
                     onHabitIncrement={taskManager.incrementHabit}
+                    onSubtaskToggle={taskManager.toggleSubtask}
+                    onMoveUp={taskManager.moveTaskUp}
+                    onMoveDown={taskManager.moveTaskDown}
+                    isFirst={index === 0}
+                    isLast={index === completedTasks.length - 1}
                   />
                 ))}
               </View>
@@ -95,6 +115,12 @@ export default function LongTermGoals() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="goals"
+      />
+
+      <EmergencyOverride
+        visible={showEmergencyOverride}
+        onClose={() => setShowEmergencyOverride(false)}
+        onConfirm={handleEmergencyOverride}
       />
     </SafeAreaView>
   );
@@ -170,7 +196,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 100,
+    bottom: 20,
     right: 20,
     width: 60,
     height: 60,
