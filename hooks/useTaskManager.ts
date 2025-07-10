@@ -11,6 +11,7 @@ export interface TaskManager {
   rolloverTasks: () => void;
   emergencyOverride: () => void;
   reorderTasks: (startIndex: number, endIndex: number, category: string) => void;
+  updateTaskOrder: (newOrderedTasks: Task[], category: string) => void;
 }
 
 export function useTaskManager(): TaskManager {
@@ -125,6 +126,26 @@ export function useTaskManager(): TaskManager {
     });
   };
 
+  // New method to handle DraggableFlatList's onDragEnd
+  const updateTaskOrder = (newOrderedTasks: Task[], category: string) => {
+    setTasks(prev => {
+      // Get all tasks that are not in the specified category
+      const otherTasks = prev.filter(task => task.category !== category);
+      
+      // Get the IDs of the newly ordered tasks
+      const newOrderIds = newOrderedTasks.map(task => task.id);
+      
+      // Get all tasks from the specified category that aren't in the new order
+      // (This is a safeguard, but typically all tasks should be in the newOrderedTasks)
+      const remainingCategoryTasks = prev.filter(
+        task => task.category === category && !newOrderIds.includes(task.id)
+      );
+      
+      // Combine the newly ordered tasks with the other tasks
+      return [...newOrderedTasks, ...remainingCategoryTasks, ...otherTasks];
+    });
+  };
+
   // Auto-rollover logic could be implemented here with date checking
   useEffect(() => {
     // This would typically check if it's a new day and rollover incomplete tasks
@@ -141,5 +162,6 @@ export function useTaskManager(): TaskManager {
     rolloverTasks,
     emergencyOverride,
     reorderTasks,
+    updateTaskOrder,
   };
 }
