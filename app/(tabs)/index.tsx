@@ -1,8 +1,7 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Plus, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -29,38 +28,6 @@ export default function DailyTasks() {
     setShowEmergencyOverride(false);
   };
 
-  const renderItem = ({ item, drag, isActive }: RenderItemParams<any>) => {
-    return (
-      <TaskItem
-        key={item.id}
-        task={item}
-        onToggle={taskManager.toggleTask}
-        onDelete={taskManager.deleteTask}
-        onHabitIncrement={taskManager.incrementHabit}
-        onSubtaskToggle={taskManager.toggleSubtask}
-        onMoveStart={drag}
-        isActive={isActive}
-      />
-    );
-  };
-
-  const onDragEnd = ({ data }: { data: any[] }) => {
-    // Assuming your taskManager has a method to update task order
-    // If not, you'll need to implement this functionality
-    if (taskManager.updateTaskOrder) {
-      taskManager.updateTaskOrder(data);
-    }
-  };
-
-  const EmptyStateComponent = () => (
-    <NeumorphicCard style={styles.emptyState}>
-      <Text style={styles.emptyTitle}>No tasks for today</Text>
-      <Text style={styles.emptySubtitle}>
-        Start by adding a task or habit to get organized
-      </Text>
-    </NeumorphicCard>
-  );
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
@@ -80,39 +47,52 @@ export default function DailyTasks() {
         </View>
       </View>
 
-      {dailyTasks.length === 0 ? (
-        <EmptyStateComponent />
-      ) : (
-        <View style={styles.content}>
-          {pendingTasks.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Pending</Text>
-              <DraggableFlatList
-                data={pendingTasks}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                onDragEnd={onDragEnd}
-                activationDistance={10}
-                contentContainerStyle={{ paddingBottom: 10 }}
-              />
-            </View>
-          )}
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {dailyTasks.length === 0 ? (
+          <NeumorphicCard style={styles.emptyState}>
+            <Text style={styles.emptyTitle}>No tasks for today</Text>
+            <Text style={styles.emptySubtitle}>
+              Start by adding a task or habit to get organized
+            </Text>
+          </NeumorphicCard>
+        ) : (
+          <>
+            {pendingTasks.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Pending</Text>
+                {pendingTasks.map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggle={taskManager.toggleTask}
+                    onDelete={taskManager.deleteTask}
+                    onHabitIncrement={taskManager.incrementHabit}
+                    onSubtaskToggle={taskManager.toggleSubtask}
+                    onMoveStart={() => {}}
+                  />
+                ))}
+              </View>
+            )}
 
-          {completedTasks.length > 0 && (
-            <View style={styles.section}>
-              <Text style={styles.sectionTitle}>Completed</Text>
-              <DraggableFlatList
-                data={completedTasks}
-                renderItem={renderItem}
-                keyExtractor={(item) => item.id}
-                onDragEnd={onDragEnd}
-                activationDistance={10}
-                contentContainerStyle={{ paddingBottom: 10 }}
-              />
-            </View>
-          )}
-        </View>
-      )}
+            {completedTasks.length > 0 && (
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Completed</Text>
+                {completedTasks.map(task => (
+                  <TaskItem
+                    key={task.id}
+                    task={task}
+                    onToggle={taskManager.toggleTask}
+                    onDelete={taskManager.deleteTask}
+                    onHabitIncrement={taskManager.incrementHabit}
+                    onSubtaskToggle={taskManager.toggleSubtask}
+                    onMoveStart={() => {}}
+                  />
+                ))}
+              </View>
+            )}
+          </>
+        )}
+      </ScrollView>
 
       <TouchableOpacity
         style={[styles.addButton, { 
@@ -183,7 +163,6 @@ const styles = StyleSheet.create({
   },
   section: {
     marginBottom: 20,
-    flex: 1,
   },
   sectionTitle: {
     fontSize: 16,
