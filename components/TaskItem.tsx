@@ -61,7 +61,7 @@ export default function TaskItem({
   const getTabColor = (category: string) => {
     switch (category) {
       case 'daily': return '#2B6CB0'; 
-      case 'goals': return '#276749';  // Updated to deeper green
+      case 'goals': return '#1B4731';  // Even darker green for checkmarks
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
       case 'cleaning': return '#4299E1';
@@ -139,7 +139,7 @@ export default function TaskItem({
               styles.checkbox,
               task.completed && styles.checkedBox,
               task.isHabit && styles.habitBox,
-              { backgroundColor: task.completed ? taskAccentColor : '#E2E8F0' },
+              { backgroundColor: task.completed ? (task.category === 'goals' ? '#1B4731' : taskAccentColor) : '#E2E8F0' },
             ]}
           >
             {task.completed ? (
@@ -186,7 +186,7 @@ export default function TaskItem({
                     styles.habitProgressBar, 
                     { 
                       width: `${habitProgress}%`,
-                      backgroundColor: taskHabitColor
+                      backgroundColor: task.category === 'goals' ? '#1B4731' : taskHabitColor
                     }
                   ]} 
                 />
@@ -209,7 +209,7 @@ export default function TaskItem({
                         styles.subtaskCheckbox, 
                         subtask.completed && [
                           styles.subtaskCompleted,
-                          { backgroundColor: taskAccentColor }
+                          { backgroundColor: task.category === 'goals' ? '#1B4731' : taskAccentColor }
                         ]
                       ]} 
                     >
