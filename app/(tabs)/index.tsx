@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { Plus, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import DraggableFlatList, { RenderItemParams } from 'react-native-draggable-flatlist';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -28,6 +29,35 @@ export default function DailyTasks() {
     setShowEmergencyOverride(false);
   };
 
+  const renderPendingItem = ({ item, drag, isActive }: RenderItemParams<any>) => {
+    return (
+      <TaskItem
+        key={item.id}
+        task={item}
+        onToggle={taskManager.toggleTask}
+        onDelete={taskManager.deleteTask}
+        onHabitIncrement={taskManager.incrementHabit}
+        onSubtaskToggle={taskManager.toggleSubtask}
+        onMoveStart={drag} // Pass the drag handler here
+      />
+    );
+  };
+
+  const renderCompletedItem = ({ item }: RenderItemParams<any>) => {
+    // For completed items, we don't pass drag handler as we typically don't want to reorder completed tasks
+    return (
+      <TaskItem
+        key={item.id}
+        task={item}
+        onToggle={taskManager.toggleTask}
+        onDelete={taskManager.deleteTask}
+        onHabitIncrement={taskManager.incrementHabit}
+        onSubtaskToggle={taskManager.toggleSubtask}
+        onMoveStart={() => {}} // No drag for completed items
+      />
+    );
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
@@ -47,7 +77,7 @@ export default function DailyTasks() {
         </View>
       </View>
 
-      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+      <View style={styles.content}>
         {dailyTasks.length === 0 ? (
           <NeumorphicCard style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No tasks for today</Text>
@@ -60,39 +90,34 @@ export default function DailyTasks() {
             {pendingTasks.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Pending</Text>
-                {pendingTasks.map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={taskManager.toggleTask}
-                    onDelete={taskManager.deleteTask}
-                    onHabitIncrement={taskManager.incrementHabit}
-                    onSubtaskToggle={taskManager.toggleSubtask}
-                    onMoveStart={() => {}}
-                  />
-                ))}
+                <DraggableFlatList
+                  data={pendingTasks}
+                  renderItem={renderPendingItem}
+                  keyExtractor={(item) => item.id}
+                  onDragEnd={({ from, to }) => {
+                    // Call reorderTasks when drag ends
+                    taskManager.reorderTasks(from, to, 'daily');
+                  }}
+                  activationDistance={10}
+                  containerStyle={{ overflow: 'visible' }}
+                />
               </View>
             )}
 
             {completedTasks.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Completed</Text>
-                {completedTasks.map(task => (
-                  <TaskItem
-                    key={task.id}
-                    task={task}
-                    onToggle={taskManager.toggleTask}
-                    onDelete={taskManager.deleteTask}
-                    onHabitIncrement={taskManager.incrementHabit}
-                    onSubtaskToggle={taskManager.toggleSubtask}
-                    onMoveStart={() => {}}
-                  />
-                ))}
+                <DraggableFlatList
+                  data={completedTasks}
+                  renderItem={renderCompletedItem}
+                  keyExtractor={(item) => item.id}
+                  scrollEnabled={false}
+                />
               </View>
             )}
           </>
         )}
-      </ScrollView>
+      </View>
 
       <TouchableOpacity
         style={[styles.addButton, { 
