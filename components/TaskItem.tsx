@@ -23,7 +23,8 @@ interface TaskItemProps {
   onDelete: (id: string) => void;
   onHabitIncrement?: (id: string) => void;
   onSubtaskToggle?: (taskId: string, subtaskId: string) => void;
-  onMoveStart?: () => void;
+  onMoveStart: () => void;
+  isActive?: boolean;
 }
 
 export default function TaskItem({ 
@@ -32,7 +33,8 @@ export default function TaskItem({
   onDelete, 
   onHabitIncrement, 
   onSubtaskToggle,
-  onMoveStart
+  onMoveStart,
+  isActive = false
 }: TaskItemProps) {
   const [scaleAnim] = useState(new Animated.Value(1));
 
@@ -109,10 +111,14 @@ export default function TaskItem({
     : 0;
 
   return (
-    <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
+    <Animated.View style={[
+      { transform: [{ scale: scaleAnim }] },
+      isActive && styles.activeItem
+    ]}>
       <NeumorphicCard style={[
         styles.taskCard, 
         task.isHabit && styles.habitCard,
+        isActive && styles.activeCard,
       ]}>
         <View style={styles.taskHeader}>
           <TouchableOpacity
@@ -208,7 +214,8 @@ export default function TaskItem({
 
           <View style={styles.actionIcons}>
             <TouchableOpacity
-              onPress={onMoveStart}
+              onLongPress={onMoveStart}
+              delayLongPress={150}
               style={styles.moveButton}
             >
               <GripVertical size={18} color="#A0AEC0" />
@@ -237,6 +244,17 @@ const styles = StyleSheet.create({
   },
   habitCard: {
     backgroundColor: '#d9e0fc', // Changed to the requested color for habits
+  },
+  activeCard: {
+    borderColor: '#4299E1',
+    shadowColor: '#4299E1',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.5,
+    shadowRadius: 10,
+    elevation: 8,
+  },
+  activeItem: {
+    zIndex: 999,
   },
   taskHeader: {
     flexDirection: 'row',
