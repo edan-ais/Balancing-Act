@@ -136,7 +136,7 @@ export default function TabLayout() {
           padding: 0,
           // Add padding to center content vertically
           paddingTop: 30, // This centers the icons vertically
-          paddingBottom: 35, // This centers the icons vertically
+          paddingBottom: 40, // This centers the icons vertically
           // Add shadow with color matching active tab
           shadowColor: tabColors[activeColorKey].dark,
           shadowOffset: { width: 0, height: -3 },
