@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Animated, TextInput, Modal } from 'react-native';
-import { Check, X, ChevronUp, ChevronDown, Edit2, Save, Plus, Trash } from 'lucide-react-native';
+import { View, Text, StyleSheet, TouchableOpacity, Animated, TextInput, ScrollView } from 'react-native';
+import { Check, X, ChevronUp, ChevronDown, Edit2, Save, Plus, Trash, Calendar } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
@@ -15,22 +15,26 @@ export interface Task {
   delegatedTo?: string;
   subtasks?: { id: string; title: string; completed: boolean }[];
   category: string;
+  dueDate?: string;
+  recurrence?: 'daily' | 'weekly' | 'monthly' | 'none';
+  estimatedTime?: number; // in minutes
+  notes?: string;
 }
 
 interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
-  onUpdate: (updatedTask: Task) => void; // New prop for updating task
+  onUpdate: (updatedTask: Task) => void;
   onHabitIncrement?: (id: string) => void;
   onSubtaskToggle?: (taskId: string, subtaskId: string) => void;
   onMoveUp?: (id: string) => void;
   onMoveDown?: (id: string) => void;
   isFirst?: boolean;
   isLast?: boolean;
-  accentColor?: string; // Optional color override
-  borderColor?: string; // Optional border color override
-  habitColor?: string;  // Optional habit color override
+  accentColor?: string;
+  borderColor?: string;
+  habitColor?: string;
 }
 
 export default function TaskItem({ 
@@ -66,7 +70,7 @@ export default function TaskItem({
   const getTabColor = (category: string) => {
     switch (category) {
       case 'daily': return '#2B6CB0'; 
-      case 'goals': return '#276749';  // Using the color from emergency icon
+      case 'goals': return '#276749';
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
       case 'cleaning': return '#4299E1';
@@ -76,13 +80,11 @@ export default function TaskItem({
     }
   };
   
-  // If override colors are provided, use them, otherwise use the category colors
   const taskColor = borderColor || getTabColor(task.category);
   const taskAccentColor = accentColor || taskColor;
   const taskHabitColor = habitColor || taskColor;
   
   const handleToggle = () => {
-    // Celebration animation
     Animated.sequence([
       Animated.timing(scaleAnim, {
         toValue: 1.1,
@@ -101,7 +103,6 @@ export default function TaskItem({
 
   const handleHabitIncrement = () => {
     if (onHabitIncrement) {
-      // Special habit animation
       Animated.sequence([
         Animated.timing(scaleAnim, {
           toValue: 1.2,
@@ -177,6 +178,16 @@ export default function TaskItem({
     });
   };
 
+  // Determine which edit options to show based on category
+  const shouldShowPriorityEditor = ['daily', 'weekly', 'goals'].includes(task.category);
+  const shouldShowHabitEditor = ['daily', 'weekly', 'goals', 'self-care'].includes(task.category);
+  const shouldShowDelegationEditor = ['daily', 'weekly', 'goals', 'cleaning', 'meal-prep'].includes(task.category);
+  const shouldShowSubtasksEditor = ['daily', 'weekly', 'goals', 'cleaning', 'meal-prep'].includes(task.category);
+  const shouldShowTimeEstimateEditor = ['daily', 'weekly', 'goals'].includes(task.category);
+  const shouldShowDueDateEditor = ['weekly', 'goals'].includes(task.category);
+  const shouldShowNotesEditor = ['goals', 'self-care'].includes(task.category);
+  const shouldShowRecurrenceEditor = ['daily', 'weekly', 'cleaning'].includes(task.category);
+
   // Calculate habit progress percentage
   const habitProgress = task.isHabit && task.habitCount && task.habitGoal 
     ? (task.habitCount / task.habitGoal) * 100 
@@ -190,143 +201,296 @@ export default function TaskItem({
         { borderColor: taskColor }
       ]}>
         <View style={styles.editHeader}>
-          <Text style={styles.editTitle}>Edit Task</Text>
+          <Text style={styles.editTitle}>Edit {task.category.charAt(0).toUpperCase() + task.category.slice(1)} Task</Text>
           <TouchableOpacity onPress={handleEditCancel} style={styles.editHeaderButton}>
             <X size={18} color="#FC8181" />
           </TouchableOpacity>
         </View>
 
-        <TextInput
-          style={styles.editInput}
-          value={editedTask.title}
-          onChangeText={(text) => setEditedTask({...editedTask, title: text})}
-          placeholder="Task title"
-        />
+        <ScrollView style={styles.editScrollView}>
+          <TextInput
+            style={styles.editInput}
+            value={editedTask.title}
+            onChangeText={(text) => setEditedTask({...editedTask, title: text})}
+            placeholder="Task title"
+          />
 
-        <View style={styles.editSection}>
-          <Text style={styles.editSectionTitle}>Priority</Text>
-          <View style={styles.priorityButtons}>
-            {['high', 'medium', 'low', 'quick-win'].map((priority) => (
-              <TouchableOpacity
-                key={priority}
-                style={[
-                  styles.priorityButton,
-                  { backgroundColor: getPriorityColor(priority) },
-                  editedTask.priority === priority && styles.activePriorityButton
-                ]}
-                onPress={() => setEditedTask({...editedTask, priority: priority as any})}
-              >
-                <Text style={styles.priorityButtonText}>
-                  {priority === 'quick-win' ? 'QUICK' : priority.toUpperCase()}
+          {shouldShowPriorityEditor && (
+            <View style={styles.editSection}>
+              <Text style={styles.editSectionTitle}>Priority</Text>
+              <View style={styles.priorityButtons}>
+                {['high', 'medium', 'low', 'quick-win'].map((priority) => (
+                  <TouchableOpacity
+                    key={priority}
+                    style={[
+                      styles.priorityButton,
+                      { backgroundColor: getPriorityColor(priority) },
+                      editedTask.priority === priority && styles.activePriorityButton
+                    ]}
+                    onPress={() => setEditedTask({...editedTask, priority: priority as any})}
+                  >
+                    <Text style={styles.priorityButtonText}>
+                      {priority === 'quick-win' ? 'QUICK' : priority.toUpperCase()}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+          )}
+
+          {shouldShowHabitEditor && (
+            <View style={styles.editSection}>
+              <View style={styles.editToggleRow}>
+                <Text style={styles.editSectionTitle}>Habit</Text>
+                <TouchableOpacity 
+                  style={[styles.toggleButton, editedTask.isHabit && styles.toggleButtonActive]} 
+                  onPress={toggleHabitMode}
+                >
+                  <Text style={[
+                    styles.toggleButtonText,
+                    editedTask.isHabit && styles.toggleButtonTextActive
+                  ]}>
+                    {editedTask.isHabit ? 'ON' : 'OFF'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              
+              {editedTask.isHabit && (
+                <View style={styles.habitControls}>
+                  <Text style={styles.habitControlLabel}>Goal:</Text>
+                  <View style={styles.habitCounterRow}>
+                    <TouchableOpacity 
+                      style={styles.habitCounterButton} 
+                      onPress={() => setEditedTask({
+                        ...editedTask, 
+                        habitGoal: Math.max(1, (editedTask.habitGoal || 1) - 1)
+                      })}
+                    >
+                      <Text style={styles.habitCounterButtonText}>-</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.habitCountValue}>{editedTask.habitGoal || 1}</Text>
+                    <TouchableOpacity 
+                      style={styles.habitCounterButton} 
+                      onPress={() => setEditedTask({
+                        ...editedTask, 
+                        habitGoal: (editedTask.habitGoal || 1) + 1
+                      })}
+                    >
+                      <Text style={styles.habitCounterButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                  
+                  <Text style={styles.habitControlLabel}>Current progress:</Text>
+                  <View style={styles.habitCounterRow}>
+                    <TouchableOpacity 
+                      style={styles.habitCounterButton} 
+                      onPress={() => setEditedTask({
+                        ...editedTask, 
+                        habitCount: Math.max(0, (editedTask.habitCount || 0) - 1)
+                      })}
+                    >
+                      <Text style={styles.habitCounterButtonText}>-</Text>
+                    </TouchableOpacity>
+                    <Text style={styles.habitCountValue}>{editedTask.habitCount || 0}</Text>
+                    <TouchableOpacity 
+                      style={styles.habitCounterButton} 
+                      onPress={() => setEditedTask({
+                        ...editedTask, 
+                        habitCount: (editedTask.habitCount || 0) + 1
+                      })}
+                    >
+                      <Text style={styles.habitCounterButtonText}>+</Text>
+                    </TouchableOpacity>
+                  </View>
+                </View>
+              )}
+            </View>
+          )}
+
+          {shouldShowDelegationEditor && (
+            <View style={styles.editSection}>
+              <View style={styles.editToggleRow}>
+                <Text style={styles.editSectionTitle}>Delegated</Text>
+                <TouchableOpacity 
+                  style={[styles.toggleButton, editedTask.isDelegated && styles.toggleButtonActive]} 
+                  onPress={toggleDelegatedMode}
+                >
+                  <Text style={[
+                    styles.toggleButtonText,
+                    editedTask.isDelegated && styles.toggleButtonTextActive
+                  ]}>
+                    {editedTask.isDelegated ? 'ON' : 'OFF'}
+                  </Text>
+                </TouchableOpacity>
+              </View>
+              
+              {editedTask.isDelegated && (
+                <TextInput
+                  style={styles.editInput}
+                  value={editedTask.delegatedTo}
+                  onChangeText={(text) => setEditedTask({...editedTask, delegatedTo: text})}
+                  placeholder="Delegated to"
+                />
+              )}
+            </View>
+          )}
+
+          {shouldShowDueDateEditor && (
+            <View style={styles.editSection}>
+              <Text style={styles.editSectionTitle}>Due Date</Text>
+              <TouchableOpacity style={styles.datePickerButton}>
+                <Calendar size={16} color="#4A5568" style={styles.datePickerIcon} />
+                <Text style={styles.datePickerText}>
+                  {editedTask.dueDate || 'Set a due date'}
                 </Text>
               </TouchableOpacity>
-            ))}
-          </View>
-        </View>
-
-        <View style={styles.editSection}>
-          <View style={styles.editToggleRow}>
-            <Text style={styles.editSectionTitle}>Habit</Text>
-            <TouchableOpacity 
-              style={[styles.toggleButton, editedTask.isHabit && styles.toggleButtonActive]} 
-              onPress={toggleHabitMode}
-            >
-              <Text style={styles.toggleButtonText}>
-                {editedTask.isHabit ? 'ON' : 'OFF'}
+              <Text style={styles.datePickerNote}>
+                *Note: Date picker would be implemented with a date picker component
               </Text>
-            </TouchableOpacity>
-          </View>
-          
-          {editedTask.isHabit && (
-            <View style={styles.habitControls}>
-              <Text style={styles.habitControlLabel}>Goal:</Text>
-              <View style={styles.habitCounterRow}>
+            </View>
+          )}
+
+          {shouldShowTimeEstimateEditor && (
+            <View style={styles.editSection}>
+              <Text style={styles.editSectionTitle}>Estimated Time (minutes)</Text>
+              <View style={styles.timeEstimateRow}>
                 <TouchableOpacity 
-                  style={styles.habitCounterButton} 
+                  style={styles.timeButton} 
                   onPress={() => setEditedTask({
                     ...editedTask, 
-                    habitGoal: Math.max(1, (editedTask.habitGoal || 1) - 1)
+                    estimatedTime: 5
                   })}
                 >
-                  <Text style={styles.habitCounterButtonText}>-</Text>
+                  <Text style={[
+                    styles.timeButtonText,
+                    editedTask.estimatedTime === 5 && styles.activeTimeButtonText
+                  ]}>5</Text>
                 </TouchableOpacity>
-                <Text style={styles.habitCountValue}>{editedTask.habitGoal || 1}</Text>
                 <TouchableOpacity 
-                  style={styles.habitCounterButton} 
+                  style={styles.timeButton} 
                   onPress={() => setEditedTask({
                     ...editedTask, 
-                    habitGoal: (editedTask.habitGoal || 1) + 1
+                    estimatedTime: 15
                   })}
                 >
-                  <Text style={styles.habitCounterButtonText}>+</Text>
+                  <Text style={[
+                    styles.timeButtonText,
+                    editedTask.estimatedTime === 15 && styles.activeTimeButtonText
+                  ]}>15</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.timeButton} 
+                  onPress={() => setEditedTask({
+                    ...editedTask, 
+                    estimatedTime: 30
+                  })}
+                >
+                  <Text style={[
+                    styles.timeButtonText,
+                    editedTask.estimatedTime === 30 && styles.activeTimeButtonText
+                  ]}>30</Text>
+                </TouchableOpacity>
+                <TouchableOpacity 
+                  style={styles.timeButton} 
+                  onPress={() => setEditedTask({
+                    ...editedTask, 
+                    estimatedTime: 60
+                  })}
+                >
+                  <Text style={[
+                    styles.timeButtonText,
+                    editedTask.estimatedTime === 60 && styles.activeTimeButtonText
+                  ]}>60</Text>
                 </TouchableOpacity>
               </View>
             </View>
           )}
-        </View>
 
-        <View style={styles.editSection}>
-          <View style={styles.editToggleRow}>
-            <Text style={styles.editSectionTitle}>Delegated</Text>
-            <TouchableOpacity 
-              style={[styles.toggleButton, editedTask.isDelegated && styles.toggleButtonActive]} 
-              onPress={toggleDelegatedMode}
-            >
-              <Text style={styles.toggleButtonText}>
-                {editedTask.isDelegated ? 'ON' : 'OFF'}
-              </Text>
-            </TouchableOpacity>
-          </View>
-          
-          {editedTask.isDelegated && (
-            <TextInput
-              style={styles.editInput}
-              value={editedTask.delegatedTo}
-              onChangeText={(text) => setEditedTask({...editedTask, delegatedTo: text})}
-              placeholder="Delegated to"
-            />
-          )}
-        </View>
-
-        <View style={styles.editSection}>
-          <Text style={styles.editSectionTitle}>Subtasks</Text>
-          
-          {editedTask.subtasks && editedTask.subtasks.map(subtask => (
-            <View key={subtask.id} style={styles.editSubtaskRow}>
-              <TextInput
-                style={styles.editSubtaskInput}
-                value={subtask.title}
-                onChangeText={(text) => {
-                  const updatedSubtasks = editedTask.subtasks?.map(s => 
-                    s.id === subtask.id ? {...s, title: text} : s
-                  );
-                  setEditedTask({...editedTask, subtasks: updatedSubtasks});
-                }}
-              />
-              <TouchableOpacity 
-                style={styles.removeSubtaskButton}
-                onPress={() => handleRemoveSubtask(subtask.id)}
-              >
-                <Trash size={16} color="#FC8181" />
-              </TouchableOpacity>
+          {shouldShowRecurrenceEditor && (
+            <View style={styles.editSection}>
+              <Text style={styles.editSectionTitle}>Recurrence</Text>
+              <View style={styles.recurrenceButtons}>
+                {['none', 'daily', 'weekly', 'monthly'].map((recurrence) => (
+                  <TouchableOpacity
+                    key={recurrence}
+                    style={[
+                      styles.recurrenceButton,
+                      editedTask.recurrence === recurrence && styles.activeRecurrenceButton
+                    ]}
+                    onPress={() => setEditedTask({
+                      ...editedTask, 
+                      recurrence: recurrence as any
+                    })}
+                  >
+                    <Text style={[
+                      styles.recurrenceButtonText,
+                      editedTask.recurrence === recurrence && styles.activeRecurrenceButtonText
+                    ]}>
+                      {recurrence.charAt(0).toUpperCase() + recurrence.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
             </View>
-          ))}
-          
-          <View style={styles.addSubtaskRow}>
-            <TextInput
-              style={styles.addSubtaskInput}
-              value={newSubtask}
-              onChangeText={setNewSubtask}
-              placeholder="Add new subtask"
-            />
-            <TouchableOpacity 
-              style={styles.addSubtaskButton}
-              onPress={handleAddSubtask}
-            >
-              <Plus size={16} color="#FFFFFF" />
-            </TouchableOpacity>
-          </View>
-        </View>
+          )}
+
+          {shouldShowSubtasksEditor && (
+            <View style={styles.editSection}>
+              <Text style={styles.editSectionTitle}>Subtasks</Text>
+              
+              {editedTask.subtasks && editedTask.subtasks.map(subtask => (
+                <View key={subtask.id} style={styles.editSubtaskRow}>
+                  <TextInput
+                    style={styles.editSubtaskInput}
+                    value={subtask.title}
+                    onChangeText={(text) => {
+                      const updatedSubtasks = editedTask.subtasks?.map(s => 
+                        s.id === subtask.id ? {...s, title: text} : s
+                      );
+                      setEditedTask({...editedTask, subtasks: updatedSubtasks});
+                    }}
+                  />
+                  <TouchableOpacity 
+                    style={styles.removeSubtaskButton}
+                    onPress={() => handleRemoveSubtask(subtask.id)}
+                  >
+                    <Trash size={16} color="#FC8181" />
+                  </TouchableOpacity>
+                </View>
+              ))}
+              
+              <View style={styles.addSubtaskRow}>
+                <TextInput
+                  style={styles.addSubtaskInput}
+                  value={newSubtask}
+                  onChangeText={setNewSubtask}
+                  placeholder="Add new subtask"
+                />
+                <TouchableOpacity 
+                  style={styles.addSubtaskButton}
+                  onPress={handleAddSubtask}
+                >
+                  <Plus size={16} color="#FFFFFF" />
+                </TouchableOpacity>
+              </View>
+            </View>
+          )}
+
+          {shouldShowNotesEditor && (
+            <View style={styles.editSection}>
+              <Text style={styles.editSectionTitle}>Notes</Text>
+              <TextInput
+                style={[styles.editInput, styles.notesInput]}
+                value={editedTask.notes}
+                onChangeText={(text) => setEditedTask({...editedTask, notes: text})}
+                placeholder="Add notes or details"
+                multiline
+                numberOfLines={4}
+                textAlignVertical="top"
+              />
+            </View>
+          )}
+        </ScrollView>
 
         <TouchableOpacity 
           style={[styles.saveButton, { backgroundColor: taskAccentColor }]}
@@ -391,6 +555,19 @@ export default function TaskItem({
                   </Text>
                 </View>
               )}
+              
+              {task.estimatedTime && (
+                <View style={styles.timeTag}>
+                  <Text style={styles.timeText}>{task.estimatedTime} min</Text>
+                </View>
+              )}
+              
+              {task.dueDate && (
+                <View style={styles.dateTag}>
+                  <Calendar size={10} color="#4A5568" style={styles.dateTagIcon} />
+                  <Text style={styles.dateText}>{task.dueDate}</Text>
+                </View>
+              )}
             </View>
 
             {task.isHabit && task.habitGoal && (
@@ -434,6 +611,14 @@ export default function TaskItem({
                     </Text>
                   </TouchableOpacity>
                 ))}
+              </View>
+            )}
+            
+            {task.notes && (
+              <View style={styles.notesContainer}>
+                <Text style={styles.notesText} numberOfLines={2} ellipsizeMode="tail">
+                  {task.notes}
+                </Text>
               </View>
             )}
           </View>
@@ -486,11 +671,15 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   habitCard: {
-    backgroundColor: '#E3F5EC', // Slightly more visible light green background
+    backgroundColor: '#E3F5EC',
   },
   editingCard: {
     padding: 16,
     backgroundColor: '#FFFFFF',
+    maxHeight: 500, // Limit height to ensure it doesn't take up the entire screen
+  },
+  editScrollView: {
+    maxHeight: 420, // Allow scrolling within the card
   },
   taskHeader: {
     flexDirection: 'row',
@@ -554,6 +743,37 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-SemiBold',
     textTransform: 'uppercase',
   },
+  timeTag: {
+    backgroundColor: '#EBF4FF',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 4,
+  },
+  timeText: {
+    color: '#4A5568',
+    fontSize: 10,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  dateTag: {
+    backgroundColor: '#F7FAFC',
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 4,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  dateTagIcon: {
+    marginRight: 4,
+  },
+  dateText: {
+    color: '#4A5568',
+    fontSize: 10,
+    fontFamily: 'Quicksand-SemiBold',
+  },
   habitProgressContainer: {
     height: 8,
     backgroundColor: '#E2E8F0',
@@ -573,6 +793,18 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Quicksand-SemiBold',
     color: '#4A5568',
+  },
+  notesContainer: {
+    backgroundColor: '#F7FAFC',
+    padding: 8,
+    borderRadius: 4,
+    marginTop: 4,
+  },
+  notesText: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+    color: '#4A5568',
+    fontStyle: 'italic',
   },
   subtasks: {
     marginTop: 8,
@@ -652,6 +884,10 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Regular',
     backgroundColor: '#F7FAFC',
   },
+  notesInput: {
+    height: 80,
+    textAlignVertical: 'top',
+  },
   editSection: {
     marginBottom: 16,
   },
@@ -701,6 +937,9 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontFamily: 'Quicksand-SemiBold',
   },
+  toggleButtonTextActive: {
+    color: '#FFFFFF',
+  },
   habitControls: {
     backgroundColor: '#F7FAFC',
     padding: 12,
@@ -717,6 +956,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+    marginBottom: 12,
   },
   habitCounterButton: {
     width: 32,
@@ -736,6 +976,73 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Bold',
     color: '#2D3748',
     marginHorizontal: 16,
+  },
+  datePickerButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    padding: 10,
+    backgroundColor: '#F7FAFC',
+  },
+  datePickerIcon: {
+    marginRight: 8,
+  },
+  datePickerText: {
+    fontSize: 16,
+    fontFamily: 'Quicksand-Regular',
+    color: '#4A5568',
+  },
+  datePickerNote: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Italic',
+    color: '#A0AEC0',
+    marginTop: 4,
+  },
+  timeEstimateRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  timeButton: {
+    flex: 1,
+    padding: 8,
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 8,
+    marginHorizontal: 4,
+    alignItems: 'center',
+  },
+  timeButtonText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#4A5568',
+  },
+  activeTimeButtonText: {
+    color: '#4299E1',
+  },
+  recurrenceButtons: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+  },
+  recurrenceButton: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    marginRight: 8,
+    marginBottom: 8,
+    backgroundColor: '#E2E8F0',
+  },
+  activeRecurrenceButton: {
+    backgroundColor: '#4299E1',
+  },
+  recurrenceButtonText: {
+    color: '#4A5568',
+    fontSize: 12,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  activeRecurrenceButtonText: {
+    color: '#FFFFFF',
   },
   editSubtaskRow: {
     flexDirection: 'row',
