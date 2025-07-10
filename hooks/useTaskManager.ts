@@ -10,7 +10,8 @@ export interface TaskManager {
   toggleSubtask: (taskId: string, subtaskId: string) => void;
   rolloverTasks: () => void;
   emergencyOverride: () => void;
-  reorderTasks: (taskId: string, targetIndex: number, section: 'pending' | 'completed') => void;
+  moveTaskUp: (id: string) => void;
+  moveTaskDown: (id: string) => void;
 }
 
 export function useTaskManager(): TaskManager {
@@ -64,7 +65,6 @@ export function useTaskManager(): TaskManager {
           subtask.id === subtaskId ? { ...subtask, completed: !subtask.completed } : subtask
         );
         
-        // Removed the auto-completion of parent task based on subtasks
         return {
           ...task,
           subtasks: updatedSubtasks
@@ -110,89 +110,63 @@ export function useTaskManager(): TaskManager {
     });
   };
 
-  const reorderTasks = (taskId: string, targetIndex: number, section: 'pending' | 'completed') => {
-    setTasks(currentTasks => {
-      const newTasks = [...currentTasks];
+  const moveTaskUp = (id: string) => {
+    setTasks(prevTasks => {
+      const taskIndex = prevTasks.findIndex(task => task.id === id);
+      if (taskIndex <= 0) return prevTasks; // Already at the top
       
-      // Find the task to move
-      const taskIndex = newTasks.findIndex(t => t.id === taskId);
-      if (taskIndex === -1) return currentTasks;
+      const task = prevTasks[taskIndex];
+      const isCompleted = task.completed;
+      const category = task.category;
       
-      const taskToMove = newTasks[taskIndex];
-      const taskCategory = taskToMove.category;
-      const isCompleted = taskToMove.completed;
-      
-      // Only allow reordering within the same section (pending or completed)
-      const sectionMatches = 
-        (section === 'pending' && !isCompleted) || 
-        (section === 'completed' && isCompleted);
-      
-      if (!sectionMatches) return currentTasks;
-      
-      // Remove the task from its current position
-      newTasks.splice(taskIndex, 1);
-      
-      // Get the tasks in the same section and category
-      const sectionTasks = newTasks.filter(t => 
-        t.category === taskCategory && 
-        (section === 'pending' ? !t.completed : t.completed)
+      // Find tasks in the same section (completed/uncompleted) and category
+      const sectionTasks = prevTasks.filter(t => 
+        t.category === category && t.completed === isCompleted
       );
       
-      // Calculate the insert position in the overall array
-      let insertPosition = 0;
+      const sectionIndex = sectionTasks.findIndex(t => t.id === id);
+      if (sectionIndex <= 0) return prevTasks; // Already at the top of its section
       
-      if (sectionTasks.length > 0) {
-        // If there are tasks in this section, find where to insert
-        const boundedTargetIndex = Math.min(targetIndex, sectionTasks.length);
-        
-        if (boundedTargetIndex === sectionTasks.length) {
-          // Insert after the last task in this section
-          const lastTask = sectionTasks[sectionTasks.length - 1];
-          insertPosition = newTasks.findIndex(t => t.id === lastTask.id) + 1;
-        } else {
-          // Insert before the target task
-          const targetTask = sectionTasks[boundedTargetIndex];
-          insertPosition = newTasks.findIndex(t => t.id === targetTask.id);
-        }
-      } else {
-        // If there are no tasks in this section, find the appropriate position
-        // based on category and completion status
-        const categoryTasks = newTasks.filter(t => t.category === taskCategory);
-        
-        if (section === 'pending') {
-          // Insert at the beginning of this category
-          const firstCategoryTask = categoryTasks[0];
-          insertPosition = firstCategoryTask 
-            ? newTasks.findIndex(t => t.id === firstCategoryTask.id)
-            : newTasks.length;
-        } else {
-          // For completed, insert after all pending tasks in this category
-          const pendingTasks = categoryTasks.filter(t => !t.completed);
-          if (pendingTasks.length > 0) {
-            const lastPendingTask = pendingTasks[pendingTasks.length - 1];
-            insertPosition = newTasks.findIndex(t => t.id === lastPendingTask.id) + 1;
-          } else {
-            // If no pending tasks, insert at the beginning of the category
-            const firstCategoryTask = categoryTasks[0];
-            insertPosition = firstCategoryTask 
-              ? newTasks.findIndex(t => t.id === firstCategoryTask.id)
-              : newTasks.length;
-          }
-        }
-      }
+      // Get the task to swap with
+      const prevTask = sectionTasks[sectionIndex - 1];
+      const prevTaskIndex = prevTasks.findIndex(t => t.id === prevTask.id);
       
-      // Insert the task at the calculated position
-      newTasks.splice(insertPosition, 0, taskToMove);
+      // Create a new array with the tasks swapped
+      const newTasks = [...prevTasks];
+      [newTasks[taskIndex], newTasks[prevTaskIndex]] = [newTasks[prevTaskIndex], newTasks[taskIndex]];
       
       return newTasks;
     });
   };
-
-  // Auto-rollover logic could be implemented here with date checking
-  useEffect(() => {
-    // This would typically check if it's a new day and rollover incomplete tasks
-    // For demo purposes, we'll keep it simple
-  }, []);
+  
+  const moveTaskDown = (id: string) => {
+    setTasks(prevTasks => {
+      const taskIndex = prevTasks.findIndex(task => task.id === id);
+      if (taskIndex === -1 || taskIndex === prevTasks.length - 1) return prevTasks; // Not found or already at the bottom
+      
+      const task = prevTasks[taskIndex];
+      const isCompleted = task.completed;
+      const category = task.category;
+      
+      // Find tasks in the same section (completed/uncompleted) and category
+      const sectionTasks = prevTasks.filter(t => 
+        t.category === category && t.completed === isCompleted
+      );
+      
+      const sectionIndex = sectionTasks.findIndex(t => t.id === id);
+      if (sectionIndex === sectionTasks.length - 1) return prevTasks; // Already at the bottom of its section
+      
+      // Get the task to swap with
+      const nextTask = sectionTasks[sectionIndex + 1];
+      const nextTaskIndex = prevTasks.findIndex(t => t.id === nextTask.id);
+      
+      // Create a new array with the tasks swapped
+      const newTasks = [...prevTasks];
+      [newTasks[taskIndex], newTasks[nextTaskIndex]] = [newTasks[nextTaskIndex], newTasks[taskIndex]];
+      
+      return newTasks;
+    });
+  };
 
   return {
     tasks,
@@ -203,6 +177,7 @@ export function useTaskManager(): TaskManager {
     toggleSubtask,
     rolloverTasks,
     emergencyOverride,
-    reorderTasks,
+    moveTaskUp,
+    moveTaskDown
   };
 }
