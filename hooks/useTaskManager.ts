@@ -10,7 +10,7 @@ export interface TaskManager {
   toggleSubtask: (taskId: string, subtaskId: string) => void;
   rolloverTasks: () => void;
   emergencyOverride: () => void;
-  reorderTasks: (startIndex: number, endIndex: number, category: string) => void;
+  reorderTasks: (taskId: string, targetIndex: number, section: 'pending' | 'completed') => void;
 }
 
 export function useTaskManager(): TaskManager {
@@ -110,18 +110,81 @@ export function useTaskManager(): TaskManager {
     });
   };
 
-  const reorderTasks = (startIndex: number, endIndex: number, category: string) => {
-    setTasks(prev => {
-      const result = [...prev];
-      const categoryTasks = result.filter(task => task.category === category);
-      const otherTasks = result.filter(task => task.category !== category);
+  const reorderTasks = (taskId: string, targetIndex: number, section: 'pending' | 'completed') => {
+    setTasks(currentTasks => {
+      const newTasks = [...currentTasks];
       
-      // Reorder within the category
-      const [removed] = categoryTasks.splice(startIndex, 1);
-      categoryTasks.splice(endIndex, 0, removed);
+      // Find the task to move
+      const taskIndex = newTasks.findIndex(t => t.id === taskId);
+      if (taskIndex === -1) return currentTasks;
       
-      // Combine and return
-      return [...categoryTasks, ...otherTasks];
+      const taskToMove = newTasks[taskIndex];
+      const taskCategory = taskToMove.category;
+      const isCompleted = taskToMove.completed;
+      
+      // Only allow reordering within the same section (pending or completed)
+      const sectionMatches = 
+        (section === 'pending' && !isCompleted) || 
+        (section === 'completed' && isCompleted);
+      
+      if (!sectionMatches) return currentTasks;
+      
+      // Remove the task from its current position
+      newTasks.splice(taskIndex, 1);
+      
+      // Get the tasks in the same section and category
+      const sectionTasks = newTasks.filter(t => 
+        t.category === taskCategory && 
+        (section === 'pending' ? !t.completed : t.completed)
+      );
+      
+      // Calculate the insert position in the overall array
+      let insertPosition = 0;
+      
+      if (sectionTasks.length > 0) {
+        // If there are tasks in this section, find where to insert
+        const boundedTargetIndex = Math.min(targetIndex, sectionTasks.length);
+        
+        if (boundedTargetIndex === sectionTasks.length) {
+          // Insert after the last task in this section
+          const lastTask = sectionTasks[sectionTasks.length - 1];
+          insertPosition = newTasks.findIndex(t => t.id === lastTask.id) + 1;
+        } else {
+          // Insert before the target task
+          const targetTask = sectionTasks[boundedTargetIndex];
+          insertPosition = newTasks.findIndex(t => t.id === targetTask.id);
+        }
+      } else {
+        // If there are no tasks in this section, find the appropriate position
+        // based on category and completion status
+        const categoryTasks = newTasks.filter(t => t.category === taskCategory);
+        
+        if (section === 'pending') {
+          // Insert at the beginning of this category
+          const firstCategoryTask = categoryTasks[0];
+          insertPosition = firstCategoryTask 
+            ? newTasks.findIndex(t => t.id === firstCategoryTask.id)
+            : newTasks.length;
+        } else {
+          // For completed, insert after all pending tasks in this category
+          const pendingTasks = categoryTasks.filter(t => !t.completed);
+          if (pendingTasks.length > 0) {
+            const lastPendingTask = pendingTasks[pendingTasks.length - 1];
+            insertPosition = newTasks.findIndex(t => t.id === lastPendingTask.id) + 1;
+          } else {
+            // If no pending tasks, insert at the beginning of the category
+            const firstCategoryTask = categoryTasks[0];
+            insertPosition = firstCategoryTask 
+              ? newTasks.findIndex(t => t.id === firstCategoryTask.id)
+              : newTasks.length;
+          }
+        }
+      }
+      
+      // Insert the task at the calculated position
+      newTasks.splice(insertPosition, 0, taskToMove);
+      
+      return newTasks;
     });
   };
 
