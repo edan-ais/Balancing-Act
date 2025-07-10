@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Check, X, MoveHorizontal as MoreHorizontal } from 'lucide-react-native';
+import { Check, X, MoveHorizontal as MoreHorizontal, GripVertical } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
@@ -9,9 +9,8 @@ export interface Task {
   completed: boolean;
   isHabit?: boolean;
   habitCount?: number;
-  location?: 'home' | 'work' | 'errands' | 'anywhere';
-  priority?: 'high' | 'medium' | 'low';
-  isQuickWin?: boolean;
+  habitGoal?: number;
+  priority?: 'high' | 'medium' | 'low' | 'quick-win';
   isDelegated?: boolean;
   delegatedTo?: string;
   subtasks?: { id: string; title: string; completed: boolean }[];
@@ -23,43 +22,44 @@ interface TaskItemProps {
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;
   onHabitIncrement?: (id: string) => void;
+  onSubtaskToggle?: (taskId: string, subtaskId: string) => void;
+  onMoveStart?: () => void;
 }
 
-export default function TaskItem({ task, onToggle, onDelete, onHabitIncrement }: TaskItemProps) {
+export default function TaskItem({ 
+  task, 
+  onToggle, 
+  onDelete, 
+  onHabitIncrement, 
+  onSubtaskToggle,
+  onMoveStart
+}: TaskItemProps) {
   const [showActions, setShowActions] = useState(false);
   const [scaleAnim] = useState(new Animated.Value(1));
-
-  const getLocationColor = (location?: string) => {
-    switch (location) {
-      case 'home': return '#68D391';
-      case 'work': return '#4299E1';
-      case 'errands': return '#F6AD55';
-      case 'anywhere': return '#9F7AEA';
-      default: return '#A0AEC0';
-    }
-  };
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
       case 'high': return '#FC8181';
       case 'medium': return '#F6AD55';
       case 'low': return '#68D391';
+      case 'quick-win': return '#F6AD55';
       default: return '#A0AEC0';
     }
   };
 
   const getTabColor = (category: string) => {
     switch (category) {
-      case 'daily': return '#667EEA';
+      case 'daily': return '#2B6CB0'; // Changed to dark blue for habits
       case 'goals': return '#48BB78';
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
       case 'cleaning': return '#4299E1';
       case 'self-care': return '#F56565';
       case 'delegation': return '#38B2AC';
-      default: return '#667EEA';
+      default: return '#2B6CB0';
     }
   };
+  
   const handleToggle = () => {
     // Celebration animation
     Animated.sequence([
@@ -98,9 +98,20 @@ export default function TaskItem({ task, onToggle, onDelete, onHabitIncrement }:
     }
   };
 
+  const handleSubtaskToggle = (subtaskId: string) => {
+    if (onSubtaskToggle) {
+      onSubtaskToggle(task.id, subtaskId);
+    }
+  };
+
+  // Calculate habit progress percentage
+  const habitProgress = task.isHabit && task.habitCount && task.habitGoal 
+    ? (task.habitCount / task.habitGoal) * 100 
+    : 0;
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-      <NeumorphicCard style={[styles.taskCard, task.isQuickWin && styles.quickWinCard]}>
+      <NeumorphicCard style={styles.taskCard}>
         <View style={styles.taskHeader}>
           <TouchableOpacity
             onPress={task.isHabit ? handleHabitIncrement : handleToggle}
@@ -112,8 +123,13 @@ export default function TaskItem({ task, onToggle, onDelete, onHabitIncrement }:
             ]}
           >
             {task.completed && <Check size={16} color="#ffffff" />}
-            {task.isHabit && task.habitCount && (
-              <Text style={styles.habitCount}>{task.habitCount}</Text>
+            {task.isHabit && task.habitCount !== undefined && (
+              <Text style={[
+                styles.habitCount,
+                { color: task.completed ? '#ffffff' : getTabColor(task.category) }
+              ]}>
+                {task.habitCount}
+              </Text>
             )}
           </TouchableOpacity>
 
@@ -122,54 +138,85 @@ export default function TaskItem({ task, onToggle, onDelete, onHabitIncrement }:
               styles.taskTitle,
               task.completed && styles.completedTitle,
               task.isHabit && styles.habitTitle,
-              task.isQuickWin && styles.quickWinTitle,
             ]}>
               {task.title}
-              {task.isQuickWin && <Text style={styles.quickWinBadge}> QUICK WIN</Text>}
               {task.isDelegated && <Text style={styles.delegatedBadge}> → {task.delegatedTo}</Text>}
             </Text>
             
             <View style={styles.taskMeta}>
-              {task.location && (
-                <View style={[styles.locationTag, { backgroundColor: getLocationColor(task.location) }]}>
-                  <Text style={styles.locationText}>{task.location}</Text>
+              {task.priority && (
+                <View style={[
+                  styles.priorityTag,
+                  { backgroundColor: getPriorityColor(task.priority) }
+                ]}>
+                  <Text style={styles.priorityText}>
+                    {task.priority === 'quick-win' ? 'QUICK WIN' : task.priority.toUpperCase()}
+                  </Text>
                 </View>
               )}
-              {task.priority && (
-                <View style={[styles.priorityIndicator, { backgroundColor: getPriorityColor(task.priority) }]} />
-              )}
             </View>
+
+            {task.isHabit && task.habitGoal && (
+              <View style={styles.habitProgressContainer}>
+                <View 
+                  style={[
+                    styles.habitProgressBar, 
+                    { 
+                      width: `${habitProgress}%`,
+                      backgroundColor: getTabColor(task.category)
+                    }
+                  ]} 
+                />
+                <Text style={styles.habitGoalText}>
+                  {task.habitCount || 0}/{task.habitGoal}
+                </Text>
+              </View>
+            )}
 
             {task.subtasks && task.subtasks.length > 0 && (
               <View style={styles.subtasks}>
                 {task.subtasks.map(subtask => (
-                  <View key={subtask.id} style={styles.subtask}>
-                    <View style={[styles.subtaskCheckbox, subtask.completed && styles.subtaskCompleted]} />
+                  <TouchableOpacity 
+                    key={subtask.id} 
+                    style={styles.subtask}
+                    onPress={() => handleSubtaskToggle(subtask.id)}
+                  >
+                    <View 
+                      style={[
+                        styles.subtaskCheckbox, 
+                        subtask.completed && [
+                          styles.subtaskCompleted,
+                          { backgroundColor: getTabColor(task.category) }
+                        ]
+                      ]} 
+                    >
+                      {subtask.completed && <Check size={8} color="#ffffff" />}
+                    </View>
                     <Text style={[styles.subtaskText, subtask.completed && styles.subtaskCompletedText]}>
                       {subtask.title}
                     </Text>
-                  </View>
+                  </TouchableOpacity>
                 ))}
               </View>
             )}
           </View>
 
-          <TouchableOpacity
-            onPress={() => setShowActions(!showActions)}
-            style={styles.actionButton}
-          >
-            <MoreHorizontal size={20} color="#A0AEC0" />
-          </TouchableOpacity>
-        </View>
-
-        {showActions && (
-          <View style={styles.actionMenu}>
-            <TouchableOpacity onPress={() => onDelete(task.id)} style={styles.deleteButton}>
-              <X size={16} color="#FC8181" />
-              <Text style={styles.deleteText}>Delete</Text>
+          <View style={styles.actionIcons}>
+            <TouchableOpacity
+              onPress={onMoveStart}
+              style={styles.moveButton}
+            >
+              <GripVertical size={18} color="#A0AEC0" />
+            </TouchableOpacity>
+            
+            <TouchableOpacity
+              onPress={() => onDelete(task.id)}
+              style={styles.deleteIconButton}
+            >
+              <X size={18} color="#FC8181" />
             </TouchableOpacity>
           </View>
-        )}
+        </View>
       </NeumorphicCard>
     </Animated.View>
   );
@@ -179,10 +226,6 @@ const styles = StyleSheet.create({
   taskCard: {
     margin: 4,
     padding: 12,
-  },
-  quickWinCard: {
-    borderLeftWidth: 3,
-    borderLeftColor: '#F6AD55',
   },
   taskHeader: {
     flexDirection: 'row',
@@ -203,7 +246,6 @@ const styles = StyleSheet.create({
   checkedBox: {},
   habitBox: {},
   habitCount: {
-    color: '#ffffff',
     fontSize: 12,
     fontFamily: 'Quicksand-SemiBold',
   },
@@ -223,14 +265,6 @@ const styles = StyleSheet.create({
   habitTitle: {
     fontStyle: 'italic',
   },
-  quickWinTitle: {
-    fontFamily: 'Quicksand-Bold',
-  },
-  quickWinBadge: {
-    fontSize: 10,
-    fontFamily: 'Quicksand-Bold',
-    color: '#F6AD55',
-  },
   delegatedBadge: {
     fontSize: 12,
     fontFamily: 'Quicksand-SemiBold',
@@ -239,27 +273,45 @@ const styles = StyleSheet.create({
   taskMeta: {
     flexDirection: 'row',
     alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 4,
   },
-  locationTag: {
+  priorityTag: {
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
     marginRight: 8,
+    marginBottom: 4,
   },
-  locationText: {
+  priorityText: {
     color: '#ffffff',
     fontSize: 10,
     fontFamily: 'Quicksand-SemiBold',
     textTransform: 'uppercase',
   },
-  priorityIndicator: {
-    width: 8,
+  habitProgressContainer: {
     height: 8,
+    backgroundColor: '#E2E8F0',
     borderRadius: 4,
+    marginVertical: 4,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  habitProgressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  habitGoalText: {
+    position: 'absolute',
+    right: 0,
+    top: -16,
+    fontSize: 10,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#4A5568',
   },
   subtasks: {
     marginTop: 8,
-    paddingLeft: 12,
+    paddingLeft: 4,
   },
   subtask: {
     flexDirection: 'row',
@@ -267,15 +319,15 @@ const styles = StyleSheet.create({
     marginBottom: 4,
   },
   subtaskCheckbox: {
-    width: 12,
-    height: 12,
-    borderRadius: 6,
+    width: 14,
+    height: 14,
+    borderRadius: 7,
     backgroundColor: '#E2E8F0',
     marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  subtaskCompleted: {
-    backgroundColor: '#48BB78',
-  },
+  subtaskCompleted: {},
   subtaskText: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
@@ -284,6 +336,17 @@ const styles = StyleSheet.create({
   subtaskCompletedText: {
     textDecorationLine: 'line-through',
     color: '#A0AEC0',
+  },
+  actionIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  moveButton: {
+    padding: 4,
+    marginRight: 4,
+  },
+  deleteIconButton: {
+    padding: 4,
   },
   actionButton: {
     padding: 4,
