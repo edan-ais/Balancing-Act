@@ -16,14 +16,9 @@ export default function EmergencyOverride({ visible, onClose, onConfirm }: Emerg
     <View style={styles.overlay}>
       <NeumorphicCard style={styles.card}>
         <View style={styles.header}>
-          <AlertTriangle size={32} color="#FC8181" />
+          <AlertTriangle size={32} color="#2B6CB0" />
           <Text style={styles.title}>Emergency Override</Text>
         </View>
-
-        <Text style={styles.description}>
-          This will move all non-urgent tasks to tomorrow and create space for emergency tasks. 
-          Critical habits will be maintained with reduced frequency.
-        </Text>
 
         <View style={styles.effects}>
           <Text style={styles.effectsTitle}>What happens:</Text>
@@ -37,7 +32,7 @@ export default function EmergencyOverride({ visible, onClose, onConfirm }: Emerg
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
-            <Text style={styles.confirmText}>Activate Override</Text>
+            <Text style={styles.confirmText}>Activate</Text>
             <ArrowRight size={16} color="#ffffff" />
           </TouchableOpacity>
         </View>
@@ -75,31 +70,24 @@ const styles = StyleSheet.create({
     color: '#2D3748',
     marginLeft: 12,
   },
-  description: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
-    lineHeight: 24,
-    marginBottom: 20,
-  },
   effects: {
-    backgroundColor: '#FFF5F5',
+    backgroundColor: '#EBF8FF',
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
     borderLeftWidth: 4,
-    borderLeftColor: '#FC8181',
+    borderLeftColor: '#2B6CB0',
   },
   effectsTitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#C53030',
+    color: '#2B6CB0',
     marginBottom: 8,
   },
   effectItem: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#742A2A',
+    color: '#2C5282',
     marginBottom: 4,
   },
   actions: {
@@ -126,11 +114,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#FC8181',
+    backgroundColor: '#2B6CB0',
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: '#FC8181',
+    shadowColor: '#2B6CB0',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
