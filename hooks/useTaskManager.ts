@@ -45,12 +45,10 @@ export function useTaskManager(): TaskManager {
     setTasks(prev => prev.map(task => {
       if (task.id === id && task.isHabit) {
         const newCount = (task.habitCount || 0) + 1;
-        const isCompleted = task.habitGoal ? newCount >= task.habitGoal : false;
-        
+        // Changed this to not automatically set completed based on habit count
         return { 
           ...task, 
-          habitCount: newCount,
-          completed: isCompleted
+          habitCount: newCount
         };
       }
       return task;
@@ -64,13 +62,10 @@ export function useTaskManager(): TaskManager {
           subtask.id === subtaskId ? { ...subtask, completed: !subtask.completed } : subtask
         );
         
-        // Check if all subtasks are completed
-        const allSubtasksCompleted = updatedSubtasks.every(subtask => subtask.completed);
-        
+        // Removed the auto-completion of parent task based on subtasks
         return {
           ...task,
-          subtasks: updatedSubtasks,
-          completed: allSubtasksCompleted && updatedSubtasks.length > 0 ? true : task.completed
+          subtasks: updatedSubtasks
         };
       }
       return task;
