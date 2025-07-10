@@ -147,7 +147,7 @@ export default function TabLayout() {
           borderRadius: 12,
           marginHorizontal: 2,
           paddingHorizontal: 2,
-          height: 65, // Fixed height for items
+          height: 80, // Fixed height for items
           // Center content vertically
           alignItems: 'center',
           justifyContent: 'center',
