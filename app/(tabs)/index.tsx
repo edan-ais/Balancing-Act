@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, ScrollView, TouchableOpacity, ActivityIndicator } from 'react-native';
-import { Plus, TriangleAlert as AlertTriangle, RotateCcw } from 'lucide-react-native';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { Plus, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
@@ -12,7 +12,6 @@ import { tabColors } from './_layout';
 export default function DailyTasks() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEmergencyOverride, setShowEmergencyOverride] = useState(false);
-  const [isRollingOver, setIsRollingOver] = useState(false);
   const taskManager = useTaskManager();
   const colors = tabColors.daily;
 
@@ -27,12 +26,6 @@ export default function DailyTasks() {
   const handleEmergencyOverride = () => {
     taskManager.emergencyOverride();
     setShowEmergencyOverride(false);
-  };
-
-  const handleRolloverTasks = async () => {
-    setIsRollingOver(true);
-    await taskManager.rolloverTasks();
-    setIsRollingOver(false);
   };
 
   return (
@@ -50,17 +43,6 @@ export default function DailyTasks() {
             onPress={() => setShowEmergencyOverride(true)}
           >
             <AlertTriangle size={20} color={colors.dark} />
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={[styles.rolloverButton, { backgroundColor: colors.accent }]}
-            onPress={handleRolloverTasks}
-            disabled={isRollingOver}
-          >
-            {isRollingOver ? (
-              <ActivityIndicator size="small" color={colors.dark} />
-            ) : (
-              <RotateCcw size={20} color={colors.dark} />
-            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -85,6 +67,8 @@ export default function DailyTasks() {
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
                     onHabitIncrement={taskManager.incrementHabit}
+                    onSubtaskToggle={taskManager.toggleSubtask}
+                    onMoveStart={() => {}}
                   />
                 ))}
               </View>
@@ -100,6 +84,8 @@ export default function DailyTasks() {
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
                     onHabitIncrement={taskManager.incrementHabit}
+                    onSubtaskToggle={taskManager.toggleSubtask}
+                    onMoveStart={() => {}}
                   />
                 ))}
               </View>
@@ -171,17 +157,6 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.2,
     shadowRadius: 6,
   },
-  rolloverButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowColor: '#C8D0E0',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 0.2,
-    shadowRadius: 6,
-  },
   content: {
     flex: 1,
     paddingHorizontal: 12,
@@ -215,7 +190,7 @@ const styles = StyleSheet.create({
   },
   addButton: {
     position: 'absolute',
-    bottom: 20, // Moved from 100 to 20 to be closer to footer
+    bottom: 20,
     right: 20,
     width: 60,
     height: 60,
