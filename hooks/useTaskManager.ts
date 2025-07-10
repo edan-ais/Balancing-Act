@@ -45,10 +45,12 @@ export function useTaskManager(): TaskManager {
     setTasks(prev => prev.map(task => {
       if (task.id === id && task.isHabit) {
         const newCount = (task.habitCount || 0) + 1;
-        // Changed this to not automatically set completed based on habit count
+        const isCompleted = task.habitGoal ? newCount >= task.habitGoal : false;
+        
         return { 
           ...task, 
-          habitCount: newCount
+          habitCount: newCount,
+          completed: isCompleted
         };
       }
       return task;
