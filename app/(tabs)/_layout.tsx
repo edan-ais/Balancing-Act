@@ -65,6 +65,9 @@ export default function TabLayout() {
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
     const colorKey = routeToColorMap[name];
     
+    // Calculate offset to keep icon visually centered when scaled
+    const offsetY = focused ? 8 : 0; // Adjust this value as needed
+    
     return (
       <View style={{ 
         transform: [{ scale: focused ? 1.8 : 1 }],
@@ -72,11 +75,10 @@ export default function TabLayout() {
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: focused ? 0.8 : 0,
         shadowRadius: focused ? 10 : 0,
-        // Center the icon vertically in the tab
+        // Add alignment adjustments
         alignItems: 'center',
         justifyContent: 'center',
-        // Move icon to center of tab bar
-        marginBottom: focused ? 0 : 14, // Adjust for label space when not focused
+        marginTop: offsetY, // Move down when focused
       }}>
         <Icon size={size} color={tabColors[colorKey].dark} />
       </View>
@@ -108,9 +110,6 @@ export default function TabLayout() {
           fontSize: 10,
           marginTop: 4,
           textAlign: 'center',
-          position: 'absolute',
-          bottom: 10, // Position label at the bottom with some padding
-          width: '100%',
         }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -131,31 +130,24 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: tabColors[activeColorKey].accent,
           borderTopWidth: 0,
-          elevation: 8,
+          elevation: 0,
+          shadowOpacity: 0,
           height: 120, // Taller footer
-          padding: 0,
-          paddingBottom: 0,
-          paddingTop: 0,
+          paddingBottom: 30, // Bottom padding
+          paddingTop: 20, // Top padding
+          // Shadow styling similar to original but with specific shadow values
           shadowColor: tabColors[activeColorKey].dark,
           shadowOffset: { width: 0, height: -3 },
-          shadowOpacity: 0.3,
           shadowRadius: 6,
         },
         tabBarItemStyle: {
           borderRadius: 12,
           marginHorizontal: 2,
           paddingHorizontal: 2,
-          height: 120, // Make items fill the entire footer height
-          alignItems: 'center',
-          justifyContent: 'center', // This centers content vertically
-          margin: 0,
-          padding: 0,
+          // Ensure consistent height and positioning
+          height: 75, // Fixed height for items
+          paddingTop: 12, // Top padding to position icon
         },
-        tabBarIconStyle: {
-          marginTop: 0,
-          marginBottom: 0,
-        },
-        // Remove tabBarLabelStyle as we're handling label positioning in the TabLabel component
         tabBarLabelPosition: 'below-icon',
       }}>
       <Tabs.Screen
