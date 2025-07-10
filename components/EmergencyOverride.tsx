@@ -7,31 +7,48 @@ interface EmergencyOverrideProps {
   visible: boolean;
   onClose: () => void;
   onConfirm: () => void;
+  accentColor?: string; // Main accent color
+  darkColor?: string;   // Darker variant for borders, etc.
 }
 
-export default function EmergencyOverride({ visible, onClose, onConfirm }: EmergencyOverrideProps) {
+export default function EmergencyOverride({ 
+  visible, 
+  onClose, 
+  onConfirm, 
+  accentColor = '#2B6CB0', // Default blue
+  darkColor = '#2C5282'    // Default dark blue
+}: EmergencyOverrideProps) {
   if (!visible) return null;
 
   return (
     <View style={styles.overlay}>
       <NeumorphicCard style={styles.card}>
         <View style={styles.header}>
-          <AlertTriangle size={32} color="#2B6CB0" />
+          <AlertTriangle size={32} color={accentColor} />
           <Text style={styles.title}>Emergency Override</Text>
         </View>
 
-        <View style={styles.effects}>
-          <Text style={styles.effectsTitle}>What happens:</Text>
-          <Text style={styles.effectItem}>• Non-urgent tasks → Tomorrow</Text>
-          <Text style={styles.effectItem}>• Emergency tasks created</Text>
-          <Text style={styles.effectItem}>• Critical habits reduced</Text>
+        <View style={[styles.effects, { 
+          backgroundColor: `${accentColor}10`, // Light version of accent color
+          borderLeftColor: accentColor 
+        }]}>
+          <Text style={[styles.effectsTitle, { color: accentColor }]}>What happens:</Text>
+          <Text style={[styles.effectItem, { color: darkColor }]}>• Non-urgent tasks → Tomorrow</Text>
+          <Text style={[styles.effectItem, { color: darkColor }]}>• Emergency tasks created</Text>
+          <Text style={[styles.effectItem, { color: darkColor }]}>• Critical habits reduced</Text>
         </View>
 
         <View style={styles.actions}>
           <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
             <Text style={styles.cancelText}>Cancel</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.confirmButton} onPress={onConfirm}>
+          <TouchableOpacity 
+            style={[styles.confirmButton, { 
+              backgroundColor: accentColor,
+              shadowColor: accentColor 
+            }]} 
+            onPress={onConfirm}
+          >
             <Text style={styles.confirmText}>Activate</Text>
             <ArrowRight size={16} color="#ffffff" />
           </TouchableOpacity>
