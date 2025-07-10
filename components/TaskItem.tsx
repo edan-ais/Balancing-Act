@@ -27,6 +27,9 @@ interface TaskItemProps {
   onMoveDown?: (id: string) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  accentColor?: string; // Optional color override
+  borderColor?: string; // Optional border color override
+  habitColor?: string;  // Optional habit color override
 }
 
 export default function TaskItem({ 
@@ -38,7 +41,10 @@ export default function TaskItem({
   onMoveUp,
   onMoveDown,
   isFirst,
-  isLast
+  isLast,
+  accentColor,
+  borderColor,
+  habitColor
 }: TaskItemProps) {
   const [scaleAnim] = useState(new Animated.Value(1));
 
@@ -64,6 +70,11 @@ export default function TaskItem({
       default: return '#2B6CB0';
     }
   };
+  
+  // If override colors are provided, use them, otherwise use the category colors
+  const taskColor = borderColor || getTabColor(task.category);
+  const taskAccentColor = accentColor || taskColor;
+  const taskHabitColor = habitColor || taskColor;
   
   const handleToggle = () => {
     // Celebration animation
@@ -119,6 +130,7 @@ export default function TaskItem({
       <NeumorphicCard style={[
         styles.taskCard, 
         task.isHabit && styles.habitCard,
+        { borderColor: taskColor }
       ]}>
         <View style={styles.taskHeader}>
           <TouchableOpacity
@@ -127,7 +139,7 @@ export default function TaskItem({
               styles.checkbox,
               task.completed && styles.checkedBox,
               task.isHabit && styles.habitBox,
-              { backgroundColor: task.completed ? getTabColor(task.category) : '#E2E8F0' },
+              { backgroundColor: task.completed ? taskAccentColor : '#E2E8F0' },
             ]}
           >
             {task.completed ? (
@@ -136,7 +148,7 @@ export default function TaskItem({
               task.isHabit && task.habitCount !== undefined && (
                 <Text style={[
                   styles.habitCount,
-                  { color: task.completed ? '#ffffff' : getTabColor(task.category) }
+                  { color: task.completed ? '#ffffff' : taskHabitColor }
                 ]}>
                   {task.habitCount}
                 </Text>
@@ -174,7 +186,7 @@ export default function TaskItem({
                     styles.habitProgressBar, 
                     { 
                       width: `${habitProgress}%`,
-                      backgroundColor: getTabColor(task.category)
+                      backgroundColor: taskHabitColor
                     }
                   ]} 
                 />
@@ -197,7 +209,7 @@ export default function TaskItem({
                         styles.subtaskCheckbox, 
                         subtask.completed && [
                           styles.subtaskCompleted,
-                          { backgroundColor: getTabColor(task.category) }
+                          { backgroundColor: taskAccentColor }
                         ]
                       ]} 
                     >
@@ -253,7 +265,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   habitCard: {
-    backgroundColor: '#d9e0fc',
+    backgroundColor: '#f0f9f4', // Light green background for habit cards
   },
   taskHeader: {
     flexDirection: 'row',
