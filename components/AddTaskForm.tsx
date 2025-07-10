@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView } from 'react-native';
-import { Plus, X } from 'lucide-react-native';
+import { Plus, X, Calendar as CalendarIcon } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 interface AddTaskFormProps {
@@ -15,11 +15,22 @@ interface AddTaskFormProps {
     isDelegated: boolean;
     delegatedTo: string;
     subtasks: { title: string }[];
+    // New fields
+    mealType?: string;
+    dayOfWeek?: string;
+    specificDate?: Date;
+    notes?: string;
+    frequency?: string;
+    recurringDays?: string[];
+    recurringDate?: number;
+    isRecurring?: boolean;
+    reminderEnabled?: boolean;
   }) => void;
   category: string;
+  selectedDate?: Date | null;
 }
 
-export default function AddTaskForm({ visible, onClose, onSubmit, category }: AddTaskFormProps) {
+export default function AddTaskForm({ visible, onClose, onSubmit, category, selectedDate }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
   const [location, setLocation] = useState('anywhere');
@@ -29,9 +40,18 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category }: Ad
   const [delegatedTo, setDelegatedTo] = useState('');
   const [subtasks, setSubtasks] = useState<string[]>(['']);
 
+  // New state variables for category-specific fields
+  const [mealType, setMealType] = useState('');
+  const [dayOfWeek, setDayOfWeek] = useState('');
+  const [notes, setNotes] = useState('');
+  const [frequency, setFrequency] = useState('');
+  const [isRecurring, setIsRecurring] = useState(false);
+  const [recurringDays, setRecurringDays] = useState<string[]>([]);
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+
   const handleSubmit = () => {
     if (title.trim()) {
-      onSubmit({
+      const baseTask = {
         title: title.trim(),
         isHabit,
         location,
@@ -40,7 +60,50 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category }: Ad
         isDelegated,
         delegatedTo: isDelegated ? delegatedTo : '',
         subtasks: subtasks.filter(s => s.trim()).map(s => ({ title: s.trim() })),
-      });
+      };
+
+      // Add category-specific fields
+      let taskData = { ...baseTask };
+
+      // Weekly calendar specific fields
+      if (category === 'weekly') {
+        taskData = {
+          ...taskData,
+          isRecurring,
+          recurringDays: isRecurring ? recurringDays : [],
+          recurringDate: isRecurring && selectedDate ? selectedDate.getDate() : undefined,
+        };
+      }
+
+      // Meal prep specific fields
+      if (category === 'meal-prep') {
+        taskData = {
+          ...taskData,
+          mealType,
+          dayOfWeek,
+          notes,
+        };
+      }
+
+      // Cleaning, self-care, delegation specific fields
+      if (['cleaning', 'self-care', 'delegation'].includes(category)) {
+        taskData = {
+          ...taskData,
+          frequency,
+        };
+      }
+
+      // Delegation reminder
+      if (category === 'delegation') {
+        taskData = {
+          ...taskData,
+          reminderEnabled,
+        };
+      }
+
+      onSubmit(taskData);
+
+      // Reset all fields
       setTitle('');
       setIsHabit(false);
       setLocation('anywhere');
@@ -49,6 +112,14 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category }: Ad
       setIsDelegated(false);
       setDelegatedTo('');
       setSubtasks(['']);
+      setMealType('');
+      setDayOfWeek('');
+      setNotes('');
+      setFrequency('');
+      setIsRecurring(false);
+      setRecurringDays([]);
+      setReminderEnabled(false);
+      
       onClose();
     }
   };
@@ -79,6 +150,14 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category }: Ad
       default: return '#667EEA';
     }
   };
+
+  const toggleRecurringDay = (day: string) => {
+    if (recurringDays.includes(day)) {
+      setRecurringDays(recurringDays.filter(d => d !== day));
+    } else {
+      setRecurringDays([...recurringDays, day]);
+    }
+  };
   
   if (!visible) return null;
 
@@ -100,6 +179,7 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category }: Ad
           autoFocus
         />
 
+        {/* Daily & Goals Tabs */}
         {(category === 'daily' || category === 'goals') && (
           <>
             <View style={styles.section}>
@@ -148,88 +228,279 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category }: Ad
                 <Text style={[styles.addSubtaskText, { color: getTabColor() }]}>Add Subtask</Text>
               </TouchableOpacity>
             </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Priority</Text>
+              <View style={styles.buttonRow}>
+                {['low', 'medium', 'high'].map((prio) => (
+                  <TouchableOpacity
+                    key={prio}
+                    style={[
+                      styles.optionButton, 
+                      priority === prio && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setPriority(prio)}
+                  >
+                    <Text style={[styles.optionText, priority === prio && styles.selectedText]}>
+                      {prio.charAt(0).toUpperCase() + prio.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+                <TouchableOpacity
+                  style={[
+                    styles.optionButton, 
+                    isQuickWin && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                  ]}
+                  onPress={() => setIsQuickWin(!isQuickWin)}
+                >
+                  <Text style={[styles.optionText, isQuickWin && styles.selectedText]}>Quick Win</Text>
+                </TouchableOpacity>
+              </View>
+            </View>
           </>
         )}
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Location</Text>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <View style={styles.buttonRow}>
-              {['home', 'work', 'errands', 'anywhere'].map((loc) => (
+        {/* Weekly Calendar Tab */}
+        {category === 'weekly' && (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Type</Text>
+              <View style={styles.buttonRow}>
                 <TouchableOpacity
-                  key={loc}
                   style={[
                     styles.optionButton, 
-                    location === loc && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    !isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
                   ]}
-                  onPress={() => setLocation(loc)}
+                  onPress={() => setIsHabit(false)}
                 >
-                  <Text style={[styles.optionText, location === loc && styles.selectedText]}>
-                    {loc.charAt(0).toUpperCase() + loc.slice(1)}
-                  </Text>
+                  <Text style={[styles.optionText, !isHabit && styles.selectedText]}>Task</Text>
                 </TouchableOpacity>
-              ))}
+                <TouchableOpacity
+                  style={[
+                    styles.optionButton, 
+                    isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                  ]}
+                  onPress={() => setIsHabit(true)}
+                >
+                  <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
+                </TouchableOpacity>
+              </View>
             </View>
-          </ScrollView>
-        </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Priority</Text>
-          <View style={styles.buttonRow}>
-            {['low', 'medium', 'high'].map((prio) => (
-              <TouchableOpacity
-                key={prio}
-                style={[
-                  styles.optionButton, 
-                  priority === prio && [styles.selectedOption, {backgroundColor: getTabColor()}]
-                ]}
-                onPress={() => setPriority(prio)}
-              >
-                <Text style={[styles.optionText, priority === prio && styles.selectedText]}>
-                  {prio.charAt(0).toUpperCase() + prio.slice(1)}
-                </Text>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Subtasks</Text>
+              {subtasks.map((subtask, index) => (
+                <View key={index} style={styles.subtaskRow}>
+                  <TextInput
+                    style={styles.subtaskInput}
+                    placeholder={`Subtask ${index + 1}`}
+                    value={subtask}
+                    onChangeText={(value) => updateSubtask(index, value)}
+                  />
+                  {subtasks.length > 1 && (
+                    <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
+                      <X size={16} color="#FC8181" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+              <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
+                <Plus size={16} color={getTabColor()} />
+                <Text style={[styles.addSubtaskText, { color: getTabColor() }]}>Add Subtask</Text>
               </TouchableOpacity>
-            ))}
-          </View>
-        </View>
+            </View>
 
-        <View style={styles.section}>
-          <Text style={styles.sectionTitle}>Tags</Text>
-          <View style={styles.buttonRow}>
-            <TouchableOpacity
-              style={[
-                styles.optionButton, 
-                isQuickWin && [styles.selectedOption, {backgroundColor: getTabColor()}]
-              ]}
-              onPress={() => setIsQuickWin(!isQuickWin)}
-            >
-              <Text style={[styles.optionText, isQuickWin && styles.selectedText]}>Quick Win</Text>
-            </TouchableOpacity>
-            {category === 'delegation' && (
-              <TouchableOpacity
-                style={[
-                  styles.optionButton, 
-                  isDelegated && [styles.selectedOption, {backgroundColor: getTabColor()}]
-                ]}
-                onPress={() => setIsDelegated(!isDelegated)}
-              >
-                <Text style={[styles.optionText, isDelegated && styles.selectedText]}>Delegated</Text>
-              </TouchableOpacity>
-            )}
-          </View>
-        </View>
-
-        {isDelegated && (
-          <View style={styles.section}>
-            <Text style={styles.sectionTitle}>Delegate To</Text>
-            <TextInput
-              style={styles.input}
-              placeholder="Person's name"
-              value={delegatedTo}
-              onChangeText={setDelegatedTo}
-            />
-          </View>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Date Options</Text>
+              <View style={styles.buttonRow}>
+                <TouchableOpacity
+                  style={[
+                    styles.optionButton, 
+                    !isRecurring && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                  ]}
+                  onPress={() => setIsRecurring(false)}
+                >
+                  <Text style={[styles.optionText, !isRecurring && styles.selectedText]}>One-time</Text>
+                </TouchableOpacity>
+                <TouchableOpacity
+                  style={[
+                    styles.optionButton, 
+                    isRecurring && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                  ]}
+                  onPress={() => setIsRecurring(true)}
+                >
+                  <Text style={[styles.optionText, isRecurring && styles.selectedText]}>Recurring</Text>
+                </TouchableOpacity>
+              </View>
+              
+              {isRecurring && (
+                <View style={styles.recurringOptions}>
+                  <Text style={styles.recurringTitle}>Repeat on:</Text>
+                  <View style={styles.daysRow}>
+                    {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
+                      <TouchableOpacity
+                        key={day}
+                        style={[
+                          styles.dayButton,
+                          recurringDays.includes(day) && {backgroundColor: getTabColor()}
+                        ]}
+                        onPress={() => toggleRecurringDay(day)}
+                      >
+                        <Text style={[
+                          styles.dayText,
+                          recurringDays.includes(day) && {color: '#FFFFFF'}
+                        ]}>
+                          {day.charAt(0)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
+                  </View>
+                </View>
+              )}
+            </View>
+          </>
         )}
+
+        {/* Meal Prep Tab */}
+        {category === 'meal-prep' && (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Meal Type</Text>
+              <View style={styles.buttonRow}>
+                {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
+                  <TouchableOpacity
+                    key={type}
+                    style={[
+                      styles.optionButton, 
+                      mealType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setMealType(type)}
+                  >
+                    <Text style={[styles.optionText, mealType === type && styles.selectedText]}>
+                      {type.charAt(0).toUpperCase() + type.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Day</Text>
+              <View style={styles.buttonRow}>
+                {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                  <TouchableOpacity
+                    key={day}
+                    style={[
+                      styles.optionButton, 
+                      dayOfWeek === day && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setDayOfWeek(day)}
+                  >
+                    <Text style={[styles.optionText, dayOfWeek === day && styles.selectedText]}>
+                      {day}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Recipe Notes</Text>
+              <TextInput
+                style={[styles.input, styles.notesInput]}
+                placeholder="Add recipe notes, ingredients, etc."
+                value={notes}
+                onChangeText={setNotes}
+                multiline
+                numberOfLines={4}
+              />
+            </View>
+          </>
+        )}
+
+        {/* Cleaning, Self-care, and Delegation Tabs */}
+        {['cleaning', 'self-care', 'delegation'].includes(category) && (
+          <>
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Frequency</Text>
+              <View style={styles.buttonRow}>
+                {['daily', 'weekly', 'monthly', 'seasonal'].map((freq) => (
+                  <TouchableOpacity
+                    key={freq}
+                    style={[
+                      styles.optionButton, 
+                      frequency === freq && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setFrequency(freq)}
+                  >
+                    <Text style={[styles.optionText, frequency === freq && styles.selectedText]}>
+                      {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                    </Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+            </View>
+
+            <View style={styles.section}>
+              <Text style={styles.sectionTitle}>Subtasks</Text>
+              {subtasks.map((subtask, index) => (
+                <View key={index} style={styles.subtaskRow}>
+                  <TextInput
+                    style={styles.subtaskInput}
+                    placeholder={`Subtask ${index + 1}`}
+                    value={subtask}
+                    onChangeText={(value) => updateSubtask(index, value)}
+                  />
+                  {subtasks.length > 1 && (
+                    <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
+                      <X size={16} color="#FC8181" />
+                    </TouchableOpacity>
+                  )}
+                </View>
+              ))}
+              <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
+                <Plus size={16} color={getTabColor()} />
+                <Text style={[styles.addSubtaskText, { color: getTabColor() }]}>Add Subtask</Text>
+              </TouchableOpacity>
+            </View>
+
+            {/* Delegation-specific reminder */}
+            {category === 'delegation' && (
+              <View style={styles.section}>
+                <View style={styles.reminderRow}>
+                  <Text style={styles.sectionTitle}>Add calendar reminder</Text>
+                  <TouchableOpacity
+                    style={[
+                      styles.toggleButton,
+                      reminderEnabled && { backgroundColor: getTabColor() }
+                    ]}
+                    onPress={() => setReminderEnabled(!reminderEnabled)}
+                  >
+                    <View style={[
+                      styles.toggleKnob,
+                      reminderEnabled && { transform: [{ translateX: 18 }] }
+                    ]} />
+                  </TouchableOpacity>
+                </View>
+                {reminderEnabled && (
+                  <Text style={styles.reminderText}>
+                    Will add "Remind {delegatedTo || 'person'} to {title}" to your calendar
+                  </Text>
+                )}
+                <View style={styles.section}>
+                  <Text style={styles.sectionTitle}>Delegate To</Text>
+                  <TextInput
+                    style={styles.input}
+                    placeholder="Person's name"
+                    value={delegatedTo}
+                    onChangeText={setDelegatedTo}
+                  />
+                </View>
+              </View>
+            )}
+          </>
+        )}
+
         <TouchableOpacity style={[styles.submitButton, { backgroundColor: getTabColor() }]} onPress={handleSubmit}>
           <Plus size={20} color="#ffffff" />
           <Text style={styles.submitText}>Add Task</Text>
@@ -256,6 +527,7 @@ const styles = StyleSheet.create({
     maxWidth: 400,
     padding: 20,
     margin: 0,
+    maxHeight: '90%',
   },
   header: {
     flexDirection: 'row',
@@ -283,6 +555,10 @@ const styles = StyleSheet.create({
     shadowOpacity: 0.1,
     shadowRadius: 4,
   },
+  notesInput: {
+    height: 100,
+    textAlignVertical: 'top',
+  },
   section: {
     marginBottom: 20,
   },
@@ -294,7 +570,9 @@ const styles = StyleSheet.create({
   },
   buttonRow: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     gap: 8,
+    marginBottom: 8,
   },
   optionButton: {
     paddingHorizontal: 16,
@@ -365,4 +643,61 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-SemiBold',
     marginLeft: 8,
   },
+  recurringOptions: {
+    marginTop: 10,
+  },
+  recurringTitle: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Medium',
+    color: '#4A5568',
+    marginBottom: 8,
+  },
+  daysRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 10,
+  },
+  dayButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: '#E2E8F0',
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#C8D0E0',
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+  },
+  dayText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#4A5568',
+  },
+  reminderRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 8,
+  },
+  toggleButton: {
+    width: 44,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#CBD5E0',
+    padding: 2,
+  },
+  toggleKnob: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    backgroundColor: '#FFFFFF',
+  },
+  reminderText: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+    color: '#4A5568',
+    fontStyle: 'italic',
+    marginBottom: 10,
+  }
 });
