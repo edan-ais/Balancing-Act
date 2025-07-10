@@ -16,7 +16,7 @@ export default function EmergencyOverride({
   onClose, 
   onConfirm, 
   accentColor = '#38A169', // Vibrant medium green
-  darkColor = '#276749'    // Deep forest green
+  darkColor = '#1B4731'    // Very dark forest green for better contrast
 }: EmergencyOverrideProps) {
   if (!visible) return null;
 
@@ -24,13 +24,13 @@ export default function EmergencyOverride({
     <View style={styles.overlay}>
       <NeumorphicCard style={styles.card}>
         <View style={styles.header}>
-          <AlertTriangle size={32} color={accentColor} />
+          <AlertTriangle size={32} color={darkColor} />
           <Text style={styles.title}>Emergency Override</Text>
         </View>
 
         <View style={[styles.effects, { 
           backgroundColor: '#E6FFFA', // Light mint green
-          borderLeftColor: accentColor 
+          borderLeftColor: darkColor 
         }]}>
           <Text style={[styles.effectsTitle, { color: darkColor }]}>What happens:</Text>
           <Text style={[styles.effectItem, { color: darkColor }]}>• Non-urgent tasks → Tomorrow</Text>
@@ -93,18 +93,18 @@ const styles = StyleSheet.create({
     padding: 16,
     marginBottom: 24,
     borderLeftWidth: 4,
-    borderLeftColor: '#38A169',
+    borderLeftColor: '#1B4731',
   },
   effectsTitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2F855A',
+    color: '#1B4731',
     marginBottom: 8,
   },
   effectItem: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#276749',
+    color: '#1B4731',
     marginBottom: 4,
   },
   actions: {
@@ -131,11 +131,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#276749',
+    backgroundColor: '#1B4731',
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: '#276749',
+    shadowColor: '#1B4731',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
