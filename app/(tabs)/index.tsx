@@ -1,15 +1,7 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Plus, TriangleAlert as AlertTriangle } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { PanGestureHandler, State } from 'react-native-gesture-handler';
-import Animated, { 
-  useAnimatedGestureHandler, 
-  useAnimatedStyle, 
-  useSharedValue, 
-  withSpring,
-  runOnJS 
-} from 'react-native-reanimated';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -20,66 +12,20 @@ import { tabColors } from './_layout';
 export default function DailyTasks() {
   const [showAddForm, setShowAddForm] = useState(false);
   const [showEmergencyOverride, setShowEmergencyOverride] = useState(false);
-  const [draggingTaskId, setDraggingTaskId] = useState(null);
   const taskManager = useTaskManager();
   const colors = tabColors.daily;
-  
-  const scrollViewRef = useRef(null);
-  const taskPositions = useRef({}).current;
-  const scrollOffset = useSharedValue(0);
 
   const dailyTasks = taskManager.tasks.filter(task => task.category === 'daily');
   const completedTasks = dailyTasks.filter(task => task.completed);
   const pendingTasks = dailyTasks.filter(task => !task.completed);
 
-  const handleAddTask = (newTask) => {
+  const handleAddTask = (newTask: any) => {
     taskManager.addTask({ ...newTask, category: 'daily' });
   };
 
   const handleEmergencyOverride = () => {
     taskManager.emergencyOverride();
     setShowEmergencyOverride(false);
-  };
-
-  const onScroll = (event) => {
-    scrollOffset.value = event.nativeEvent.contentOffset.y;
-  };
-
-  const handleMoveStart = (taskId) => {
-    setDraggingTaskId(taskId);
-  };
-
-  const reorderTasks = (taskId, toY) => {
-    // Find the task section (pending or completed)
-    const isCompleted = completedTasks.some(task => task.id === taskId);
-    const tasksToReorder = isCompleted ? completedTasks : pendingTasks;
-    
-    // Find the task index
-    const taskIndex = tasksToReorder.findIndex(task => task.id === taskId);
-    
-    // Find target position
-    let targetIndex = taskIndex;
-    for (let i = 0; i < tasksToReorder.length; i++) {
-      const taskPosition = taskPositions[tasksToReorder[i].id];
-      if (taskPosition && 
-          toY > taskPosition.y && 
-          toY < taskPosition.y + taskPosition.height &&
-          i !== taskIndex) {
-        targetIndex = i;
-        break;
-      }
-    }
-    
-    if (targetIndex !== taskIndex) {
-      taskManager.reorderTasks(taskId, targetIndex, isCompleted ? 'completed' : 'pending');
-    }
-  };
-  
-  const registerTaskPosition = (id, layout) => {
-    taskPositions[id] = {
-      y: layout.y,
-      height: layout.height
-    };
   };
 
   return (
@@ -101,13 +47,7 @@ export default function DailyTasks() {
         </View>
       </View>
 
-      <ScrollView 
-        style={styles.content} 
-        showsVerticalScrollIndicator={false}
-        ref={scrollViewRef}
-        onScroll={onScroll}
-        scrollEventThrottle={16}
-      >
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {dailyTasks.length === 0 ? (
           <NeumorphicCard style={styles.emptyState}>
             <Text style={styles.emptyTitle}>No tasks for today</Text>
@@ -120,7 +60,7 @@ export default function DailyTasks() {
             {pendingTasks.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Pending</Text>
-                {pendingTasks.map(task => (
+                {pendingTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
                     task={task}
@@ -128,13 +68,10 @@ export default function DailyTasks() {
                     onDelete={taskManager.deleteTask}
                     onHabitIncrement={taskManager.incrementHabit}
                     onSubtaskToggle={taskManager.toggleSubtask}
-                    onMoveStart={() => handleMoveStart(task.id)}
-                    isDragging={draggingTaskId === task.id}
-                    onLayout={(layout) => registerTaskPosition(task.id, layout)}
-                    onDragEnd={(position) => {
-                      reorderTasks(task.id, position.y + scrollOffset.value);
-                      setDraggingTaskId(null);
-                    }}
+                    onMoveUp={taskManager.moveTaskUp}
+                    onMoveDown={taskManager.moveTaskDown}
+                    isFirst={index === 0}
+                    isLast={index === pendingTasks.length - 1}
                   />
                 ))}
               </View>
@@ -143,7 +80,7 @@ export default function DailyTasks() {
             {completedTasks.length > 0 && (
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Completed</Text>
-                {completedTasks.map(task => (
+                {completedTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
                     task={task}
@@ -151,13 +88,10 @@ export default function DailyTasks() {
                     onDelete={taskManager.deleteTask}
                     onHabitIncrement={taskManager.incrementHabit}
                     onSubtaskToggle={taskManager.toggleSubtask}
-                    onMoveStart={() => handleMoveStart(task.id)}
-                    isDragging={draggingTaskId === task.id}
-                    onLayout={(layout) => registerTaskPosition(task.id, layout)}
-                    onDragEnd={(position) => {
-                      reorderTasks(task.id, position.y + scrollOffset.value);
-                      setDraggingTaskId(null);
-                    }}
+                    onMoveUp={taskManager.moveTaskUp}
+                    onMoveDown={taskManager.moveTaskDown}
+                    isFirst={index === 0}
+                    isLast={index === completedTasks.length - 1}
                   />
                 ))}
               </View>
@@ -193,6 +127,7 @@ export default function DailyTasks() {
 }
 
 const styles = StyleSheet.create({
+  // Keep your existing styles
   container: {
     flex: 1,
   },
