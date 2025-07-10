@@ -61,7 +61,7 @@ export default function TaskItem({
   const getTabColor = (category: string) => {
     switch (category) {
       case 'daily': return '#2B6CB0'; 
-      case 'goals': return '#48BB78';
+      case 'goals': return '#276749';  // Updated to deeper green
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
       case 'cleaning': return '#4299E1';
@@ -257,91 +257,142 @@ export default function TaskItem({
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  taskCard: {
+    margin: 4,
+    padding: 12,
+    borderWidth: 1,
+    borderColor: '#38A169',
+    backgroundColor: '#FFFFFF',
+  },
+  habitCard: {
+    backgroundColor: '#E3F5EC', // Slightly more visible light green background
+  },
+  taskHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
-    zIndex: 1000,
-  },
-  card: {
-    width: '90%',
-    maxWidth: 400,
-    padding: 24,
-    margin: 0,
-  },
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 16,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: 'Quicksand-Bold',
-    color: '#2D3748',
-    marginLeft: 12,
-  },
-  effects: {
-    backgroundColor: '#E6FFFA',
-    borderRadius: 12,
-    padding: 16,
-    marginBottom: 24,
-    borderLeftWidth: 4,
-    borderLeftColor: '#38A169',
-  },
-  effectsTitle: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-    color: '#2F855A',
-    marginBottom: 8,
-  },
-  effectItem: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
-    color: '#276749',
-    marginBottom: 4,
-  },
-  actions: {
-    flexDirection: 'row',
-    gap: 12,
-  },
-  cancelButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: '#E2E8F0',
-    alignItems: 'center',
+    marginRight: 12,
     shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 4,
   },
-  cancelText: {
+  checkedBox: {},
+  habitBox: {},
+  habitCount: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  taskContent: {
+    flex: 1,
+  },
+  taskTitle: {
     fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#2D3748',
+    marginBottom: 4,
+  },
+  completedTitle: {
+    textDecorationLine: 'line-through',
+    color: '#A0AEC0',
+  },
+  habitTitle: {
+    fontStyle: 'italic',
+  },
+  delegatedBadge: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#38B2AC',
+  },
+  taskMeta: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flexWrap: 'wrap',
+    marginBottom: 4,
+  },
+  priorityTag: {
+    paddingHorizontal: 8,
+    paddingVertical: 2,
+    borderRadius: 12,
+    marginRight: 8,
+    marginBottom: 4,
+  },
+  priorityText: {
+    color: '#ffffff',
+    fontSize: 10,
+    fontFamily: 'Quicksand-SemiBold',
+    textTransform: 'uppercase',
+  },
+  habitProgressContainer: {
+    height: 8,
+    backgroundColor: '#E2E8F0',
+    borderRadius: 4,
+    marginVertical: 4,
+    overflow: 'hidden',
+    position: 'relative',
+  },
+  habitProgressBar: {
+    height: '100%',
+    borderRadius: 4,
+  },
+  habitGoalText: {
+    position: 'absolute',
+    right: 0,
+    top: -16,
+    fontSize: 10,
     fontFamily: 'Quicksand-SemiBold',
     color: '#4A5568',
   },
-  confirmButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    backgroundColor: '#276749',
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    shadowColor: '#276749',
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+  subtasks: {
+    marginTop: 8,
+    paddingLeft: 4,
   },
-  confirmText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-    color: '#ffffff',
+  subtask: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  subtaskCheckbox: {
+    width: 14,
+    height: 14,
+    borderRadius: 7,
+    backgroundColor: '#E2E8F0',
     marginRight: 8,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  subtaskCompleted: {},
+  subtaskText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Regular',
+    color: '#4A5568',
+  },
+  subtaskCompletedText: {
+    textDecorationLine: 'line-through',
+    color: '#A0AEC0',
+  },
+  actionIcons: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  orderButtons: {
+    flexDirection: 'column',
+    marginRight: 8,
+  },
+  orderButton: {
+    padding: 4,
+    marginVertical: 2,
+  },
+  disabledButton: {
+    opacity: 0.5,
+  },
+  deleteIconButton: {
+    padding: 4,
   },
 });
