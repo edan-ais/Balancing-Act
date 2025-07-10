@@ -15,8 +15,8 @@ export default function EmergencyOverride({
   visible, 
   onClose, 
   onConfirm, 
-  accentColor = '#2B6CB0', // Default blue
-  darkColor = '#2C5282'    // Default dark blue
+  accentColor = '#38A169', // Vibrant medium green
+  darkColor = '#276749'    // Deep forest green
 }: EmergencyOverrideProps) {
   if (!visible) return null;
 
@@ -29,10 +29,10 @@ export default function EmergencyOverride({
         </View>
 
         <View style={[styles.effects, { 
-          backgroundColor: `${accentColor}10`, // Light version of accent color
+          backgroundColor: '#E6FFFA', // Light mint green
           borderLeftColor: accentColor 
         }]}>
-          <Text style={[styles.effectsTitle, { color: accentColor }]}>What happens:</Text>
+          <Text style={[styles.effectsTitle, { color: darkColor }]}>What happens:</Text>
           <Text style={[styles.effectItem, { color: darkColor }]}>• Non-urgent tasks → Tomorrow</Text>
           <Text style={[styles.effectItem, { color: darkColor }]}>• Emergency tasks created</Text>
           <Text style={[styles.effectItem, { color: darkColor }]}>• Critical habits reduced</Text>
@@ -44,8 +44,8 @@ export default function EmergencyOverride({
           </TouchableOpacity>
           <TouchableOpacity 
             style={[styles.confirmButton, { 
-              backgroundColor: accentColor,
-              shadowColor: accentColor 
+              backgroundColor: darkColor,
+              shadowColor: darkColor 
             }]} 
             onPress={onConfirm}
           >
@@ -88,23 +88,23 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   effects: {
-    backgroundColor: '#EBF8FF',
+    backgroundColor: '#E6FFFA',
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
     borderLeftWidth: 4,
-    borderLeftColor: '#2B6CB0',
+    borderLeftColor: '#38A169',
   },
   effectsTitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2B6CB0',
+    color: '#2F855A',
     marginBottom: 8,
   },
   effectItem: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#2C5282',
+    color: '#276749',
     marginBottom: 4,
   },
   actions: {
@@ -135,7 +135,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: '#2B6CB0',
+    shadowColor: '#276749',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
