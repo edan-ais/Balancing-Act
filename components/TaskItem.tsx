@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Check, X, GripVertical } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
+import { tabColors } from '../app/_layout';
 
 export interface Task {
   id: string;
@@ -35,6 +36,7 @@ export default function TaskItem({
   onMoveStart
 }: TaskItemProps) {
   const [scaleAnim] = useState(new Animated.Value(1));
+  const colors = tabColors[task.category];
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
@@ -112,7 +114,7 @@ export default function TaskItem({
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <NeumorphicCard style={[
         styles.taskCard, 
-        task.isHabit && styles.habitCard,
+        task.isHabit && [styles.habitCard, { backgroundColor: colors?.accent || '#EBF8FF' }],
       ]}>
         <View style={styles.taskHeader}>
           <TouchableOpacity
@@ -235,7 +237,7 @@ const styles = StyleSheet.create({
     borderColor: '#E2E8F0',
   },
   habitCard: {
-    backgroundColor: '#EBF8FF',
+    // Background color is now dynamically set using colors.accent
   },
   taskHeader: {
     flexDirection: 'row',
