@@ -48,7 +48,7 @@ export default function TaskItem({
 
   const getTabColor = (category: string) => {
     switch (category) {
-      case 'daily': return '#d9e0fc'; // Changed to dark blue for habits
+      case 'daily': return '#2B6CB0'; // Changed to dark blue for habits
       case 'goals': return '#48BB78';
       case 'weekly': return '#9F7AEA';
       case 'meal-prep': return '#ED8936';
