@@ -65,9 +65,6 @@ export default function TabLayout() {
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
     const colorKey = routeToColorMap[name];
     
-    // Calculate offset to keep icon visually centered when scaled
-    const offsetY = focused ? 8 : 0; // Adjust this value as needed
-    
     return (
       <View style={{ 
         transform: [{ scale: focused ? 1.8 : 1 }],
@@ -75,10 +72,11 @@ export default function TabLayout() {
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: focused ? 0.8 : 0,
         shadowRadius: focused ? 10 : 0,
-        // Add alignment adjustments
+        // Center the icon vertically in the tab
         alignItems: 'center',
         justifyContent: 'center',
-        marginTop: offsetY, // Move down when focused
+        // Move icon to center of tab bar
+        marginBottom: focused ? 0 : 14, // Adjust for label space when not focused
       }}>
         <Icon size={size} color={tabColors[colorKey].dark} />
       </View>
@@ -110,6 +108,9 @@ export default function TabLayout() {
           fontSize: 10,
           marginTop: 4,
           textAlign: 'center',
+          position: 'absolute',
+          bottom: 10, // Position label at the bottom with some padding
+          width: '100%',
         }}
         numberOfLines={1}
         ellipsizeMode="tail"
@@ -132,11 +133,9 @@ export default function TabLayout() {
           borderTopWidth: 0,
           elevation: 8,
           height: 120, // Taller footer
-          // Remove all padding
           padding: 0,
           paddingBottom: 0,
           paddingTop: 0,
-          // Add shadow with color matching active tab
           shadowColor: tabColors[activeColorKey].dark,
           shadowOffset: { width: 0, height: -3 },
           shadowOpacity: 0.3,
@@ -147,25 +146,16 @@ export default function TabLayout() {
           marginHorizontal: 2,
           paddingHorizontal: 2,
           height: 120, // Make items fill the entire footer height
-          // Center content vertically
           alignItems: 'center',
-          justifyContent: 'center',
-          // Remove any margins or padding that might affect centering
+          justifyContent: 'center', // This centers content vertically
           margin: 0,
           padding: 0,
-          paddingTop: 0,
-          paddingBottom: 0,
         },
         tabBarIconStyle: {
-          // Ensure icon is centered
           marginTop: 0,
           marginBottom: 0,
         },
-        tabBarLabelStyle: {
-          // Position label below icon
-          position: 'absolute',
-          bottom: 25, // Adjust this to position label properly
-        },
+        // Remove tabBarLabelStyle as we're handling label positioning in the TabLabel component
         tabBarLabelPosition: 'below-icon',
       }}>
       <Tabs.Screen
