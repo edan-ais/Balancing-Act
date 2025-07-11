@@ -107,6 +107,9 @@ const tabConfig = {
   }
 };
 
+// List of all possible tab IDs
+const allTabIds = Object.keys(tabConfig);
+
 export default function TabLayout() {
   const { selectedTabs } = useTabContext();
   
@@ -167,59 +170,74 @@ export default function TabLayout() {
   // Filter out any selectedTabs that don't have valid configurations
   const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
   
-  // Calculate flex values based on number of visible tabs
-  const tabCount = validSelectedTabs.length;
-  const flexBasis = `${100 / tabCount}%`;
+  // Create a Set for O(1) lookup
+  const selectedTabsSet = new Set(validSelectedTabs);
   
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: tabColors[activeColorKey].accent,
-          borderTopWidth: 0,
-          elevation: 8,
-          height: 120, // Taller footer
-          // Remove all padding
-          padding: 0,
-          // Add padding to center content vertically
-          paddingTop: 30, // This centers the icons vertically
-          paddingBottom: 60, // This centers the icons vertically
-          // Add shadow with color matching active tab
-          shadowColor: tabColors[activeColorKey].dark,
-          shadowOffset: { width: 0, height: -3 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
-          // Ensure tabs fill the entire width
-          display: 'flex',
-          flexDirection: 'row',
-        },
-        tabBarItemStyle: {
-          borderRadius: 12,
-          marginHorizontal: 2,
-          paddingHorizontal: 2,
-          height: 80, // Fixed height for items
-          // Center content vertically
-          alignItems: 'center',
-          justifyContent: 'center',
-          // Make tabs expand to fill available space evenly
-          flexGrow: 1,
-          flexBasis: flexBasis,
-        },
-        tabBarIconStyle: {
-          // Ensure icon is centered
-          marginTop: 0,
-          marginBottom: 0,
-        },
-        tabBarLabelStyle: {
-          // Position label below icon
-          marginTop: 4,
-        },
-        tabBarLabelPosition: 'below-icon',
+      screenOptions={({ route }) => {
+        // Check if this tab is selected
+        const routeName = route.name;
+        const isSelected = selectedTabsSet.has(routeName);
+        
+        return {
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: tabColors[activeColorKey].accent,
+            borderTopWidth: 0,
+            elevation: 8,
+            height: 120, // Taller footer
+            // Remove all padding
+            padding: 0,
+            // Add padding to center content vertically
+            paddingTop: 30, // This centers the icons vertically
+            paddingBottom: 60, // This centers the icons vertically
+            // Add shadow with color matching active tab
+            shadowColor: tabColors[activeColorKey].dark,
+            shadowOffset: { width: 0, height: -3 },
+            shadowOpacity: 0.3,
+            shadowRadius: 6,
+          },
+          // Apply different styles based on whether tab is selected
+          tabBarItemStyle: isSelected ? {
+            borderRadius: 12,
+            marginHorizontal: 2,
+            paddingHorizontal: 2,
+            height: 80, // Fixed height for items
+            // Center content vertically
+            alignItems: 'center',
+            justifyContent: 'center',
+            // Make selected tabs flexible
+            flex: 1,
+          } : {
+            // Make unselected tabs completely hidden
+            width: 0,
+            height: 0,
+            margin: 0,
+            padding: 0,
+            opacity: 0,
+            position: 'absolute',
+            left: -1000, // Move far off-screen
+          },
+          tabBarIconStyle: {
+            // Ensure icon is centered
+            marginTop: 0,
+            marginBottom: 0,
+          },
+          tabBarLabelStyle: {
+            // Position label below icon
+            marginTop: 4,
+          },
+          tabBarLabelPosition: 'below-icon',
+          // Hide the tab completely if not selected
+          tabBarButton: (props) => (
+            isSelected ? <View {...props} /> : null
+          ),
+        };
       }}>
       
-      {/* Only render tabs that are in the selectedTabs array */}
-      {validSelectedTabs.map((tabId) => {
+      {/* Render ALL tabs, but hide unselected ones with styling */}
+      {allTabIds.map((tabId) => {
         const config = tabConfig[tabId];
         if (!config) return null;
         
