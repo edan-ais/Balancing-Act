@@ -15,10 +15,22 @@ export default function EmergencyOverride({
   visible, 
   onClose, 
   onConfirm, 
-  accentColor = '#38A169', // Vibrant medium green
-  darkColor = '#1B4731'    // Very dark forest green for better contrast
+  accentColor = '#38A169', // Default accent color
+  darkColor = '#1B4731'    // Default dark color
 }: EmergencyOverrideProps) {
   if (!visible) return null;
+
+  // Generate a lighter background color based on the accent color
+  const getLightBackgroundColor = (color: string) => {
+    // For simplicity, we're using predefined light colors based on common themes
+    if (color.toLowerCase().includes('2b6cb0')) return '#E6F0FA'; // Light blue for daily
+    if (color.toLowerCase().includes('38a169') || color.toLowerCase().includes('276749')) return '#E6FFFA'; // Light green for goals
+    if (color.toLowerCase().includes('9f7aea')) return '#F3F0FF'; // Light purple for weekly
+    if (color.toLowerCase().includes('ed8936')) return '#FEEBC8'; // Light orange for meal-prep
+    return '#F7FAFC'; // Default light gray
+  };
+
+  const lightBackground = getLightBackgroundColor(darkColor);
 
   return (
     <View style={styles.overlay}>
@@ -29,7 +41,7 @@ export default function EmergencyOverride({
         </View>
 
         <View style={[styles.effects, { 
-          backgroundColor: '#E6FFFA', // Light mint green
+          backgroundColor: lightBackground,
           borderLeftColor: darkColor 
         }]}>
           <Text style={[styles.effectsTitle, { color: darkColor }]}>What happens:</Text>
@@ -88,23 +100,19 @@ const styles = StyleSheet.create({
     marginLeft: 12,
   },
   effects: {
-    backgroundColor: '#E6FFFA',
     borderRadius: 12,
     padding: 16,
     marginBottom: 24,
     borderLeftWidth: 4,
-    borderLeftColor: '#1B4731',
   },
   effectsTitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#1B4731',
     marginBottom: 8,
   },
   effectItem: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#1B4731',
     marginBottom: 4,
   },
   actions: {
@@ -131,11 +139,9 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: 16,
     borderRadius: 12,
-    backgroundColor: '#1B4731',
     alignItems: 'center',
     flexDirection: 'row',
     justifyContent: 'center',
-    shadowColor: '#1B4731',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
