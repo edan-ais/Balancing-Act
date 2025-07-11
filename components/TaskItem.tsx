@@ -91,8 +91,6 @@ useNativeDriver: true,
 }),
 ]).start();
 
-
-Copy
 onToggle(task.id);
 };
 
@@ -112,9 +110,6 @@ useNativeDriver: true,
 }),
 ]).start();
 
-basic
-
-Copy
   onHabitIncrement(task.id);
 }
 };
