@@ -1,8 +1,9 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
-import { View, Text } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useTabContext } from '@/contexts/TabContext';
+import { usePathname, useRouter } from 'expo-router';
 
 // Define pastel and dark color pairs for each tab
 export const tabColors = {
@@ -107,161 +108,122 @@ const tabConfig = {
   }
 };
 
-// List of all possible tab IDs
-const allTabIds = Object.keys(tabConfig);
-
-export default function TabLayout() {
+// Custom tab bar component
+function CustomTabBar() {
   const { selectedTabs } = useTabContext();
+  const pathname = usePathname();
+  const router = useRouter();
   
-  // Custom tab icon component to ensure proper re-rendering
-  const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
-    const colorKey = routeToColorMap[name];
-    
-    // Calculate offset to keep icon visually centered when scaled
-    const offsetY = focused ? 8 : 0; // Adjust this value as needed
-    
-    return (
-      <View style={{ 
-        transform: [{ scale: focused ? 1.8 : 1 }],
-        shadowColor: focused ? tabColors[colorKey].dark : 'transparent',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: focused ? 0.8 : 0,
-        shadowRadius: focused ? 10 : 0,
-        // Add alignment adjustments
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: offsetY, // Move down when focused
-      }}>
-        <Icon size={size} color={tabColors[colorKey].dark} />
-      </View>
-    );
-  };
+  // Extract the current tab name from the pathname
+  const currentTab = pathname.split('/').pop() || 'index';
+  const colorKey = routeToColorMap[currentTab];
   
-  // Custom tab label component with proper styling
-  const TabLabel = ({ name, focused }) => {
-    const colorKey = routeToColorMap[name];
-    
-    if (focused) return null;
-    
-    const config = tabConfig[name];
-    if (!config) return null;
-    
-    return (
-      <Text 
-        style={{
-          color: tabColors[colorKey].dark,
-          fontFamily: 'Quicksand-SemiBold',
-          fontSize: 10,
-          marginTop: 4,
-          textAlign: 'center',
-        }}
-        numberOfLines={1}
-        ellipsizeMode="tail"
-      >
-        {config.title}
-      </Text>
-    );
-  };
-  
-  // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
-  const activeColorKey = routeToColorMap[focusedTab];
-  
-  // Filter out any selectedTabs that don't have valid configurations
+  // Filter tabs to only show selected ones with valid configurations
   const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
   
-  // Create a Set for O(1) lookup
-  const selectedTabsSet = new Set(validSelectedTabs);
-  
   return (
-    <Tabs
-      screenOptions={({ route }) => {
-        // Check if this tab is selected
-        const routeName = route.name;
-        const isSelected = selectedTabsSet.has(routeName);
-        
-        return {
-          headerShown: false,
-          tabBarStyle: {
-            backgroundColor: tabColors[activeColorKey].accent,
-            borderTopWidth: 0,
-            elevation: 8,
-            height: 120, // Taller footer
-            // Remove all padding
-            padding: 0,
-            // Add padding to center content vertically
-            paddingTop: 30, // This centers the icons vertically
-            paddingBottom: 60, // This centers the icons vertically
-            // Add shadow with color matching active tab
-            shadowColor: tabColors[activeColorKey].dark,
-            shadowOffset: { width: 0, height: -3 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-          },
-          // Apply different styles based on whether tab is selected
-          tabBarItemStyle: isSelected ? {
-            borderRadius: 12,
-            marginHorizontal: 2,
-            paddingHorizontal: 2,
-            height: 80, // Fixed height for items
-            // Center content vertically
-            alignItems: 'center',
-            justifyContent: 'center',
-            // Make selected tabs flexible
-            flex: 1,
-          } : {
-            // Make unselected tabs completely hidden
-            width: 0,
-            height: 0,
-            margin: 0,
-            padding: 0,
-            opacity: 0,
-            position: 'absolute',
-            left: -1000, // Move far off-screen
-          },
-          tabBarIconStyle: {
-            // Ensure icon is centered
-            marginTop: 0,
-            marginBottom: 0,
-          },
-          tabBarLabelStyle: {
-            // Position label below icon
-            marginTop: 4,
-          },
-          tabBarLabelPosition: 'below-icon',
-          // Hide the tab completely if not selected
-          tabBarButton: (props) => (
-            isSelected ? <View {...props} /> : null
-          ),
-        };
-      }}>
-      
-      {/* Render ALL tabs, but hide unselected ones with styling */}
-      {allTabIds.map((tabId) => {
+    <View style={[styles.tabBar, { backgroundColor: tabColors[colorKey].accent }]}>
+      {validSelectedTabs.map((tabId) => {
         const config = tabConfig[tabId];
         if (!config) return null;
         
-        const colorKey = config.colorKey;
+        const Icon = config.icon;
+        const isActive = currentTab === config.name;
+        const tabColorKey = routeToColorMap[config.name];
         
         return (
-          <Tabs.Screen
+          <TouchableOpacity
             key={tabId}
-            name={config.name}
-            options={{
-              title: config.title,
-              tabBarActiveTintColor: tabColors[colorKey].dark,
-              tabBarInactiveTintColor: tabColors[colorKey].dark,
-              tabBarIcon: ({ size, focused }) => {
-                return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
-              },
-              tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
+            style={[styles.tabItem, { flex: 1 }]}
+            onPress={() => {
+              router.replace(`/(tabs)/${config.name === 'index' ? '' : config.name}`);
             }}
-            listeners={{
-              focus: () => setFocusedTab(config.name),
-            }}
-          />
+          >
+            <View style={[
+              styles.iconContainer,
+              isActive && { 
+                transform: [{ scale: 1.8 }],
+                shadowColor: tabColors[tabColorKey].dark,
+                shadowOffset: { width: 0, height: 0 },
+                shadowOpacity: 0.8,
+                shadowRadius: 10,
+                marginTop: 8,
+              }
+            ]}>
+              <Icon 
+                size={24} 
+                color={tabColors[tabColorKey].dark} 
+              />
+            </View>
+            {!isActive && (
+              <Text style={[
+                styles.tabLabel,
+                { color: tabColors[tabColorKey].dark }
+              ]}>
+                {config.title}
+              </Text>
+            )}
+          </TouchableOpacity>
         );
       })}
-    </Tabs>
+    </View>
   );
 }
+
+// Main tab layout component
+export default function TabLayout() {
+  // We still need to render all possible tab screens for navigation to work,
+  // but we'll hide the default tab bar and replace it with our custom one
+  return (
+    <View style={{ flex: 1 }}>
+      <Tabs
+        screenOptions={{
+          headerShown: false,
+          // Hide the default tab bar
+          tabBarStyle: { 
+            display: 'none' 
+          },
+        }}>
+        <Tabs.Screen name="index" />
+        <Tabs.Screen name="goals" />
+        <Tabs.Screen name="weekly" />
+        <Tabs.Screen name="meal-prep" />
+        <Tabs.Screen name="cleaning" />
+        <Tabs.Screen name="self-care" />
+        <Tabs.Screen name="delegation" />
+      </Tabs>
+      
+      {/* Our custom tab bar appears outside the Tabs component */}
+      <CustomTabBar />
+    </View>
+  );
+}
+
+const styles = StyleSheet.create({
+  tabBar: {
+    flexDirection: 'row',
+    height: 120,
+    paddingTop: 30,
+    paddingBottom: 60,
+    borderTopWidth: 0,
+    elevation: 8,
+    shadowOffset: { width: 0, height: -3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+  },
+  tabItem: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    height: 80,
+  },
+  iconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  tabLabel: {
+    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 10,
+    marginTop: 4,
+    textAlign: 'center',
+  }
+});
