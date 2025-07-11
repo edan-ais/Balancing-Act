@@ -61,6 +61,52 @@ const routeToColorMap = {
   'delegation': 'delegate'
 };
 
+// Tab configuration mapping
+const tabConfig = {
+  'index': {
+    name: 'index',
+    title: 'Daily',
+    icon: CalendarDays,
+    colorKey: 'daily'
+  },
+  'goals': {
+    name: 'goals',
+    title: 'Future',
+    icon: Target,
+    colorKey: 'future'
+  },
+  'weekly': {
+    name: 'weekly',
+    title: 'Calendar',
+    icon: Calendar,
+    colorKey: 'calendar'
+  },
+  'meal-prep': {
+    name: 'meal-prep',
+    title: 'Meals',
+    icon: ChefHat,
+    colorKey: 'meals'
+  },
+  'cleaning': {
+    name: 'cleaning',
+    title: 'Cleaning',
+    icon: Sparkles,
+    colorKey: 'cleaning'
+  },
+  'self-care': {
+    name: 'self-care',
+    title: 'Self-Care',
+    icon: Heart,
+    colorKey: 'selfCare'
+  },
+  'delegation': {
+    name: 'delegation',
+    title: 'Delegate',
+    icon: Users,
+    colorKey: 'delegate'
+  }
+};
+
 export default function TabLayout() {
   const { selectedTabs } = useTabContext();
   
@@ -94,16 +140,8 @@ export default function TabLayout() {
     
     if (focused) return null;
     
-    // Map route names to display labels
-    const labelMap = {
-      'index': 'Daily',
-      'goals': 'Future',
-      'weekly': 'Calendar',
-      'meal-prep': 'Meals',
-      'cleaning': 'Cleaning',
-      'self-care': 'Self-Care',
-      'delegation': 'Delegate'
-    };
+    const config = tabConfig[name];
+    if (!config) return null;
     
     return (
       <Text 
@@ -117,13 +155,13 @@ export default function TabLayout() {
         numberOfLines={1}
         ellipsizeMode="tail"
       >
-        {labelMap[name]}
+        {config.title}
       </Text>
     );
   };
   
   // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState('index');
+  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
   const activeColorKey = routeToColorMap[focusedTab];
   
   return (
@@ -166,111 +204,33 @@ export default function TabLayout() {
         },
         tabBarLabelPosition: 'below-icon',
       }}>
-      {selectedTabs.includes('index') && <Tabs.Screen
-        name="index"
-        options={{
-          title: 'Daily',
-          tabBarActiveTintColor: tabColors.daily.dark,
-          tabBarInactiveTintColor: tabColors.daily.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="index" size={size} iconComponent={CalendarDays} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="index" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('index'),
-        }}
-      />}
-      {selectedTabs.includes('goals') && <Tabs.Screen
-        name="goals"
-        options={{
-          title: 'Future',
-          tabBarActiveTintColor: tabColors.future.dark,
-          tabBarInactiveTintColor: tabColors.future.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="goals" size={size} iconComponent={Target} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="goals" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('goals'),
-        }}
-      />}
-      {selectedTabs.includes('weekly') && <Tabs.Screen
-        name="weekly"
-        options={{
-          title: 'Calendar',
-          tabBarActiveTintColor: tabColors.calendar.dark,
-          tabBarInactiveTintColor: tabColors.calendar.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="weekly" size={size} iconComponent={Calendar} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="weekly" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('weekly'),
-        }}
-      />}
-      {selectedTabs.includes('meal-prep') && <Tabs.Screen
-        name="meal-prep"
-        options={{
-          title: 'Meals',
-          tabBarActiveTintColor: tabColors.meals.dark,
-          tabBarInactiveTintColor: tabColors.meals.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="meal-prep" size={size} iconComponent={ChefHat} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="meal-prep" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('meal-prep'),
-        }}
-      />}
-      {selectedTabs.includes('cleaning') && <Tabs.Screen
-        name="cleaning"
-        options={{
-          title: 'Cleaning',
-          tabBarActiveTintColor: tabColors.cleaning.dark,
-          tabBarInactiveTintColor: tabColors.cleaning.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="cleaning" size={size} iconComponent={Sparkles} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="cleaning" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('cleaning'),
-        }}
-      />}
-      {selectedTabs.includes('self-care') && <Tabs.Screen
-        name="self-care"
-        options={{
-          title: 'Self-Care',
-          tabBarActiveTintColor: tabColors.selfCare.dark,
-          tabBarInactiveTintColor: tabColors.selfCare.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="self-care" size={size} iconComponent={Heart} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="self-care" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('self-care'),
-        }}
-      />}
-      {selectedTabs.includes('delegation') && <Tabs.Screen
-        name="delegation"
-        options={{
-          title: 'Delegate',
-          tabBarActiveTintColor: tabColors.delegate.dark,
-          tabBarInactiveTintColor: tabColors.delegate.dark,
-          tabBarIcon: ({ size, focused }) => {
-            return <TabIcon name="delegation" size={size} iconComponent={Users} focused={focused} />;
-          },
-          tabBarLabel: ({ focused }) => <TabLabel name="delegation" focused={focused} />,
-        }}
-        listeners={{
-          focus: () => setFocusedTab('delegation'),
-        }}
-      />}
+      
+      {/* Dynamically render only selected tabs */}
+      {selectedTabs.map((tabId) => {
+        const config = tabConfig[tabId];
+        if (!config) return null;
+        
+        const colorKey = config.colorKey;
+        
+        return (
+          <Tabs.Screen
+            key={tabId}
+            name={config.name}
+            options={{
+              title: config.title,
+              tabBarActiveTintColor: tabColors[colorKey].dark,
+              tabBarInactiveTintColor: tabColors[colorKey].dark,
+              tabBarIcon: ({ size, focused }) => {
+                return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
+              },
+              tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
+            }}
+            listeners={{
+              focus: () => setFocusedTab(config.name),
+            }}
+          />
+        );
+      })}
     </Tabs>
   );
 }
