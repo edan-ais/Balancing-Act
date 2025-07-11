@@ -112,7 +112,17 @@ export default function TabLayout() {
   
   // Custom tab icon component to ensure proper re-rendering
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
+    // Make sure we have a valid name and color key
+    if (!name || !routeToColorMap[name]) {
+      return null;
+    }
+    
     const colorKey = routeToColorMap[name];
+    
+    // Check if Icon is a valid component
+    if (!Icon) {
+      return null;
+    }
     
     // Calculate offset to keep icon visually centered when scaled
     const offsetY = focused ? 8 : 0; // Adjust this value as needed
@@ -136,6 +146,11 @@ export default function TabLayout() {
   
   // Custom tab label component with proper styling
   const TabLabel = ({ name, focused }) => {
+    // Make sure we have a valid name and color key
+    if (!name || !routeToColorMap[name]) {
+      return null;
+    }
+    
     const colorKey = routeToColorMap[name];
     
     if (focused) return null;
@@ -160,12 +175,18 @@ export default function TabLayout() {
     );
   };
   
-  // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
-  const activeColorKey = routeToColorMap[focusedTab];
-  
   // Filter out any selectedTabs that don't have valid configurations
-  const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
+  // This is the key fix: ensure we only work with valid tab configurations
+  const validSelectedTabs = selectedTabs.filter(tabId => 
+    tabId && tabConfig[tabId] && tabConfig[tabId].icon
+  );
+  
+  // Default to index if no valid tabs are selected
+  const defaultTab = validSelectedTabs.length > 0 ? validSelectedTabs[0] : 'index';
+  
+  // Get the currently focused tab for background color
+  const [focusedTab, setFocusedTab] = React.useState(defaultTab);
+  const activeColorKey = routeToColorMap[focusedTab] || 'daily'; // Fallback to daily if not found
   
   return (
     <Tabs
@@ -211,8 +232,9 @@ export default function TabLayout() {
       {/* Only render tabs that have valid configurations */}
       {validSelectedTabs.map((tabId) => {
         const config = tabConfig[tabId];
-        // This check is redundant now but keeping for safety
-        if (!config) return null;
+        
+        // Skip if no valid config (should be redundant now)
+        if (!config || !config.icon) return null;
         
         const colorKey = config.colorKey;
         
@@ -225,7 +247,12 @@ export default function TabLayout() {
               tabBarActiveTintColor: tabColors[colorKey].dark,
               tabBarInactiveTintColor: tabColors[colorKey].dark,
               tabBarIcon: ({ size, focused }) => {
-                return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
+                return <TabIcon 
+                  name={config.name} 
+                  size={size} 
+                  iconComponent={config.icon} 
+                  focused={focused} 
+                />;
               },
               tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
             }}
