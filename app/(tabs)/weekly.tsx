@@ -11,7 +11,7 @@ import { tabColors } from './_layout';
 
 export default function MonthlyCalendar() {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [selectedDate, setSelectedDate] = useState<Date | null>(null);
+  const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const taskManager = useTaskManager();
   const router = useRouter();
