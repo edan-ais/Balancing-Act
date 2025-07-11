@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
-import { View, Text, Dimensions, TouchableOpacity } from 'react-native';
+import { View, Text } from 'react-native';
 import { useTabContext } from '@/contexts/TabContext';
 
 // Define pastel and dark color pairs for each tab
@@ -112,7 +112,6 @@ const allTabIds = Object.keys(tabConfig);
 
 export default function TabLayout() {
   const { selectedTabs } = useTabContext();
-  const screenWidth = Dimensions.get('window').width;
   
   // Custom tab icon component to ensure proper re-rendering
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
@@ -179,66 +178,45 @@ export default function TabLayout() {
   
   return (
     <Tabs
-      screenOptions={({ route }) => {
-        // Check if this tab is selected
-        const routeName = route.name;
-        const isSelected = selectedTabsSet.has(routeName);
-        
-        return {
-          headerShown: false,
-          tabBarStyle: {
-            backgroundColor: tabColors[activeColorKey].accent,
-            borderTopWidth: 0,
-            elevation: 8,
-            height: 120, // Taller footer
-            // Remove all padding
-            padding: 0,
-            // Add padding to center content vertically
-            paddingTop: 30, // This centers the icons vertically
-            paddingBottom: 60, // This centers the icons vertically
-            // Add shadow with color matching active tab
-            shadowColor: tabColors[activeColorKey].dark,
-            shadowOffset: { width: 0, height: -3 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-          },
-          // For selected tabs, make them visible and distribute evenly
-          // For non-selected tabs, hide them completely
-          tabBarItemStyle: isSelected ? {
-            borderRadius: 12,
-            marginHorizontal: 2,
-            paddingHorizontal: 2,
-            height: 80, // Fixed height for items
-            // Center content vertically
-            alignItems: 'center',
-            justifyContent: 'center',
-            // Make tabs expand to fill space
-            flex: 1,
-            width: `${100 / validSelectedTabs.length}%`,
-          } : {
-            width: 0,
-            height: 0,
-            margin: 0,
-            padding: 0,
-            opacity: 0,
-            position: 'absolute',
-            left: -9999,
-          },
-          tabBarIconStyle: {
-            // Ensure icon is centered
-            marginTop: 0,
-            marginBottom: 0,
-          },
-          tabBarLabelStyle: {
-            // Position label below icon
-            marginTop: 4,
-          },
-          tabBarLabelPosition: 'below-icon',
-          // Hide the tab completely if not selected
-          tabBarButton: (props) => (
-            isSelected ? <TouchableOpacity {...props} /> : null
-          ),
-        };
+      screenOptions={{
+        headerShown: false,
+        tabBarStyle: {
+          backgroundColor: tabColors[activeColorKey].accent,
+          borderTopWidth: 0,
+          elevation: 8,
+          height: 120, // Taller footer
+          // Remove all padding
+          padding: 0,
+          // Add padding to center content vertically
+          paddingTop: 30, // This centers the icons vertically
+          paddingBottom: 60, // This centers the icons vertically
+          // Add shadow with color matching active tab
+          shadowColor: tabColors[activeColorKey].dark,
+          shadowOffset: { width: 0, height: -3 },
+          shadowOpacity: 0.3,
+          shadowRadius: 6,
+        },
+        tabBarItemStyle: {
+          borderRadius: 12,
+          marginHorizontal: 2,
+          paddingHorizontal: 2,
+          height: 80, // Fixed height for items
+          // Center content vertically
+          alignItems: 'center',
+          justifyContent: 'center',
+          // Each visible tab should grow to take available space
+          flex: 1,
+        },
+        tabBarIconStyle: {
+          // Ensure icon is centered
+          marginTop: 0,
+          marginBottom: 0,
+        },
+        tabBarLabelStyle: {
+          // Position label below icon
+          marginTop: 4,
+        },
+        tabBarLabelPosition: 'below-icon',
       }}>
       
       {/* Render all possible tabs, but protect non-selected ones */}
@@ -262,6 +240,8 @@ export default function TabLayout() {
                 return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
               },
               tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
+              // Hide the tab bar button if not selected
+              tabBarButton: selected ? undefined : () => null,
             }}
             listeners={{
               focus: () => setFocusedTab(config.name),
