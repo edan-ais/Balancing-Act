@@ -112,17 +112,17 @@ export default function TabLayout() {
   
   // Custom tab icon component to ensure proper re-rendering
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
+    // If Icon is not defined, return an empty placeholder with same dimensions
+    if (!Icon) {
+      return <View style={{ width: size, height: size }} />;
+    }
+    
     // Make sure we have a valid name and color key
     if (!name || !routeToColorMap[name]) {
-      return null;
+      return <View style={{ width: size, height: size }} />;
     }
     
     const colorKey = routeToColorMap[name];
-    
-    // Check if Icon is a valid component
-    if (!Icon) {
-      return null;
-    }
     
     // Calculate offset to keep icon visually centered when scaled
     const offsetY = focused ? 8 : 0; // Adjust this value as needed
@@ -146,9 +146,9 @@ export default function TabLayout() {
   
   // Custom tab label component with proper styling
   const TabLabel = ({ name, focused }) => {
-    // Make sure we have a valid name and color key
+    // If no valid name or color key, return empty component with same height
     if (!name || !routeToColorMap[name]) {
-      return null;
+      return <View style={{ height: 14 }} />;
     }
     
     const colorKey = routeToColorMap[name];
@@ -156,7 +156,7 @@ export default function TabLayout() {
     if (focused) return null;
     
     const config = tabConfig[name];
-    if (!config) return null;
+    if (!config) return <View style={{ height: 14 }} />;
     
     return (
       <Text 
@@ -175,18 +175,12 @@ export default function TabLayout() {
     );
   };
   
-  // Filter out any selectedTabs that don't have valid configurations
-  // This is the key fix: ensure we only work with valid tab configurations
-  const validSelectedTabs = selectedTabs.filter(tabId => 
-    tabId && tabConfig[tabId] && tabConfig[tabId].icon
-  );
-  
-  // Default to index if no valid tabs are selected
-  const defaultTab = validSelectedTabs.length > 0 ? validSelectedTabs[0] : 'index';
-  
   // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState(defaultTab);
+  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
   const activeColorKey = routeToColorMap[focusedTab] || 'daily'; // Fallback to daily if not found
+  
+  // Calculate available tab width based on the number of selected tabs
+  const availableWidth = `${100 / selectedTabs.length}%`;
   
   return (
     <Tabs
@@ -216,6 +210,8 @@ export default function TabLayout() {
           // Center content vertically
           alignItems: 'center',
           justifyContent: 'center',
+          // Set dynamic width based on number of tabs
+          width: availableWidth,
         },
         tabBarIconStyle: {
           // Ensure icon is centered
@@ -229,35 +225,45 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
       }}>
       
-      {/* Only render tabs that have valid configurations */}
-      {validSelectedTabs.map((tabId) => {
+      {/* Render all selected tabs, even if their config is invalid */}
+      {selectedTabs.map((tabId) => {
         const config = tabConfig[tabId];
+        // Use a default config object if the tab doesn't have a valid config
+        const safeConfig = config || { 
+          name: tabId, 
+          title: '', 
+          icon: null, 
+          colorKey: 'daily' // Use a default color key
+        };
         
-        // Skip if no valid config (should be redundant now)
-        if (!config || !config.icon) return null;
-        
-        const colorKey = config.colorKey;
+        const colorKey = safeConfig.colorKey;
         
         return (
           <Tabs.Screen
             key={tabId}
-            name={config.name}
+            name={safeConfig.name}
             options={{
-              title: config.title,
-              tabBarActiveTintColor: tabColors[colorKey].dark,
-              tabBarInactiveTintColor: tabColors[colorKey].dark,
+              title: safeConfig.title || '',
+              tabBarActiveTintColor: tabColors[colorKey]?.dark || '#000000',
+              tabBarInactiveTintColor: tabColors[colorKey]?.dark || '#000000',
               tabBarIcon: ({ size, focused }) => {
                 return <TabIcon 
-                  name={config.name} 
+                  name={safeConfig.name} 
                   size={size} 
-                  iconComponent={config.icon} 
+                  iconComponent={safeConfig.icon} 
                   focused={focused} 
                 />;
               },
-              tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
+              tabBarLabel: ({ focused }) => <TabLabel name={safeConfig.name} focused={focused} />,
+              // Make the tab button non-interactive if it doesn't have a valid config
+              tabBarButton: !config ? () => <View style={{ width: availableWidth }} /> : undefined,
             }}
             listeners={{
-              focus: () => setFocusedTab(config.name),
+              focus: () => {
+                if (config) {
+                  setFocusedTab(config.name);
+                }
+              },
             }}
           />
         );
