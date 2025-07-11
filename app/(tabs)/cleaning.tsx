@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, RotateCcw, Calendar, Sun, RefreshCw, Moon, CloudSnow } from 'lucide-react-native';
+import { Plus, Home, Sun, RefreshCw, Moon, CloudSnow } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -11,6 +12,7 @@ import { tabColors } from './_layout'; // Import from tab layout
 export default function RepetitiveCleaning() {
   const [showAddForm, setShowAddForm] = useState(false);
   const taskManager = useTaskManager();
+  const router = useRouter();
   const colors = tabColors.cleaning;
   const blueColor = '#4299E1'; // Blue color for all icons
 
@@ -55,11 +57,11 @@ export default function RepetitiveCleaning() {
           <Text style={styles.subtitle}>Maintain your space regularly</Text>
         </View>
         <View style={styles.headerActions}>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
-            <RotateCcw size={20} color={blueColor} />
-          </TouchableOpacity>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
-            <Calendar size={20} color={blueColor} />
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/')}
+          >
+            <Home size={20} color={colors.dark} />
           </TouchableOpacity>
         </View>
       </View>

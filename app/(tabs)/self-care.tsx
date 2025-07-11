@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Heart, Smile, Moon, Activity, Music } from 'lucide-react-native';
+import { Plus, Heart, Smile, Moon, Activity, Music, Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -11,6 +12,7 @@ import { tabColors } from './_layout';
 export default function SelfCare() {
   const [showAddForm, setShowAddForm] = useState(false);
   const taskManager = useTaskManager();
+  const router = useRouter();
   const colors = tabColors.selfCare;
 
   const selfCareTasks = taskManager.tasks.filter(task => task.category === 'self-care');
@@ -61,8 +63,11 @@ export default function SelfCare() {
           <Text style={styles.subtitle}>Nurture yourself daily</Text>
         </View>
         <View style={styles.headerIcons}>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
-            <Heart size={20} color="#FF0000" />
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/')}
+          >
+            <Home size={20} color={colors.dark} />
           </TouchableOpacity>
         </View>
       </View>

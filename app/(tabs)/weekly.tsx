@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react-native';
+import { Plus, ChevronLeft, ChevronRight, Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -13,6 +14,7 @@ export default function MonthlyCalendar() {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const taskManager = useTaskManager();
+  const router = useRouter();
   const colors = tabColors.calendar;
 
   const weeklyTasks = taskManager.tasks.filter(task => task.category === 'weekly');
@@ -77,6 +79,12 @@ export default function MonthlyCalendar() {
           <Text style={styles.subtitle}>Plan your future tasks</Text>
         </View>
         <View style={styles.monthNavigation}>
+          <TouchableOpacity
+            style={[styles.homeButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/')}
+          >
+            <Home size={20} color={colors.dark} />
+          </TouchableOpacity>
           <TouchableOpacity
             style={[styles.navButton, { backgroundColor: colors.accent }]}
             onPress={() => navigateMonth('prev')}
@@ -225,6 +233,17 @@ const styles = StyleSheet.create({
     gap: 8,
   },
   navButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#C8D0E0',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  homeButton: {
     width: 40,
     height: 40,
     borderRadius: 20,

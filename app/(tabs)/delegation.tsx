@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Users, Heart, Home, Star, BookOpen } from 'lucide-react-native';
+import { Plus, Users, Heart, Home as HomeIcon, Star, BookOpen } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
@@ -11,6 +12,7 @@ import { tabColors } from './_layout';
 export default function Delegation() {
   const [showAddForm, setShowAddForm] = useState(false);
   const taskManager = useTaskManager();
+  const router = useRouter();
   const colors = tabColors.delegate;
   const tealColor = '#38B2AC'; // Teal color for all icons
 
@@ -31,7 +33,7 @@ export default function Delegation() {
     { 
       name: 'Family', 
       subtitle: 'Extended support network',
-      icon: Home,
+      icon: HomeIcon,
       color: '#4299E1',
       tasks: delegationTasks.filter(t => t.title.toLowerCase().includes('family')),
     },
@@ -62,8 +64,11 @@ export default function Delegation() {
           <Text style={styles.subtitle}>Share the load with others</Text>
         </View>
         <View style={styles.headerIcons}>
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
-            <Users size={20} color={tealColor} />
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/')}
+          >
+            <HomeIcon size={20} color={colors.dark} />
           </TouchableOpacity>
         </View>
       </View>

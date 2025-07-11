@@ -1,18 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, TriangleAlert as AlertTriangle } from 'lucide-react-native';
+import { Plus, Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
-import EmergencyOverride from '@/components/EmergencyOverride';
 import { useTaskManager } from '@/hooks/useTaskManager';
 import { tabColors } from './_layout';
 
 export default function DailyTasks() {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showEmergencyOverride, setShowEmergencyOverride] = useState(false);
   const taskManager = useTaskManager();
+  const router = useRouter();
   const colors = tabColors.daily;
 
   const dailyTasks = taskManager.tasks.filter(task => task.category === 'daily');
@@ -21,11 +21,6 @@ export default function DailyTasks() {
 
   const handleAddTask = (newTask: any) => {
     taskManager.addTask({ ...newTask, category: 'daily' });
-  };
-
-  const handleEmergencyOverride = () => {
-    taskManager.emergencyOverride();
-    setShowEmergencyOverride(false);
   };
 
   return (
@@ -39,10 +34,10 @@ export default function DailyTasks() {
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity
-            style={[styles.emergencyButton, { backgroundColor: colors.accent }]}
-            onPress={() => setShowEmergencyOverride(true)}
+            style={[styles.homeButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/')}
           >
-            <AlertTriangle size={20} color={colors.dark} />
+            <Home size={20} color={colors.dark} />
           </TouchableOpacity>
         </View>
       </View>
@@ -116,14 +111,6 @@ export default function DailyTasks() {
         onSubmit={handleAddTask}
         category="daily"
       />
-
-      <EmergencyOverride
-  visible={showEmergencyOverride}
-  onClose={() => setShowEmergencyOverride(false)}
-  onConfirm={handleEmergencyOverride}
-  accentColor={colors.accent}
-  darkColor={colors.dark}
-/>
     </SafeAreaView>
   );
 }
@@ -155,7 +142,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     gap: 12,
   },
-  emergencyButton: {
+  homeButton: {
     width: 44,
     height: 44,
     borderRadius: 22,
