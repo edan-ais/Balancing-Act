@@ -167,6 +167,10 @@ export default function TabLayout() {
   // Filter out any selectedTabs that don't have valid configurations
   const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
   
+  // Calculate flex values based on number of visible tabs
+  const tabCount = validSelectedTabs.length;
+  const flexBasis = `${100 / tabCount}%`;
+  
   return (
     <Tabs
       screenOptions={{
@@ -186,6 +190,9 @@ export default function TabLayout() {
           shadowOffset: { width: 0, height: -3 },
           shadowOpacity: 0.3,
           shadowRadius: 6,
+          // Ensure tabs fill the entire width
+          display: 'flex',
+          flexDirection: 'row',
         },
         tabBarItemStyle: {
           borderRadius: 12,
@@ -195,6 +202,9 @@ export default function TabLayout() {
           // Center content vertically
           alignItems: 'center',
           justifyContent: 'center',
+          // Make tabs expand to fill available space evenly
+          flexGrow: 1,
+          flexBasis: flexBasis,
         },
         tabBarIconStyle: {
           // Ensure icon is centered
@@ -208,10 +218,9 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
       }}>
       
-      {/* Only render tabs that have valid configurations */}
+      {/* Only render tabs that are in the selectedTabs array */}
       {validSelectedTabs.map((tabId) => {
         const config = tabConfig[tabId];
-        // This check is redundant now but keeping for safety
         if (!config) return null;
         
         const colorKey = config.colorKey;
