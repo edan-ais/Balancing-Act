@@ -66,7 +66,7 @@ export default function Delegation() {
         <View style={styles.headerIcons}>
           <TouchableOpacity 
             style={[styles.actionButton, { backgroundColor: colors.accent }]}
-            onPress={() => router.push('/')}
+            onPress={() => router.push('/home')}
           >
             <HomeIcon size={20} color={colors.dark} />
           </TouchableOpacity>

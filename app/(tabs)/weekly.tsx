@@ -81,7 +81,7 @@ export default function MonthlyCalendar() {
         <View style={styles.monthNavigation}>
           <TouchableOpacity
             style={[styles.homeButton, { backgroundColor: colors.accent }]}
-            onPress={() => router.push('/')}
+            onPress={() => router.push('/home')}
           >
             <Home size={20} color={colors.dark} />
           </TouchableOpacity>

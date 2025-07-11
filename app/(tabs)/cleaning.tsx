@@ -59,7 +59,7 @@ export default function RepetitiveCleaning() {
         <View style={styles.headerActions}>
           <TouchableOpacity 
             style={[styles.actionButton, { backgroundColor: colors.accent }]}
-            onPress={() => router.push('/')}
+            onPress={() => router.push('/home')}
           >
             <Home size={20} color={colors.dark} />
           </TouchableOpacity>
