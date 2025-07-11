@@ -52,17 +52,19 @@ export default function MealPrep() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
-          <Text style={styles.subtitle}>Plan and prepare your meals</Text>
-        </View>
-            style={[styles.actionButton, { backgroundColor: colors.accent }]}
-            onPress={() => router.push('/')}
-          <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
-            <Home size={20} color={colors.dark} />
-          </TouchableOpacity>
-        </View>
-      </View>
+  <View>
+    <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
+    <Text style={styles.subtitle}>Plan and prepare your meals</Text>
+  </View>
+  <View style={styles.headerIcons}>
+    <TouchableOpacity 
+      style={[styles.actionButton, { backgroundColor: colors.accent }]}
+      onPress={() => router.push('/')}
+    >
+      <Home size={20} color={colors.dark} />
+    </TouchableOpacity>
+  </View>
+</View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {mealCategories.map((category, index) => (
