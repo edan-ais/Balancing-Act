@@ -118,10 +118,12 @@ export default function DailyTasks() {
       />
 
       <EmergencyOverride
-        visible={showEmergencyOverride}
-        onClose={() => setShowEmergencyOverride(false)}
-        onConfirm={handleEmergencyOverride}
-      />
+  visible={showEmergencyOverride}
+  onClose={() => setShowEmergencyOverride(false)}
+  onConfirm={handleEmergencyOverride}
+  accentColor={colors.accent}
+  darkColor={colors.dark}
+/>
     </SafeAreaView>
   );
 }
