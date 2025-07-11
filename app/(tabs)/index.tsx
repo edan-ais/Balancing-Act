@@ -171,6 +171,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 40,
     margin: 12,
+    borderWidth: 1,
+    borderColor: '#A0C4E2',
   },
   emptyTitle: {
     fontSize: 18,
