@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight } from 'lucide-react-native';
+import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette } from 'lucide-react-native';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import { useTabContext } from '@/contexts/TabContext';
 
@@ -126,6 +126,21 @@ export default function HomeScreen() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Theme Selector */}
+        <View style={styles.themeSelector}>
+          <Text style={styles.themeSelectorTitle}>App Theme</Text>
+          <NeumorphicCard style={styles.themeOption}>
+            <View style={styles.themeIconContainer}>
+              <Palette size={20} color="#4055C5" />
+            </View>
+            <Text style={styles.themeTitle}>Balance Theme</Text>
+            <View style={styles.themeSelectedIndicator}>
+              <Text style={styles.themeSelectedText}>✓</Text>
+            </View>
+          </NeumorphicCard>
+        </View>
+        
+        <Text style={styles.sectionTitle}>Life Areas</Text>
         <View style={styles.grid}>
           {tabOptions.map((tab) => {
             const isSelected = localSelectedTabs.includes(tab.id);
@@ -182,15 +197,6 @@ export default function HomeScreen() {
             );
           })}
         </View>
-
-        <View style={styles.summary}>
-          <Text style={styles.summaryText}>
-            {localSelectedTabs.length} area{localSelectedTabs.length !== 1 ? 's' : ''} selected
-          </Text>
-          <Text style={styles.summarySubtext}>
-            You can always change this later from any screen
-          </Text>
-        </View>
       </ScrollView>
 
       <TouchableOpacity
@@ -238,6 +244,63 @@ const styles = StyleSheet.create({
   content: {
     flex: 1,
     paddingHorizontal: 12,
+  },
+  themeSelector: {
+    marginVertical: 16,
+    paddingHorizontal: 8,
+  },
+  themeSelectorTitle: {
+    fontSize: 18,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#2D3748',
+    marginBottom: 12,
+    paddingLeft: 8,
+  },
+  themeOption: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#F2F5FF',
+    position: 'relative',
+  },
+  themeIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: '#D9E0FC',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  themeTitle: {
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#4055C5',
+  },
+  themeSelectedIndicator: {
+    position: 'absolute',
+    top: '50%',
+    right: 16,
+    marginTop: -12,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    backgroundColor: '#4055C5',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themeSelectedText: {
+    color: '#FFFFFF',
+    fontSize: 12,
+    fontFamily: 'Quicksand-Bold',
+  },
+  sectionTitle: {
+    fontSize: 18,
+    fontFamily: 'Quicksand-SemiBold',
+    color: '#2D3748',
+    marginTop: 8,
+    marginBottom: 12,
+    paddingLeft: 16,
   },
   grid: {
     flexDirection: 'row',
@@ -289,22 +352,6 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 12,
     fontFamily: 'Quicksand-Bold',
-  },
-  summary: {
-    alignItems: 'center',
-    paddingVertical: 20,
-  },
-  summaryText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
-    marginBottom: 4,
-  },
-  summarySubtext: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
-    textAlign: 'center',
   },
   continueButton: {
     flexDirection: 'row',
