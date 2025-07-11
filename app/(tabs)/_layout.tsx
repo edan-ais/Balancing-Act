@@ -164,6 +164,9 @@ export default function TabLayout() {
   const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
   const activeColorKey = routeToColorMap[focusedTab];
   
+  // Filter out any selectedTabs that don't have valid configurations
+  const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
+  
   return (
     <Tabs
       screenOptions={{
@@ -205,9 +208,10 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
       }}>
       
-      {/* Dynamically render only selected tabs */}
-      {selectedTabs.map((tabId) => {
+      {/* Only render tabs that have valid configurations */}
+      {validSelectedTabs.map((tabId) => {
         const config = tabConfig[tabId];
+        // This check is redundant now but keeping for safety
         if (!config) return null;
         
         const colorKey = config.colorKey;
