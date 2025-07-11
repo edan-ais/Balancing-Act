@@ -50,38 +50,27 @@ export const tabColors = {
   }
 };
 
-// Map route names to color keys
-const routeToColorMap = {
-  'index': 'daily',
-  'goals': 'future',
-  'weekly': 'calendar',
-  'meal-prep': 'meals',
-  'cleaning': 'cleaning',
-  'self-care': 'selfCare',
-  'delegation': 'delegate'
-};
-
 // Tab configuration mapping
 const tabConfig = {
-  'index': {
-    name: 'index',
+  'daily': {
+    name: 'index',         // The route name in expo-router
     title: 'Daily',
     icon: CalendarDays,
     colorKey: 'daily'
   },
-  'goals': {
+  'future': {
     name: 'goals',
     title: 'Future',
     icon: Target,
     colorKey: 'future'
   },
-  'weekly': {
+  'calendar': {
     name: 'weekly',
     title: 'Calendar',
     icon: Calendar,
     colorKey: 'calendar'
   },
-  'meal-prep': {
+  'meals': {
     name: 'meal-prep',
     title: 'Meals',
     icon: ChefHat,
@@ -93,13 +82,13 @@ const tabConfig = {
     icon: Sparkles,
     colorKey: 'cleaning'
   },
-  'self-care': {
+  'selfCare': {
     name: 'self-care',
     title: 'Self-Care',
     icon: Heart,
     colorKey: 'selfCare'
   },
-  'delegation': {
+  'delegate': {
     name: 'delegation',
     title: 'Delegate',
     icon: Users,
@@ -111,8 +100,12 @@ export default function TabLayout() {
   const { selectedTabs } = useTabContext();
   
   // Custom tab icon component to ensure proper re-rendering
-  const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
-    const colorKey = routeToColorMap[name];
+  const TabIcon = ({ tabId, size, focused }) => {
+    const config = tabConfig[tabId];
+    if (!config) return null;
+    
+    const Icon = config.icon;
+    const colorKey = config.colorKey;
     
     // Calculate offset to keep icon visually centered when scaled
     const offsetY = focused ? 8 : 0; // Adjust this value as needed
@@ -135,13 +128,13 @@ export default function TabLayout() {
   };
   
   // Custom tab label component with proper styling
-  const TabLabel = ({ name, focused }) => {
-    const colorKey = routeToColorMap[name];
+  const TabLabel = ({ tabId, focused }) => {
+    const config = tabConfig[tabId];
+    if (!config) return null;
     
     if (focused) return null;
     
-    const config = tabConfig[name];
-    if (!config) return null;
+    const colorKey = config.colorKey;
     
     return (
       <Text 
@@ -161,11 +154,12 @@ export default function TabLayout() {
   };
   
   // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
-  const activeColorKey = routeToColorMap[focusedTab];
+  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'daily');
+  const focusedConfig = tabConfig[focusedTab];
+  const activeColorKey = focusedConfig ? focusedConfig.colorKey : 'daily';
   
-  // Filter out any selectedTabs that don't have valid configurations
-  const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
+  // If no tabs are selected, show at least the daily tab
+  const tabsToShow = selectedTabs.length > 0 ? selectedTabs : ['daily'];
   
   return (
     <Tabs
@@ -208,13 +202,10 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
       }}>
       
-      {/* Only render tabs that have valid configurations */}
-      {validSelectedTabs.map((tabId) => {
+      {/* Only render tabs that are in the selectedTabs array */}
+      {tabsToShow.map((tabId) => {
         const config = tabConfig[tabId];
-        // This check is redundant now but keeping for safety
         if (!config) return null;
-        
-        const colorKey = config.colorKey;
         
         return (
           <Tabs.Screen
@@ -222,15 +213,17 @@ export default function TabLayout() {
             name={config.name}
             options={{
               title: config.title,
-              tabBarActiveTintColor: tabColors[colorKey].dark,
-              tabBarInactiveTintColor: tabColors[colorKey].dark,
-              tabBarIcon: ({ size, focused }) => {
-                return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
-              },
-              tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
+              tabBarActiveTintColor: tabColors[config.colorKey].dark,
+              tabBarInactiveTintColor: tabColors[config.colorKey].dark,
+              tabBarIcon: ({ size, focused }) => (
+                <TabIcon tabId={tabId} size={size} focused={focused} />
+              ),
+              tabBarLabel: ({ focused }) => (
+                <TabLabel tabId={tabId} focused={focused} />
+              ),
             }}
             listeners={{
-              focus: () => setFocusedTab(config.name),
+              focus: () => setFocusedTab(tabId),
             }}
           />
         );
