@@ -1,7 +1,7 @@
 import React from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
-import { View, Text } from 'react-native';
+import { View, Text, Dimensions } from 'react-native';
 import { useTabContext } from '@/contexts/TabContext';
 
 // Define pastel and dark color pairs for each tab
@@ -112,6 +112,7 @@ const allTabIds = Object.keys(tabConfig);
 
 export default function TabLayout() {
   const { selectedTabs } = useTabContext();
+  const screenWidth = Dimensions.get('window').width;
   
   // Custom tab icon component to ensure proper re-rendering
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
@@ -176,47 +177,97 @@ export default function TabLayout() {
   // Function to check if a tab is selected
   const isTabSelected = (tabId) => selectedTabsSet.has(tabId);
   
+  // Calculate the number of visible tabs for spacing calculations
+  const visibleTabCount = validSelectedTabs.length;
+  
+  // Custom tab bar that will spread tabs evenly across the width
+  const CustomTabBar = ({ state, descriptors, navigation }) => {
+    // Filter to only show selected tabs
+    const visibleRoutes = state.routes.filter(route => 
+      selectedTabsSet.has(route.name)
+    );
+    
+    // Calculate tab width based on number of visible tabs
+    const tabWidth = screenWidth / visibleRoutes.length;
+    
+    return (
+      <View style={{
+        flexDirection: 'row',
+        backgroundColor: tabColors[activeColorKey].accent,
+        height: 120,
+        paddingTop: 30,
+        paddingBottom: 60,
+        shadowColor: tabColors[activeColorKey].dark,
+        shadowOffset: { width: 0, height: -3 },
+        shadowOpacity: 0.3,
+        shadowRadius: 6,
+        elevation: 8,
+      }}>
+        {visibleRoutes.map((route, index) => {
+          const { options } = descriptors[route.key];
+          const isFocused = state.index === visibleRoutes.indexOf(route);
+          
+          const onPress = () => {
+            const event = navigation.emit({
+              type: 'tabPress',
+              target: route.key,
+              canPreventDefault: true,
+            });
+            
+            if (!isFocused && !event.defaultPrevented) {
+              navigation.navigate(route.name);
+            }
+          };
+          
+          return (
+            <View 
+              key={route.key}
+              style={{
+                flex: 1,
+                width: tabWidth,
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: 12,
+                marginHorizontal: 2,
+                paddingHorizontal: 2,
+                height: 80,
+              }}
+            >
+              <TabIcon 
+                name={route.name} 
+                size={24} 
+                iconComponent={tabConfig[route.name].icon}
+                focused={isFocused}
+              />
+              {!isFocused && (
+                <TabLabel name={route.name} focused={isFocused} />
+              )}
+              
+              <View
+                style={{
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  bottom: 0,
+                }}
+                accessibilityRole="button"
+                accessibilityState={isFocused ? { selected: true } : {}}
+                accessibilityLabel={options.tabBarAccessibilityLabel}
+                onPress={onPress}
+              />
+            </View>
+          );
+        })}
+      </View>
+    );
+  };
+  
   return (
     <Tabs
+      tabBar={props => <CustomTabBar {...props} />}
       screenOptions={{
         headerShown: false,
-        tabBarStyle: {
-          backgroundColor: tabColors[activeColorKey].accent,
-          borderTopWidth: 0,
-          elevation: 8,
-          height: 120, // Taller footer
-          // Remove all padding
-          padding: 0,
-          // Add padding to center content vertically
-          paddingTop: 30, // This centers the icons vertically
-          paddingBottom: 60, // This centers the icons vertically
-          // Add shadow with color matching active tab
-          shadowColor: tabColors[activeColorKey].dark,
-          shadowOffset: { width: 0, height: -3 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
-        },
-        tabBarItemStyle: {
-          borderRadius: 12,
-          marginHorizontal: 2,
-          paddingHorizontal: 2,
-          height: 80, // Fixed height for items
-          // Center content vertically
-          alignItems: 'center',
-          justifyContent: 'center',
-          // Each visible tab should grow to take available space
-          flex: 1,
-        },
-        tabBarIconStyle: {
-          // Ensure icon is centered
-          marginTop: 0,
-          marginBottom: 0,
-        },
-        tabBarLabelStyle: {
-          // Position label below icon
-          marginTop: 4,
-        },
-        tabBarLabelPosition: 'below-icon',
       }}>
       
       {/* Render all possible tabs, but protect non-selected ones */}
@@ -224,7 +275,6 @@ export default function TabLayout() {
         const config = tabConfig[tabId];
         if (!config) return null;
         
-        const colorKey = config.colorKey;
         const selected = isTabSelected(tabId);
         
         // Create the tab screen, either directly or protected
@@ -234,14 +284,6 @@ export default function TabLayout() {
             name={config.name}
             options={{
               title: config.title,
-              tabBarActiveTintColor: tabColors[colorKey].dark,
-              tabBarInactiveTintColor: tabColors[colorKey].dark,
-              tabBarIcon: ({ size, focused }) => {
-                return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
-              },
-              tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
-              // Hide the tab bar button if not selected
-              tabBarButton: selected ? undefined : () => null,
             }}
             listeners={{
               focus: () => setFocusedTab(config.name),
