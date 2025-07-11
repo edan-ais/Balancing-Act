@@ -176,50 +176,64 @@ export default function TabLayout() {
   // Function to check if a tab is selected
   const isTabSelected = (tabId) => selectedTabsSet.has(tabId);
   
+  // Calculate the flex value based on the number of visible tabs
+  const visibleTabCount = validSelectedTabs.length;
+  
   return (
     <Tabs
-      screenOptions={{
-        headerShown: false,
-        tabBarStyle: {
-          backgroundColor: tabColors[activeColorKey].accent,
-          borderTopWidth: 0,
-          elevation: 8,
-          height: 120, // Taller footer
-          // Remove all padding
-          padding: 0,
-          // Add padding to center content vertically
-          paddingTop: 30, // This centers the icons vertically
-          paddingBottom: 60, // This centers the icons vertically
-          // Add shadow with color matching active tab
-          shadowColor: tabColors[activeColorKey].dark,
-          shadowOffset: { width: 0, height: -3 },
-          shadowOpacity: 0.3,
-          shadowRadius: 6,
-        },
-        tabBarItemStyle: {
-          borderRadius: 12,
-          marginHorizontal: 2,
-          paddingHorizontal: 2,
-          height: 80, // Fixed height for items
-          // Center content vertically
-          alignItems: 'center',
-          justifyContent: 'center',
-          // Each visible tab should grow to take available space
-          flex: 1,
-        },
-        tabBarIconStyle: {
-          // Ensure icon is centered
-          marginTop: 0,
-          marginBottom: 0,
-        },
-        tabBarLabelStyle: {
-          // Position label below icon
-          marginTop: 4,
-        },
-        tabBarLabelPosition: 'below-icon',
+      screenOptions={({ route }) => {
+        const routeName = route.name;
+        const isSelected = isTabSelected(routeName);
+        
+        return {
+          headerShown: false,
+          tabBarStyle: {
+            backgroundColor: tabColors[activeColorKey].accent,
+            borderTopWidth: 0,
+            elevation: 8,
+            height: 120, // Taller footer
+            // Remove all padding
+            padding: 0,
+            // Add padding to center content vertically
+            paddingTop: 30, // This centers the icons vertically
+            paddingBottom: 60, // This centers the icons vertically
+            // Add shadow with color matching active tab
+            shadowColor: tabColors[activeColorKey].dark,
+            shadowOffset: { width: 0, height: -3 },
+            shadowOpacity: 0.3,
+            shadowRadius: 6,
+            // Add flexbox properties to ensure proper alignment
+            display: 'flex',
+            flexDirection: 'row',
+          },
+          tabBarItemStyle: {
+            borderRadius: 12,
+            marginHorizontal: 2,
+            paddingHorizontal: 2,
+            height: 80, // Fixed height for items
+            // Center content vertically
+            alignItems: 'center',
+            justifyContent: 'center',
+            // Important: only visible tabs should take up space
+            display: isSelected ? 'flex' : 'none',
+            // Make each visible tab take equal space
+            flex: isSelected ? 1 : 0,
+            width: isSelected ? `${100 / visibleTabCount}%` : 0,
+          },
+          tabBarIconStyle: {
+            // Ensure icon is centered
+            marginTop: 0,
+            marginBottom: 0,
+          },
+          tabBarLabelStyle: {
+            // Position label below icon
+            marginTop: 4,
+          },
+          tabBarLabelPosition: 'below-icon',
+        };
       }}>
       
-      {/* Render all possible tabs, but protect non-selected ones */}
+      {/* Render all tabs, but with visibility controlled by tabBarItemStyle */}
       {allTabIds.map((tabId) => {
         const config = tabConfig[tabId];
         if (!config) return null;
@@ -227,8 +241,7 @@ export default function TabLayout() {
         const colorKey = config.colorKey;
         const selected = isTabSelected(tabId);
         
-        // Create the tab screen, either directly or protected
-        const tabScreen = (
+        return (
           <Tabs.Screen
             key={tabId}
             name={config.name}
@@ -240,26 +253,12 @@ export default function TabLayout() {
                 return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
               },
               tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
-              // Hide the tab bar button if not selected
-              tabBarButton: selected ? undefined : () => null,
+              // We no longer need tabBarButton to hide tabs since we're using display:none in tabBarItemStyle
             }}
             listeners={{
               focus: () => setFocusedTab(config.name),
             }}
           />
-        );
-        
-        // If the tab is selected, render it directly
-        // If not, protect it with Tabs.Protected
-        return selected ? (
-          tabScreen
-        ) : (
-          <Tabs.Protected 
-            key={`protected-${tabId}`}
-            guard={() => false} // This ensures the tab is never accessible
-          >
-            {tabScreen}
-          </Tabs.Protected>
         );
       })}
     </Tabs>
