@@ -75,6 +75,22 @@ export default function TaskItem({
   const taskColor = borderColor || getTabColor(task.category);
   const taskAccentColor = accentColor || taskColor;
   const taskHabitColor = habitColor || taskColor;
+  
+  // Get a lighter version of the color for borders
+  const getLightBorderColor = (color: string) => {
+    // Make the border color more subtle by adding transparency
+    return color + '40'; // Adding 40 for 25% opacity
+  };
+  
+  // Get a lighter background color for habits based on the task category
+  const getHabitBackgroundColor = (category: string) => {
+    switch(category) {
+      case 'daily': return '#E6F0FA'; // Light blue for daily tasks
+      case 'goals': return '#E3F5EC'; // Light green for goals
+      case 'weekly': return '#F3F0FF'; // Light purple for weekly
+      default: return '#F7FAFC'; // Default light color
+    }
+  };
 
   const handleToggle = () => {
     // Celebration animation
@@ -129,9 +145,9 @@ export default function TaskItem({
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <NeumorphicCard style={[
         styles.taskCard,
-        task.isHabit && styles.habitCard,
+        task.isHabit && [styles.habitCard, { backgroundColor: getHabitBackgroundColor(task.category) }],
         { 
-          borderColor: taskColor,
+          borderColor: getLightBorderColor(taskColor),
           borderWidth: 1,
           // Add left border accent for habits
           ...(task.isHabit && {
@@ -147,7 +163,7 @@ export default function TaskItem({
               styles.checkbox,
               task.completed && styles.checkedBox,
               task.isHabit && styles.habitBox,
-              { backgroundColor: task.completed ? (task.category === 'goals' ? '#276749' : taskAccentColor) : '#E2E8F0' },
+              { backgroundColor: task.completed ? taskAccentColor : '#E2E8F0' },
             ]}
           >
             {task.completed ? (
@@ -194,7 +210,7 @@ export default function TaskItem({
                     styles.habitProgressBar, 
                     { 
                       width: `${habitProgress}%`,
-                      backgroundColor: task.category === 'goals' ? '#276749' : taskHabitColor
+                      backgroundColor: taskHabitColor
                     }
                   ]} 
                 />
@@ -217,7 +233,7 @@ export default function TaskItem({
                         styles.subtaskCheckbox, 
                         subtask.completed && [
                           styles.subtaskCompleted,
-                          { backgroundColor: task.category === 'goals' ? '#276749' : taskAccentColor }
+                          { backgroundColor: taskAccentColor }
                         ]
                       ]} 
                     >
@@ -271,7 +287,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#FFFFFF',
   },
   habitCard: {
-    backgroundColor: '#E3F5EC', // Slightly more visible light green background
+    // Base habit card - specific background colors are set dynamically
   },
   taskHeader: {
     flexDirection: 'row',
