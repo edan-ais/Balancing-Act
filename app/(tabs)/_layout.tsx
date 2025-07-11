@@ -107,6 +107,9 @@ const tabConfig = {
   }
 };
 
+// Get all tab IDs for rendering all possible tabs
+const allTabIds = Object.keys(tabConfig);
+
 export default function TabLayout() {
   const { selectedTabs } = useTabContext();
   
@@ -167,6 +170,12 @@ export default function TabLayout() {
   // Filter out any selectedTabs that don't have valid configurations
   const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
   
+  // Create a Set for quick lookups
+  const selectedTabsSet = new Set(validSelectedTabs);
+  
+  // Function to check if a tab is selected
+  const isTabSelected = (tabId) => selectedTabsSet.has(tabId);
+  
   return (
     <Tabs
       screenOptions={{
@@ -195,6 +204,8 @@ export default function TabLayout() {
           // Center content vertically
           alignItems: 'center',
           justifyContent: 'center',
+          // Each visible tab should grow to take available space
+          flex: 1,
         },
         tabBarIconStyle: {
           // Ensure icon is centered
@@ -208,15 +219,16 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
       }}>
       
-      {/* Only render tabs that have valid configurations */}
-      {validSelectedTabs.map((tabId) => {
+      {/* Render all possible tabs, but protect non-selected ones */}
+      {allTabIds.map((tabId) => {
         const config = tabConfig[tabId];
-        // This check is redundant now but keeping for safety
         if (!config) return null;
         
         const colorKey = config.colorKey;
+        const selected = isTabSelected(tabId);
         
-        return (
+        // Create the tab screen, either directly or protected
+        const tabScreen = (
           <Tabs.Screen
             key={tabId}
             name={config.name}
@@ -228,11 +240,26 @@ export default function TabLayout() {
                 return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
               },
               tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
+              // Hide the tab bar button if not selected
+              tabBarButton: selected ? undefined : () => null,
             }}
             listeners={{
               focus: () => setFocusedTab(config.name),
             }}
           />
+        );
+        
+        // If the tab is selected, render it directly
+        // If not, protect it with Tabs.Protected
+        return selected ? (
+          tabScreen
+        ) : (
+          <Tabs.Protected 
+            key={`protected-${tabId}`}
+            guard={() => false} // This ensures the tab is never accessible
+          >
+            {tabScreen}
+          </Tabs.Protected>
         );
       })}
     </Tabs>
