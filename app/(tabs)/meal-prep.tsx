@@ -56,7 +56,8 @@ export default function MealPrep() {
           <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
           <Text style={styles.subtitle}>Plan and prepare your meals</Text>
         </View>
-        <View style={styles.headerIcons}>
+            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/')}
           <TouchableOpacity style={[styles.actionButton, { backgroundColor: colors.accent }]}>
             <Home size={20} color={colors.dark} />
           </TouchableOpacity>

@@ -2,6 +2,7 @@ import React from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
 import { View, Text } from 'react-native';
+import { useTabContext } from '@/contexts/TabContext';
 
 // Define pastel and dark color pairs for each tab
 export const tabColors = {
@@ -61,6 +62,8 @@ const routeToColorMap = {
 };
 
 export default function TabLayout() {
+  const { selectedTabs } = useTabContext();
+  
   // Custom tab icon component to ensure proper re-rendering
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
     const colorKey = routeToColorMap[name];
@@ -163,7 +166,7 @@ export default function TabLayout() {
         },
         tabBarLabelPosition: 'below-icon',
       }}>
-      <Tabs.Screen
+      {selectedTabs.includes('index') && <Tabs.Screen
         name="index"
         options={{
           title: 'Daily',
@@ -177,8 +180,8 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('index'),
         }}
-      />
-      <Tabs.Screen
+      />}
+      {selectedTabs.includes('goals') && <Tabs.Screen
         name="goals"
         options={{
           title: 'Future',
@@ -192,8 +195,8 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('goals'),
         }}
-      />
-      <Tabs.Screen
+      />}
+      {selectedTabs.includes('weekly') && <Tabs.Screen
         name="weekly"
         options={{
           title: 'Calendar',
@@ -207,8 +210,8 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('weekly'),
         }}
-      />
-      <Tabs.Screen
+      />}
+      {selectedTabs.includes('meal-prep') && <Tabs.Screen
         name="meal-prep"
         options={{
           title: 'Meals',
@@ -222,8 +225,8 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('meal-prep'),
         }}
-      />
-      <Tabs.Screen
+      />}
+      {selectedTabs.includes('cleaning') && <Tabs.Screen
         name="cleaning"
         options={{
           title: 'Cleaning',
@@ -237,8 +240,8 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('cleaning'),
         }}
-      />
-      <Tabs.Screen
+      />}
+      {selectedTabs.includes('self-care') && <Tabs.Screen
         name="self-care"
         options={{
           title: 'Self-Care',
@@ -252,8 +255,8 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('self-care'),
         }}
-      />
-      <Tabs.Screen
+      />}
+      {selectedTabs.includes('delegation') && <Tabs.Screen
         name="delegation"
         options={{
           title: 'Delegate',
@@ -267,7 +270,7 @@ export default function TabLayout() {
         listeners={{
           focus: () => setFocusedTab('delegation'),
         }}
-      />
+      />}
     </Tabs>
   );
 }

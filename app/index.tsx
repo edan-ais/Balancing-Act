@@ -4,6 +4,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight } from 'lucide-react-native';
 import NeumorphicCard from '@/components/NeumorphicCard';
+import { useTabContext } from '@/contexts/TabContext';
 
 const tabOptions = [
   {
@@ -93,24 +94,27 @@ const tabOptions = [
 ];
 
 export default function HomeScreen() {
-  const [selectedTabs, setSelectedTabs] = useState<string[]>(['index', 'goals', 'weekly', 'meal-prep', 'cleaning', 'self-care', 'delegation']);
+  const { selectedTabs, setSelectedTabs } = useTabContext();
+  const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
   const router = useRouter();
 
   const toggleTab = (tabId: string) => {
-    if (selectedTabs.includes(tabId)) {
+    if (localSelectedTabs.includes(tabId)) {
       // Don't allow removing all tabs
-      if (selectedTabs.length > 1) {
-        setSelectedTabs(selectedTabs.filter(id => id !== tabId));
+      if (localSelectedTabs.length > 1) {
+        setLocalSelectedTabs(localSelectedTabs.filter(id => id !== tabId));
       }
     } else {
-      setSelectedTabs([...selectedTabs, tabId]);
+      setLocalSelectedTabs([...localSelectedTabs, tabId]);
     }
   };
 
   const handleContinue = () => {
-    // Store selected tabs in some global state or AsyncStorage
-    // For now, just navigate to the first selected tab
-    const firstTab = selectedTabs[0] || 'index';
+    // Update the global selected tabs
+    setSelectedTabs(localSelectedTabs);
+    
+    // Navigate to the first selected tab
+    const firstTab = localSelectedTabs[0] || 'index';
     router.push(`/(tabs)/${firstTab === 'index' ? '' : firstTab}`);
   };
 
@@ -124,7 +128,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.grid}>
           {tabOptions.map((tab) => {
-            const isSelected = selectedTabs.includes(tab.id);
+            const isSelected = localSelectedTabs.includes(tab.id);
             const IconComponent = tab.icon;
             
             return (
@@ -181,7 +185,7 @@ export default function HomeScreen() {
 
         <View style={styles.summary}>
           <Text style={styles.summaryText}>
-            {selectedTabs.length} area{selectedTabs.length !== 1 ? 's' : ''} selected
+            {localSelectedTabs.length} area{localSelectedTabs.length !== 1 ? 's' : ''} selected
           </Text>
           <Text style={styles.summarySubtext}>
             You can always change this later from any screen
@@ -193,12 +197,12 @@ export default function HomeScreen() {
         style={[
           styles.continueButton,
           { 
-            backgroundColor: selectedTabs.length > 0 ? '#4055C5' : '#CBD5E0',
-            shadowColor: selectedTabs.length > 0 ? '#4055C5' : '#CBD5E0'
+            backgroundColor: localSelectedTabs.length > 0 ? '#4055C5' : '#CBD5E0',
+            shadowColor: localSelectedTabs.length > 0 ? '#4055C5' : '#CBD5E0'
           }
         ]}
         onPress={handleContinue}
-        disabled={selectedTabs.length === 0}
+        disabled={localSelectedTabs.length === 0}
       >
         <Text style={styles.continueText}>Continue</Text>
         <ArrowRight size={20} color="#FFFFFF" />
