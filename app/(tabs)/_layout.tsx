@@ -67,58 +67,45 @@ const tabConfig = {
     name: 'index',
     title: 'Daily',
     icon: CalendarDays,
-    colorKey: 'daily',
-    tabId: 'daily'  // Add this to map to the selectedTabs values
+    colorKey: 'daily'
   },
   'goals': {
     name: 'goals',
     title: 'Future',
     icon: Target,
-    colorKey: 'future',
-    tabId: 'future'
+    colorKey: 'future'
   },
   'weekly': {
     name: 'weekly',
     title: 'Calendar',
     icon: Calendar,
-    colorKey: 'calendar',
-    tabId: 'calendar'
+    colorKey: 'calendar'
   },
   'meal-prep': {
     name: 'meal-prep',
     title: 'Meals',
     icon: ChefHat,
-    colorKey: 'meals',
-    tabId: 'meals'
+    colorKey: 'meals'
   },
   'cleaning': {
     name: 'cleaning',
     title: 'Cleaning',
     icon: Sparkles,
-    colorKey: 'cleaning',
-    tabId: 'cleaning'
+    colorKey: 'cleaning'
   },
   'self-care': {
     name: 'self-care',
     title: 'Self-Care',
     icon: Heart,
-    colorKey: 'selfCare',
-    tabId: 'selfCare'
+    colorKey: 'selfCare'
   },
   'delegation': {
     name: 'delegation',
     title: 'Delegate',
     icon: Users,
-    colorKey: 'delegate',
-    tabId: 'delegate'
+    colorKey: 'delegate'
   }
 };
-
-// Create a map of tabId to route name for quick lookup
-const tabIdToRouteMap = {};
-Object.entries(tabConfig).forEach(([route, config]) => {
-  tabIdToRouteMap[config.tabId] = route;
-});
 
 export default function TabLayout() {
   const { selectedTabs } = useTabContext();
@@ -173,28 +160,19 @@ export default function TabLayout() {
     );
   };
   
-  // Default to 'daily' if no tabs are selected
-  const defaultTab = 'index';
-  
   // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState(
-    selectedTabs.length > 0 ? tabIdToRouteMap[selectedTabs[0]] || defaultTab : defaultTab
-  );
+  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
+  const activeColorKey = routeToColorMap[focusedTab];
   
-  // Ensure we have a valid color key
-  const activeColorKey = routeToColorMap[focusedTab] || 'daily';
-  
-  // Convert selectedTabs (which are tabIds) to route names using our mapping
-  const selectedRoutes = selectedTabs
-    .map(tabId => tabIdToRouteMap[tabId])
-    .filter(Boolean); // Filter out any undefined values
+  // Filter out any selectedTabs that don't have valid configurations
+  const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
   
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
         tabBarStyle: {
-          backgroundColor: tabColors[activeColorKey]?.accent || tabColors.daily.accent,
+          backgroundColor: tabColors[activeColorKey].accent,
           borderTopWidth: 0,
           elevation: 8,
           height: 120, // Taller footer
@@ -204,7 +182,7 @@ export default function TabLayout() {
           paddingTop: 30, // This centers the icons vertically
           paddingBottom: 60, // This centers the icons vertically
           // Add shadow with color matching active tab
-          shadowColor: tabColors[activeColorKey]?.dark || tabColors.daily.dark,
+          shadowColor: tabColors[activeColorKey].dark,
           shadowOffset: { width: 0, height: -3 },
           shadowOpacity: 0.3,
           shadowRadius: 6,
@@ -230,18 +208,17 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
       }}>
       
-      {/* Only render tabs that are in selectedRoutes */}
-      {Object.entries(tabConfig).map(([route, config]) => {
-        // Skip if this route is not in selectedRoutes
-        if (selectedRoutes.length > 0 && !selectedRoutes.includes(route)) {
-          return null;
-        }
+      {/* Only render tabs that have valid configurations */}
+      {validSelectedTabs.map((tabId) => {
+        const config = tabConfig[tabId];
+        // This check is redundant now but keeping for safety
+        if (!config) return null;
         
         const colorKey = config.colorKey;
         
         return (
           <Tabs.Screen
-            key={route}
+            key={tabId}
             name={config.name}
             options={{
               title: config.title,
