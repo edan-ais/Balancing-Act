@@ -20,6 +20,17 @@ export interface Task {
   goalType?: string;
   customGoalTypeText?: string;
   customGoalTypeColor?: string;
+  // Meal prep specific
+  mealType?: string;
+  dayOfWeek?: string;
+  notes?: string;
+  // Cleaning specific
+  frequency?: string;
+  cleaningLocation?: string;
+  // Self-care specific
+  selfCareType?: string;
+  // Delegation specific
+  reminderEnabled?: boolean;
 }
 
 interface TaskItemProps {

@@ -26,25 +26,25 @@ export default function RepetitiveCleaning() {
     { 
       title: 'Daily', 
       frequency: 'Every day', 
-      tasks: cleaningTasks.filter(t => t.title.toLowerCase().includes('daily')),
+      tasks: cleaningTasks.filter(t => t.frequency === 'daily'),
       icon: Sun
     },
     { 
       title: 'Weekly', 
       frequency: 'Every week', 
-      tasks: cleaningTasks.filter(t => t.title.toLowerCase().includes('weekly')),
+      tasks: cleaningTasks.filter(t => t.frequency === 'weekly'),
       icon: RefreshCw
     },
     { 
       title: 'Monthly', 
       frequency: 'Every month', 
-      tasks: cleaningTasks.filter(t => t.title.toLowerCase().includes('monthly')),
+      tasks: cleaningTasks.filter(t => t.frequency === 'monthly'),
       icon: Moon
     },
     { 
       title: 'Seasonal', 
       frequency: 'Every season', 
-      tasks: cleaningTasks.filter(t => t.title.toLowerCase().includes('seasonal')),
+      tasks: cleaningTasks.filter(t => t.frequency === 'seasonal'),
       icon: CloudSnow
     },
   ];

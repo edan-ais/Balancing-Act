@@ -77,6 +77,7 @@ export default function AddTaskForm({
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [cleaningLocation, setCleaningLocation] = useState('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
+  const [selfCareType, setSelfCareType] = useState('');
   
   // Custom tag modal state
   const [showCustomTagModal, setShowCustomTagModal] = useState(false);
@@ -151,19 +152,21 @@ export default function AddTaskForm({
         };
       }
 
-      // Cleaning, self-care, delegation specific fields
-      if (['cleaning', 'self-care', 'delegation'].includes(category)) {
-        taskData = {
-          ...taskData,
-          frequency,
-        };
-      }
-
-      // Cleaning location
+      // Cleaning specific fields
       if (category === 'cleaning') {
         taskData = {
           ...taskData,
+          frequency,
           cleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : cleaningLocation,
+        };
+      }
+
+      // Self-care specific fields
+      if (category === 'self-care') {
+        taskData = {
+          ...taskData,
+          frequency,
+          selfCareType,
         };
       }
 
@@ -171,6 +174,7 @@ export default function AddTaskForm({
       if (category === 'delegation') {
         taskData = {
           ...taskData,
+          frequency,
           reminderEnabled,
         };
       }
@@ -205,6 +209,7 @@ export default function AddTaskForm({
     setReminderEnabled(false);
     setCleaningLocation('');
     setCustomCleaningLocation('');
+    setSelfCareType('');
   };
 
   const addSubtask = () => {
@@ -835,6 +840,29 @@ export default function AddTaskForm({
           {/* Self-care Tab */}
           {category === 'self-care' && (
             <>
+              <View style={styles.section}>
+                <Text style={styles.sectionTitle}>Self-Care Type</Text>
+                <View style={styles.buttonRow}>
+                  {['physical', 'mental', 'rest', 'joy'].map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.optionButton, 
+                        selfCareType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      ]}
+                      onPress={() => setSelfCareType(type)}
+                    >
+                      <Text style={[styles.optionText, selfCareType === type && styles.selectedText]}>
+                        {type === 'physical' ? 'Physical Health' : 
+                         type === 'mental' ? 'Mental Health' :
+                         type === 'rest' ? 'Rest & Recovery' :
+                         'Joy & Connection'}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              </View>
+
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Frequency</Text>
                 <View style={styles.buttonRow}>

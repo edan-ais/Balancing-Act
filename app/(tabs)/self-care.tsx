@@ -26,28 +26,28 @@ export default function SelfCare() {
       title: 'Physical Health', 
       icon: Activity, 
       color: '#FF0000',
-      tasks: selfCareTasks.filter(t => t.title.toLowerCase().includes('exercise') || t.title.toLowerCase().includes('health')),
+      tasks: selfCareTasks.filter(t => t.selfCareType === 'physical'),
       description: 'Movement and wellness'
     },
     { 
       title: 'Mental Health', 
       icon: Smile, 
       color: '#FF0000',
-      tasks: selfCareTasks.filter(t => t.title.toLowerCase().includes('meditation') || t.title.toLowerCase().includes('mental')),
+      tasks: selfCareTasks.filter(t => t.selfCareType === 'mental'),
       description: 'Mindfulness and peace'
     },
     { 
       title: 'Rest & Recovery', 
       icon: Moon, 
       color: '#FF0000',
-      tasks: selfCareTasks.filter(t => t.title.toLowerCase().includes('sleep') || t.title.toLowerCase().includes('rest')),
+      tasks: selfCareTasks.filter(t => t.selfCareType === 'rest'),
       description: 'Sleep and relaxation'
     },
     { 
       title: 'Joy & Connection', 
       icon: Music, 
       color: '#FF0000',
-      tasks: selfCareTasks.filter(t => t.title.toLowerCase().includes('social') || t.title.toLowerCase().includes('joy')),
+      tasks: selfCareTasks.filter(t => t.selfCareType === 'joy'),
       description: 'Relationships and fun'
     },
   ];

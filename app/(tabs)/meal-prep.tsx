@@ -27,25 +27,25 @@ export default function MealPrep() {
       title: 'Breakfast', 
       subtitle: 'Morning energy boost',
       icon: Coffee,
-      tasks: mealTasks.filter(t => t.title.toLowerCase().includes('breakfast')) 
+      tasks: mealTasks.filter(t => t.mealType === 'breakfast') 
     },
     { 
       title: 'Lunch', 
       subtitle: 'Midday nourishment',
       icon: Sandwich,
-      tasks: mealTasks.filter(t => t.title.toLowerCase().includes('lunch')) 
+      tasks: mealTasks.filter(t => t.mealType === 'lunch') 
     },
     { 
       title: 'Dinner', 
       subtitle: 'Evening satisfaction',
       icon: Utensils,
-      tasks: mealTasks.filter(t => t.title.toLowerCase().includes('dinner')) 
+      tasks: mealTasks.filter(t => t.mealType === 'dinner') 
     },
     { 
       title: 'Snacks', 
       subtitle: 'Healthy between-meals',
       icon: Apple,
-      tasks: mealTasks.filter(t => t.title.toLowerCase().includes('snack')) 
+      tasks: mealTasks.filter(t => t.mealType === 'snack') 
     },
   ];
 
