@@ -25,19 +25,8 @@ export const rainstormTheme = {
       accent: '#3D6499',   // Midnight Blue (original)
       highlight: '#4E7AB8'  // Brighter highlight version
     },
-    // Slate Showers - medium gray with blue-purple undertones
-    calendar: {
-      pastel: '#E9EAEF',   // Very light Slate Showers
-      medium: '#8A91A1',   // Medium Slate Showers for text and icons
-      dark: '#4E586D',     // Very dark Slate Showers
-      shadow: '#333B4A',   // Shadow color (darker than dark)
-      bg: '#F8F9FB',       // Ultra light background with slate undertones
-      bgAlt: '#F0F1F5',    // Alternative background (slightly darker)
-      accent: '#5F6882',   // Slate Showers (original)
-      highlight: '#7784A3'  // Brighter highlight version with purple-blue tone
-    },
     // Rain Blue - medium blue with slate undertones
-    meals: {
+    calendar: {
       pastel: '#E8EDF6',   // Very light Rain Blue
       medium: '#8BA4C9',   // Medium Rain Blue for text and icons
       dark: '#4A6FA5',     // Dark Rain Blue
@@ -46,6 +35,17 @@ export const rainstormTheme = {
       bgAlt: '#EEF3FB',    // Alternative background (slightly darker)
       accent: '#5D7FB3',   // Rain Blue (original)
       highlight: '#6E99D3'  // Brighter highlight version
+    },
+    // Slate Showers - medium gray with blue-purple undertones
+    meals: {
+      pastel: '#E9EAEF',   // Very light Slate Showers
+      medium: '#8A91A1',   // Medium Slate Showers for text and icons
+      dark: '#4E586D',     // Very dark Slate Showers
+      shadow: '#333B4A',   // Shadow color (darker than dark)
+      bg: '#F8F9FB',       // Ultra light background with slate undertones
+      bgAlt: '#F0F1F5',    // Alternative background (slightly darker)
+      accent: '#5F6882',   // Slate Showers (original)
+      highlight: '#7784A3'  // Brighter highlight version with purple-blue tone
     },
     // Misty Sky - light blue with gray undertones
     cleaning: {
