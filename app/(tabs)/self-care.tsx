@@ -119,12 +119,9 @@ export default function SelfCare() {
                     </View>
                   </View>
                 </View>
-                <View style={[styles.categoryMeta, { backgroundColor: colors.accent, padding: 8, borderRadius: 12 }]}>
+                <View style={[styles.categoryMeta, { backgroundColor: colors.accent, padding: 6, borderRadius: 12 }]}>
                   <Text style={[styles.categoryCount, { color: colors.pastel }]}>
-                    {category.tasks.length}
-                  </Text>
-                  <Text style={[styles.categoryLabel, { color: colors.pastel }]}>
-                    tasks
+                    {category.tasks.length} tasks
                   </Text>
                 </View>
               </View>
@@ -274,13 +271,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryCount: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  categoryLabel: {
-    fontSize: 10,
-    fontFamily: 'Quicksand-Regular',
-    marginTop: 2,
+    fontSize: 12,
+    fontFamily: 'Quicksand-Medium',
   },
   emptyCategory: {
     alignItems: 'center',
