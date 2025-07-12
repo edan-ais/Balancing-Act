@@ -14,16 +14,16 @@ export const rainstormTheme = {
       accent: '#2A4A75',   // Deep Ocean Blue (original)
       highlight: '#3B67A5'  // Brighter highlight version with blue tone
     },
-    // Charcoal Mist - dark gray with blue undertones
+    // Midnight Blue - medium-dark navy with cool undertones
     future: {
-      pastel: '#E4E7ED',   // Very light Charcoal Mist
-      medium: '#7A8399',   // Medium Charcoal Mist for text and icons
-      dark: '#303C50',     // Very dark Charcoal Mist
-      shadow: '#1C2434',   // Shadow color (darker than dark)
-      bg: '#F7F8FA',       // Ultra light background with blue-gray undertones
-      bgAlt: '#ECEEF2',    // Alternative background (slightly darker)
-      accent: '#404D66',   // Charcoal Mist (original)
-      highlight: '#566281'  // Brighter highlight version
+      pastel: '#E3E9F2',   // Very light Midnight Blue
+      medium: '#7C95BB',   // Medium Midnight Blue for text and icons
+      dark: '#2F5585',     // Very dark Midnight Blue
+      shadow: '#1B3A61',   // Shadow color (darker than dark)
+      bg: '#F7FAFF',       // Ultra light background with blue undertones
+      bgAlt: '#EEF3FA',    // Alternative background (slightly darker)
+      accent: '#3D6499',   // Midnight Blue (original)
+      highlight: '#4E7AB8'  // Brighter highlight version
     },
     // Slate Showers - medium gray with blue-purple undertones
     calendar: {
