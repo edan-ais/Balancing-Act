@@ -40,7 +40,6 @@ export default function SelfCare() {
     { 
       title: 'Physical Health', 
       icon: Activity, 
-      color: '#FF0000',
       type: 'physical',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'physical'),
       description: 'Movement and wellness'
@@ -48,7 +47,6 @@ export default function SelfCare() {
     { 
       title: 'Mental Health', 
       icon: Smile, 
-      color: '#FF0000',
       type: 'mental',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'mental'),
       description: 'Mindfulness and peace'
@@ -56,7 +54,6 @@ export default function SelfCare() {
     { 
       title: 'Rest & Recovery', 
       icon: Moon, 
-      color: '#FF0000',
       type: 'rest',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'rest'),
       description: 'Sleep and relaxation'
@@ -64,7 +61,6 @@ export default function SelfCare() {
     { 
       title: 'Joy & Connection', 
       icon: Music, 
-      color: '#FF0000',
       type: 'joy',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'joy'),
       description: 'Relationships and fun'
@@ -79,14 +75,19 @@ export default function SelfCare() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.dark }]}>Self-Care</Text>
-          <Text style={styles.subtitle}>Nurture yourself daily</Text>
+          <Text style={[styles.subtitle, { color: colors.medium }]}>
+            Nurture yourself daily
+          </Text>
         </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            style={[styles.actionButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.dark} />
+            <Home size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -100,29 +101,37 @@ export default function SelfCare() {
           
           return (
             <NeumorphicCard key={index} style={[styles.categoryCard, { 
-              shadowColor: colors.pastel,
+              shadowColor: colors.shadow,
               borderColor: colors.accent,
               borderWidth: 1 
             }]}>
               <View style={styles.categoryHeader}>
                 <View style={styles.categoryInfo}>
                   <View style={styles.categoryTitleRow}>
-                    <category.icon size={24} color={category.color} />
+                    <category.icon size={24} color={colors.accent} />
                     <View style={styles.categoryTextContainer}>
-                      <Text style={[styles.categoryTitle, { color: colors.dark }]}>{category.title}</Text>
-                      <Text style={styles.categoryDescription}>{category.description}</Text>
+                      <Text style={[styles.categoryTitle, { color: colors.dark }]}>
+                        {category.title}
+                      </Text>
+                      <Text style={[styles.categoryDescription, { color: colors.medium }]}>
+                        {category.description}
+                      </Text>
                     </View>
                   </View>
                 </View>
-                <View style={styles.categoryMeta}>
-                  <Text style={styles.categoryCount}>{category.tasks.length}</Text>
-                  <Text style={styles.categoryLabel}>tasks</Text>
+                <View style={[styles.categoryMeta, { backgroundColor: colors.accent, padding: 8, borderRadius: 12 }]}>
+                  <Text style={[styles.categoryCount, { color: colors.pastel }]}>
+                    {category.tasks.length}
+                  </Text>
+                  <Text style={[styles.categoryLabel, { color: colors.pastel }]}>
+                    tasks
+                  </Text>
                 </View>
               </View>
               
               {category.tasks.length === 0 ? (
                 <View style={styles.emptyCategory}>
-                  <Text style={[styles.emptyCategoryText, { color: colors.pastel }]}>
+                  <Text style={[styles.emptyCategoryText, { color: colors.medium }]}>
                     No {category.title.toLowerCase()} activities yet
                   </Text>
                 </View>
@@ -144,9 +153,7 @@ export default function SelfCare() {
                       onMoveDown={taskManager.moveTaskDown}
                       isFirst={taskPosition === 0}
                       isLast={taskPosition === typeTasks.length - 1}
-                      accentColor={colors.accent}
-                      borderColor={colors.dark}
-                      habitColor={colors.dark}
+                      colors={colors}
                     />
                   );
                 })
@@ -159,11 +166,11 @@ export default function SelfCare() {
       <TouchableOpacity
         style={[styles.addButton, { 
           backgroundColor: colors.dark,
-          shadowColor: colors.dark 
+          shadowColor: colors.shadow 
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color="#ffffff" />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -173,6 +180,10 @@ export default function SelfCare() {
         category="self-care"
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
 
       <EditTaskForm
@@ -182,6 +193,10 @@ export default function SelfCare() {
         initialTask={taskToEdit}
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
     </SafeAreaView>
   );
@@ -206,7 +221,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginTop: 2,
   },
   headerIcons: {
@@ -219,7 +233,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -255,7 +268,6 @@ const styles = StyleSheet.create({
   categoryDescription: {
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     marginTop: 2,
   },
   categoryMeta: {
@@ -264,12 +276,10 @@ const styles = StyleSheet.create({
   categoryCount: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
   },
   categoryLabel: {
     fontSize: 10,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     marginTop: 2,
   },
   emptyCategory: {
