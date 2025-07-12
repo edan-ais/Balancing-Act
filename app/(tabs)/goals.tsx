@@ -37,30 +37,34 @@ export default function LongTermGoals() {
     setShowEditForm(false);
     setTaskToEdit(null);
   };
+  
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.dark }]}>Long-term Tasks</Text>
-          <Text style={styles.subtitle}>
+          <Text style={[styles.subtitle, { color: colors.medium }]}>
             {completedTasks.length}/{goalTasks.length} completed
           </Text>
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity
-            style={[styles.homeButton, { backgroundColor: colors.accent }]}
+            style={[styles.homeButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.dark} />
+            <Home size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {goalTasks.length === 0 ? (
-          <NeumorphicCard style={styles.emptyState}>
-            <Text style={styles.emptyTitle}>No long-term tasks</Text>
-            <Text style={styles.emptySubtitle}>
+          <NeumorphicCard style={[styles.emptyState, { borderColor: colors.pastel }]}>
+            <Text style={[styles.emptyTitle, { color: colors.dark }]}>No long-term tasks</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.medium }]}>
               Add tasks you need to do, just not any time soon
             </Text>
           </NeumorphicCard>
@@ -68,7 +72,7 @@ export default function LongTermGoals() {
           <>
             {pendingTasks.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Pending</Text>
+                <Text style={[styles.sectionTitle, { color: colors.medium }]}>Pending</Text>
                 {pendingTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
@@ -82,9 +86,7 @@ export default function LongTermGoals() {
                     onMoveDown={taskManager.moveTaskDown}
                     isFirst={index === 0}
                     isLast={index === pendingTasks.length - 1}
-                    accentColor={colors.accent}
-                    borderColor={colors.dark}
-                    habitColor={colors.dark}
+                    colors={colors}
                   />
                 ))}
               </View>
@@ -92,7 +94,7 @@ export default function LongTermGoals() {
 
             {completedTasks.length > 0 && (
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Completed</Text>
+                <Text style={[styles.sectionTitle, { color: colors.medium }]}>Completed</Text>
                 {completedTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
@@ -106,9 +108,7 @@ export default function LongTermGoals() {
                     onMoveDown={taskManager.moveTaskDown}
                     isFirst={index === 0}
                     isLast={index === completedTasks.length - 1}
-                    accentColor={colors.accent}
-                    borderColor={colors.dark}
-                    habitColor={colors.dark}
+                    colors={colors}
                   />
                 ))}
               </View>
@@ -120,11 +120,11 @@ export default function LongTermGoals() {
       <TouchableOpacity
         style={[styles.addButton, { 
           backgroundColor: colors.dark,
-          shadowColor: colors.dark 
+          shadowColor: colors.shadow 
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color="#ffffff" />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -134,6 +134,10 @@ export default function LongTermGoals() {
         category="goals"
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
 
       <EditTaskForm
@@ -143,6 +147,10 @@ export default function LongTermGoals() {
         initialTask={taskToEdit}
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
     </SafeAreaView>
   );
@@ -167,7 +175,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginTop: 2,
   },
   headerActions: {
@@ -180,7 +187,6 @@ const styles = StyleSheet.create({
     borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.2,
     shadowRadius: 6,
@@ -195,7 +201,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
     marginLeft: 12,
     marginBottom: 8,
   },
@@ -204,18 +209,15 @@ const styles = StyleSheet.create({
     paddingVertical: 40,
     margin: 12,
     borderWidth: 1,
-    borderColor: '#A8D5BA',
   },
   emptyTitle: {
     fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
     marginBottom: 8,
   },
   emptySubtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     textAlign: 'center',
   },
   addButton: {
