@@ -39,6 +39,10 @@ interface AddTaskFormProps {
   selectedDate?: Date | null;
   accentColor?: string;
   darkColor?: string;
+  bgColor?: string;
+  mediumColor?: string;
+  pastelColor?: string;
+  shadowColor?: string;
 }
 
 interface CustomTag {
@@ -52,8 +56,12 @@ export default function AddTaskForm({
   onSubmit, 
   category, 
   selectedDate,
-  accentColor,
-  darkColor 
+  accentColor = '#4055C5',
+  darkColor = '#2B6CB0',
+  bgColor = '#F5F7FA',
+  mediumColor = '#4A5568',
+  pastelColor = '#E2E8F0',
+  shadowColor = '#C8D0E0'
 }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
@@ -372,19 +380,25 @@ export default function AddTaskForm({
   if (!visible) return null;
 
   return (
-    <View style={styles.overlay}>
-      <NeumorphicCard style={styles.form}>
+    <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
+      <NeumorphicCard style={[styles.form, { backgroundColor: bgColor, shadowColor: shadowColor }]}>
         <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
           <View style={styles.header}>
-            <Text style={styles.title}>Add New Task</Text>
+            <Text style={[styles.title, { color: darkColor }]}>Add New Task</Text>
             <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color="#A0AEC0" />
+              <X size={24} color={mediumColor} />
             </TouchableOpacity>
           </View>
 
           <TextInput
-            style={styles.input}
+            style={[styles.input, { 
+              backgroundColor: bgColor,
+              borderColor: pastelColor,
+              color: darkColor,
+              shadowColor: shadowColor
+            }]}
             placeholder="Task title"
+            placeholderTextColor={mediumColor}
             value={title}
             onChangeText={setTitle}
             autoFocus
@@ -394,46 +408,59 @@ export default function AddTaskForm({
           {category === 'daily' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Type</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Type</Text>
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
                     style={[
                       styles.optionButton, 
-                      !isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
+                      !isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
                     ]}
                     onPress={() => setIsHabit(false)}
                   >
-                    <Text style={[styles.optionText, !isHabit && styles.selectedText]}>Task</Text>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      !isHabit && [styles.selectedText, { color: pastelColor }]
+                    ]}>Task</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
                       styles.optionButton, 
-                      isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
+                      isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
                     ]}
                     onPress={() => setIsHabit(true)}
                   >
-                    <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      isHabit && [styles.selectedText, { color: pastelColor }]
+                    ]}>Habit</Text>
                   </TouchableOpacity>
                 </View>
                 
                 {isHabit && (
                   <View style={styles.habitFrequency}>
-                    <Text style={styles.habitFrequencyLabel}>
+                    <Text style={[styles.habitFrequencyLabel, { color: mediumColor }]}>
                       Daily goal:
                     </Text>
-                    <View style={styles.habitGoalInput}>
+                    <View style={[styles.habitGoalInput, { 
+                      backgroundColor: bgColor,
+                      shadowColor: shadowColor
+                    }]}>
                       <TouchableOpacity 
-                        style={styles.habitGoalButton}
+                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
                         onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
                       >
-                        <Text style={styles.habitGoalButtonText}>-</Text>
+                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>-</Text>
                       </TouchableOpacity>
-                      <Text style={styles.habitGoalValue}>{habitGoal}</Text>
+                      <Text style={[styles.habitGoalValue, { color: darkColor }]}>{habitGoal}</Text>
                       <TouchableOpacity 
-                        style={styles.habitGoalButton}
+                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
                         onPress={() => setHabitGoal(habitGoal + 1)}
                       >
-                        <Text style={styles.habitGoalButtonText}>+</Text>
+                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>+</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -441,12 +468,18 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Subtasks</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
                 {subtasks.map((subtask, index) => (
                   <View key={index} style={styles.subtaskRow}>
                     <TextInput
-                      style={styles.subtaskInput}
+                      style={[styles.subtaskInput, { 
+                        backgroundColor: bgColor,
+                        borderColor: pastelColor,
+                        color: darkColor,
+                        shadowColor: shadowColor
+                      }]}
                       placeholder={`Subtask ${index + 1}`}
+                      placeholderTextColor={mediumColor}
                       value={subtask}
                       onChangeText={(value) => updateSubtask(index, value)}
                     />
@@ -457,21 +490,24 @@ export default function AddTaskForm({
                     )}
                   </View>
                 ))}
-                <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
-                  <Plus size={16} color="#4A5568" />
-                  <Text style={styles.addSubtaskText}>Add Subtask</Text>
+                <TouchableOpacity 
+                  onPress={addSubtask} 
+                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                >
+                  <Plus size={16} color={pastelColor} />
+                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Priority</Text>
+                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Priority</Text>
                   <TouchableOpacity 
-                    style={styles.addCustomButton}
+                    style={[styles.addCustomButton, { backgroundColor: pastelColor }]}
                     onPress={() => openCustomTagModal('priority')}
                   >
-                    <Plus size={14} color="#4A5568" />
-                    <Text style={styles.addCustomText}>Add Custom</Text>
+                    <Plus size={14} color={mediumColor} />
+                    <Text style={[styles.addCustomText, { color: mediumColor }]}>Add Custom</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.buttonRow}>
@@ -479,11 +515,16 @@ export default function AddTaskForm({
                     key="low"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       priority === 'low' && [styles.selectedOption, {backgroundColor: '#68D391'}]
                     ]}
                     onPress={() => setPriority('low')}
                   >
-                    <Text style={[styles.optionText, priority === 'low' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      priority === 'low' && styles.selectedText
+                    ]}>
                       Low
                     </Text>
                   </TouchableOpacity>
@@ -491,11 +532,16 @@ export default function AddTaskForm({
                     key="medium"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       priority === 'medium' && [styles.selectedOption, {backgroundColor: '#4299E1'}]
                     ]}
                     onPress={() => setPriority('medium')}
                   >
-                    <Text style={[styles.optionText, priority === 'medium' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      priority === 'medium' && styles.selectedText
+                    ]}>
                       Medium
                     </Text>
                   </TouchableOpacity>
@@ -503,11 +549,16 @@ export default function AddTaskForm({
                     key="high"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       priority === 'high' && [styles.selectedOption, {backgroundColor: '#FC8181'}]
                     ]}
                     onPress={() => setPriority('high')}
                   >
-                    <Text style={[styles.optionText, priority === 'high' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      priority === 'high' && styles.selectedText
+                    ]}>
                       High
                     </Text>
                   </TouchableOpacity>
@@ -515,11 +566,16 @@ export default function AddTaskForm({
                     key="quick-win"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       priority === 'quick-win' && [styles.selectedOption, {backgroundColor: '#F6AD55'}]
                     ]}
                     onPress={() => setPriority('quick-win')}
                   >
-                    <Text style={[styles.optionText, priority === 'quick-win' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      priority === 'quick-win' && styles.selectedText
+                    ]}>
                       Quick Win
                     </Text>
                   </TouchableOpacity>
@@ -530,6 +586,7 @@ export default function AddTaskForm({
                       key={`saved-priority-${index}`}
                       style={[
                         styles.optionButton, 
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
                         priority === 'custom' && customPriorityText === tag.text && [
                           styles.selectedOption, 
                           { backgroundColor: tag.color }
@@ -543,6 +600,7 @@ export default function AddTaskForm({
                     >
                       <Text style={[
                         styles.optionText, 
+                        { color: mediumColor },
                         priority === 'custom' && customPriorityText === tag.text && styles.selectedText
                       ]}>
                         {tag.text}
@@ -559,13 +617,13 @@ export default function AddTaskForm({
             <>
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Goal Type</Text>
+                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Goal Type</Text>
                   <TouchableOpacity 
-                    style={styles.addCustomButton}
+                    style={[styles.addCustomButton, { backgroundColor: pastelColor }]}
                     onPress={() => openCustomTagModal('goalType')}
                   >
-                    <Plus size={14} color="#4A5568" />
-                    <Text style={styles.addCustomText}>Add Custom</Text>
+                    <Plus size={14} color={mediumColor} />
+                    <Text style={[styles.addCustomText, { color: mediumColor }]}>Add Custom</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.buttonRow}>
@@ -573,11 +631,16 @@ export default function AddTaskForm({
                     key="TBD"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       goalType === 'TBD' && [styles.selectedOption, {backgroundColor: '#9F7AEA'}]
                     ]}
                     onPress={() => setGoalType('TBD')}
                   >
-                    <Text style={[styles.optionText, goalType === 'TBD' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      goalType === 'TBD' && styles.selectedText
+                    ]}>
                       TBD
                     </Text>
                   </TouchableOpacity>
@@ -585,11 +648,16 @@ export default function AddTaskForm({
                     key="Not Priority"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       goalType === 'Not Priority' && [styles.selectedOption, {backgroundColor: '#FC8181'}]
                     ]}
                     onPress={() => setGoalType('Not Priority')}
                   >
-                    <Text style={[styles.optionText, goalType === 'Not Priority' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      goalType === 'Not Priority' && styles.selectedText
+                    ]}>
                       Not Priority
                     </Text>
                   </TouchableOpacity>
@@ -597,11 +665,16 @@ export default function AddTaskForm({
                     key="Wish"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       goalType === 'Wish' && [styles.selectedOption, {backgroundColor: '#4299E1'}]
                     ]}
                     onPress={() => setGoalType('Wish')}
                   >
-                    <Text style={[styles.optionText, goalType === 'Wish' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      goalType === 'Wish' && styles.selectedText
+                    ]}>
                       Wish
                     </Text>
                   </TouchableOpacity>
@@ -612,6 +685,7 @@ export default function AddTaskForm({
                       key={`saved-goalType-${index}`}
                       style={[
                         styles.optionButton, 
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
                         goalType === 'custom' && customGoalTypeText === tag.text && [
                           styles.selectedOption, 
                           { backgroundColor: tag.color }
@@ -625,6 +699,7 @@ export default function AddTaskForm({
                     >
                       <Text style={[
                         styles.optionText, 
+                        { color: mediumColor },
                         goalType === 'custom' && customGoalTypeText === tag.text && styles.selectedText
                       ]}>
                         {tag.text}
@@ -635,12 +710,18 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Subtasks</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
                 {subtasks.map((subtask, index) => (
                   <View key={index} style={styles.subtaskRow}>
                     <TextInput
-                      style={styles.subtaskInput}
+                      style={[styles.subtaskInput, { 
+                        backgroundColor: bgColor,
+                        borderColor: pastelColor,
+                        color: darkColor,
+                        shadowColor: shadowColor
+                      }]}
                       placeholder={`Subtask ${index + 1}`}
+                      placeholderTextColor={mediumColor}
                       value={subtask}
                       onChangeText={(value) => updateSubtask(index, value)}
                     />
@@ -651,9 +732,12 @@ export default function AddTaskForm({
                     )}
                   </View>
                 ))}
-                <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
-                  <Plus size={16} color="#4A5568" />
-                  <Text style={styles.addSubtaskText}>Add Subtask</Text>
+                <TouchableOpacity 
+                  onPress={addSubtask} 
+                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                >
+                  <Plus size={16} color={pastelColor} />
+                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -663,46 +747,59 @@ export default function AddTaskForm({
           {category === 'weekly' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Type</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Type</Text>
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
                     style={[
                       styles.optionButton, 
-                      !isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
+                      !isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
                     ]}
                     onPress={() => setIsHabit(false)}
                   >
-                    <Text style={[styles.optionText, !isHabit && styles.selectedText]}>Task</Text>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      !isHabit && [styles.selectedText, { color: pastelColor }]
+                    ]}>Task</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
                       styles.optionButton, 
-                      isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
+                      isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
                     ]}
                     onPress={() => setIsHabit(true)}
                   >
-                    <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      isHabit && [styles.selectedText, { color: pastelColor }]
+                    ]}>Habit</Text>
                   </TouchableOpacity>
                 </View>
                 
                 {isHabit && (
                   <View style={styles.habitFrequency}>
-                    <Text style={styles.habitFrequencyLabel}>
+                    <Text style={[styles.habitFrequencyLabel, { color: mediumColor }]}>
                       Daily goal:
                     </Text>
-                    <View style={styles.habitGoalInput}>
+                    <View style={[styles.habitGoalInput, { 
+                      backgroundColor: bgColor,
+                      shadowColor: shadowColor
+                    }]}>
                       <TouchableOpacity 
-                        style={styles.habitGoalButton}
+                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
                         onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
                       >
-                        <Text style={styles.habitGoalButtonText}>-</Text>
+                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>-</Text>
                       </TouchableOpacity>
-                      <Text style={styles.habitGoalValue}>{habitGoal}</Text>
+                      <Text style={[styles.habitGoalValue, { color: darkColor }]}>{habitGoal}</Text>
                       <TouchableOpacity 
-                        style={styles.habitGoalButton}
+                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
                         onPress={() => setHabitGoal(habitGoal + 1)}
                       >
-                        <Text style={styles.habitGoalButtonText}>+</Text>
+                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>+</Text>
                       </TouchableOpacity>
                     </View>
                   </View>
@@ -710,12 +807,18 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Subtasks</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
                 {subtasks.map((subtask, index) => (
                   <View key={index} style={styles.subtaskRow}>
                     <TextInput
-                      style={styles.subtaskInput}
+                      style={[styles.subtaskInput, { 
+                        backgroundColor: bgColor,
+                        borderColor: pastelColor,
+                        color: darkColor,
+                        shadowColor: shadowColor
+                      }]}
                       placeholder={`Subtask ${index + 1}`}
+                      placeholderTextColor={mediumColor}
                       value={subtask}
                       onChangeText={(value) => updateSubtask(index, value)}
                     />
@@ -726,51 +829,66 @@ export default function AddTaskForm({
                     )}
                   </View>
                 ))}
-                <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
-                  <Plus size={16} color="#4A5568" />
-                  <Text style={styles.addSubtaskText}>Add Subtask</Text>
+                <TouchableOpacity 
+                  onPress={addSubtask} 
+                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                >
+                  <Plus size={16} color={pastelColor} />
+                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Date Options</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Date Options</Text>
                 <View style={styles.buttonRow}>
                   <TouchableOpacity
                     style={[
                       styles.optionButton, 
-                      !isRecurring && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
+                      !isRecurring && [styles.selectedOption, { backgroundColor: accentColor }]
                     ]}
                     onPress={() => setIsRecurring(false)}
                   >
-                    <Text style={[styles.optionText, !isRecurring && styles.selectedText]}>One-time</Text>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      !isRecurring && [styles.selectedText, { color: pastelColor }]
+                    ]}>One-time</Text>
                   </TouchableOpacity>
                   <TouchableOpacity
                     style={[
                       styles.optionButton, 
-                      isRecurring && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
+                      isRecurring && [styles.selectedOption, { backgroundColor: accentColor }]
                     ]}
                     onPress={() => setIsRecurring(true)}
                   >
-                    <Text style={[styles.optionText, isRecurring && styles.selectedText]}>Recurring</Text>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      isRecurring && [styles.selectedText, { color: pastelColor }]
+                    ]}>Recurring</Text>
                   </TouchableOpacity>
                 </View>
                 
                 {isRecurring && (
                   <View style={styles.recurringOptions}>
-                    <Text style={styles.recurringTitle}>Repeat on:</Text>
+                    <Text style={[styles.recurringTitle, { color: mediumColor }]}>Repeat on:</Text>
                     <View style={styles.daysRow}>
                       {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
                         <TouchableOpacity
                           key={day}
                           style={[
                             styles.dayButton,
-                            recurringDays.includes(day) && {backgroundColor: getTabColor()}
+                            { backgroundColor: pastelColor, shadowColor: shadowColor },
+                            recurringDays.includes(day) && { backgroundColor: accentColor }
                           ]}
                           onPress={() => toggleRecurringDay(day)}
                         >
                           <Text style={[
                             styles.dayText,
-                            recurringDays.includes(day) && {color: '#FFFFFF'}
+                            { color: mediumColor },
+                            recurringDays.includes(day) && { color: pastelColor }
                           ]}>
                             {day.charAt(0)}
                           </Text>
@@ -787,21 +905,26 @@ export default function AddTaskForm({
           {category === 'meal-prep' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Meal Type</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Meal Type</Text>
                 <View style={styles.buttonRow}>
                   {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
                     <TouchableOpacity
                       key={type}
                       style={[
                         styles.optionButton, 
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
                         mealType === type && [
                           styles.selectedOption,
-                          {backgroundColor: getTabColor()}
+                          { backgroundColor: accentColor }
                         ]
                       ]}
                       onPress={() => setMealType(type)}
                     >
-                      <Text style={[styles.optionText, mealType === type && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        { color: mediumColor },
+                        mealType === type && [styles.selectedText, { color: pastelColor }]
+                      ]}>
                         {type.charAt(0).toUpperCase() + type.slice(1)}
                       </Text>
                     </TouchableOpacity>
@@ -810,7 +933,7 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Day</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Day</Text>
                 <View style={styles.buttonRow}>
                   {[
                     { day: 'Mon', color: '#FC8181' }, // Red
@@ -825,11 +948,16 @@ export default function AddTaskForm({
                       key={day}
                       style={[
                         styles.optionButton, 
-                        dayOfWeek === day && [styles.selectedOption, {backgroundColor: color}]
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
+                        dayOfWeek === day && [styles.selectedOption, { backgroundColor: color }]
                       ]}
                       onPress={() => setDayOfWeek(day)}
                     >
-                      <Text style={[styles.optionText, dayOfWeek === day && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        { color: mediumColor },
+                        dayOfWeek === day && styles.selectedText
+                      ]}>
                         {day}
                       </Text>
                     </TouchableOpacity>
@@ -838,10 +966,16 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Recipe Notes</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Recipe Notes</Text>
                 <TextInput
-                  style={[styles.input, styles.notesInput]}
+                  style={[styles.input, styles.notesInput, { 
+                    backgroundColor: bgColor,
+                    borderColor: pastelColor,
+                    color: darkColor,
+                    shadowColor: shadowColor
+                  }]}
                   placeholder="Add recipe notes, ingredients, etc."
+                  placeholderTextColor={mediumColor}
                   value={notes}
                   onChangeText={setNotes}
                   multiline
@@ -855,18 +989,23 @@ export default function AddTaskForm({
           {category === 'cleaning' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Frequency</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Frequency</Text>
                 <View style={styles.buttonRow}>
                   {['daily', 'weekly', 'monthly', 'seasonal'].map((freq) => (
                     <TouchableOpacity
                       key={freq}
                       style={[
                         styles.optionButton, 
-                        frequency === freq && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
+                        frequency === freq && [styles.selectedOption, { backgroundColor: accentColor }]
                       ]}
                       onPress={() => setFrequency(freq)}
                     >
-                      <Text style={[styles.optionText, frequency === freq && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        { color: mediumColor },
+                        frequency === freq && [styles.selectedText, { color: pastelColor }]
+                      ]}>
                         {freq.charAt(0).toUpperCase() + freq.slice(1)}
                       </Text>
                     </TouchableOpacity>
@@ -876,13 +1015,13 @@ export default function AddTaskForm({
 
               <View style={styles.section}>
                 <View style={styles.sectionHeader}>
-                  <Text style={styles.sectionTitle}>Location</Text>
+                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Location</Text>
                   <TouchableOpacity 
-                    style={styles.addCustomButton}
+                    style={[styles.addCustomButton, { backgroundColor: pastelColor }]}
                     onPress={() => openCustomTagModal('cleaningLocation')}
                   >
-                    <Plus size={14} color="#4A5568" />
-                    <Text style={styles.addCustomText}>Add Custom</Text>
+                    <Plus size={14} color={mediumColor} />
+                    <Text style={[styles.addCustomText, { color: mediumColor }]}>Add Custom</Text>
                   </TouchableOpacity>
                 </View>
                 <View style={styles.buttonRow}>
@@ -890,11 +1029,16 @@ export default function AddTaskForm({
                     key="kitchen"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       cleaningLocation === 'kitchen' && [styles.selectedOption, {backgroundColor: '#F6E05E'}]
                     ]}
                     onPress={() => setCleaningLocation('kitchen')}
                   >
-                    <Text style={[styles.optionText, cleaningLocation === 'kitchen' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      cleaningLocation === 'kitchen' && styles.selectedText
+                    ]}>
                       Kitchen
                     </Text>
                   </TouchableOpacity>
@@ -902,11 +1046,16 @@ export default function AddTaskForm({
                     key="bathroom"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       cleaningLocation === 'bathroom' && [styles.selectedOption, {backgroundColor: '#4FD1C5'}]
                     ]}
                     onPress={() => setCleaningLocation('bathroom')}
                   >
-                    <Text style={[styles.optionText, cleaningLocation === 'bathroom' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      cleaningLocation === 'bathroom' && styles.selectedText
+                    ]}>
                       Bathroom
                     </Text>
                   </TouchableOpacity>
@@ -914,11 +1063,16 @@ export default function AddTaskForm({
                     key="bedroom"
                     style={[
                       styles.optionButton, 
+                      { backgroundColor: pastelColor, shadowColor: shadowColor },
                       cleaningLocation === 'bedroom' && [styles.selectedOption, {backgroundColor: '#9F7AEA'}]
                     ]}
                     onPress={() => setCleaningLocation('bedroom')}
                   >
-                    <Text style={[styles.optionText, cleaningLocation === 'bedroom' && styles.selectedText]}>
+                    <Text style={[
+                      styles.optionText, 
+                      { color: mediumColor },
+                      cleaningLocation === 'bedroom' && styles.selectedText
+                    ]}>
                       Bedroom
                     </Text>
                   </TouchableOpacity>
@@ -929,6 +1083,7 @@ export default function AddTaskForm({
                       key={`saved-cleaning-${index}`}
                       style={[
                         styles.optionButton, 
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
                         cleaningLocation === 'custom' && customCleaningLocation === tag.text && [
                           styles.selectedOption, 
                           { backgroundColor: tag.color }
@@ -942,6 +1097,7 @@ export default function AddTaskForm({
                     >
                       <Text style={[
                         styles.optionText, 
+                        { color: mediumColor },
                         cleaningLocation === 'custom' && customCleaningLocation === tag.text && styles.selectedText
                       ]}>
                         {tag.text}
@@ -952,12 +1108,18 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Subtasks</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
                 {subtasks.map((subtask, index) => (
                   <View key={index} style={styles.subtaskRow}>
                     <TextInput
-                      style={styles.subtaskInput}
+                      style={[styles.subtaskInput, { 
+                        backgroundColor: bgColor,
+                        borderColor: pastelColor,
+                        color: darkColor,
+                        shadowColor: shadowColor
+                      }]}
                       placeholder={`Subtask ${index + 1}`}
+                      placeholderTextColor={mediumColor}
                       value={subtask}
                       onChangeText={(value) => updateSubtask(index, value)}
                     />
@@ -968,9 +1130,12 @@ export default function AddTaskForm({
                     )}
                   </View>
                 ))}
-                <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
-                  <Plus size={16} color="#4A5568" />
-                  <Text style={styles.addSubtaskText}>Add Subtask</Text>
+                <TouchableOpacity 
+                  onPress={addSubtask} 
+                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                >
+                  <Plus size={16} color={pastelColor} />
+                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -980,7 +1145,7 @@ export default function AddTaskForm({
           {category === 'self-care' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Self-Care Type</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Self-Care Type</Text>
                 <View style={styles.buttonRow}>
                   {[
                     { type: 'physical', label: 'Physical Health', color: '#68D391' },
@@ -992,11 +1157,16 @@ export default function AddTaskForm({
                       key={type}
                       style={[
                         styles.optionButton, 
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
                         selfCareType === type && [styles.selectedOption, {backgroundColor: color}]
                       ]}
                       onPress={() => setSelfCareType(type)}
                     >
-                      <Text style={[styles.optionText, selfCareType === type && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        { color: mediumColor },
+                        selfCareType === type && styles.selectedText
+                      ]}>
                         {label}
                       </Text>
                     </TouchableOpacity>
@@ -1005,12 +1175,18 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Subtasks</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
                 {subtasks.map((subtask, index) => (
                   <View key={index} style={styles.subtaskRow}>
                     <TextInput
-                      style={styles.subtaskInput}
+                      style={[styles.subtaskInput, { 
+                        backgroundColor: bgColor,
+                        borderColor: pastelColor,
+                        color: darkColor,
+                        shadowColor: shadowColor
+                      }]}
                       placeholder={`Subtask ${index + 1}`}
+                      placeholderTextColor={mediumColor}
                       value={subtask}
                       onChangeText={(value) => updateSubtask(index, value)}
                     />
@@ -1021,9 +1197,12 @@ export default function AddTaskForm({
                     )}
                   </View>
                 ))}
-                <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
-                  <Plus size={16} color="#4A5568" />
-                  <Text style={styles.addSubtaskText}>Add Subtask</Text>
+                <TouchableOpacity 
+                  onPress={addSubtask} 
+                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                >
+                  <Plus size={16} color={pastelColor} />
+                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
             </>
@@ -1033,7 +1212,7 @@ export default function AddTaskForm({
           {category === 'delegation' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Delegate To</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Delegate To</Text>
                 <View style={styles.buttonRow}>
                   {[
                     { type: 'partner', label: 'Partner Tasks', color: '#63B3ED' },
@@ -1045,11 +1224,16 @@ export default function AddTaskForm({
                       key={type}
                       style={[
                         styles.optionButton, 
+                        { backgroundColor: pastelColor, shadowColor: shadowColor },
                         delegateType === type && [styles.selectedOption, {backgroundColor: color}]
                       ]}
                       onPress={() => setDelegateType(type)}
                     >
-                      <Text style={[styles.optionText, delegateType === type && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        { color: mediumColor },
+                        delegateType === type && styles.selectedText
+                      ]}>
                         {label}
                       </Text>
                     </TouchableOpacity>
@@ -1058,22 +1242,34 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Delegate Name</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Delegate Name</Text>
                 <TextInput
-                  style={styles.input}
+                  style={[styles.input, { 
+                    backgroundColor: bgColor,
+                    borderColor: pastelColor,
+                    color: darkColor,
+                    shadowColor: shadowColor
+                  }]}
                   placeholder="Person's name"
+                  placeholderTextColor={mediumColor}
                   value={delegatedTo}
                   onChangeText={setDelegatedTo}
                 />
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Subtasks</Text>
+                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
                 {subtasks.map((subtask, index) => (
                   <View key={index} style={styles.subtaskRow}>
                     <TextInput
-                      style={styles.subtaskInput}
+                      style={[styles.subtaskInput, { 
+                        backgroundColor: bgColor,
+                        borderColor: pastelColor,
+                        color: darkColor,
+                        shadowColor: shadowColor
+                      }]}
                       placeholder={`Subtask ${index + 1}`}
+                      placeholderTextColor={mediumColor}
                       value={subtask}
                       onChangeText={(value) => updateSubtask(index, value)}
                     />
@@ -1084,30 +1280,35 @@ export default function AddTaskForm({
                     )}
                   </View>
                 ))}
-                <TouchableOpacity onPress={addSubtask} style={styles.addSubtaskButton}>
-                  <Plus size={16} color="#4A5568" />
-                  <Text style={styles.addSubtaskText}>Add Subtask</Text>
+                <TouchableOpacity 
+                  onPress={addSubtask} 
+                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                >
+                  <Plus size={16} color={pastelColor} />
+                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
 
               <View style={styles.section}>
                 <View style={styles.reminderRow}>
-                  <Text style={styles.sectionTitle}>Add task reminder</Text>
+                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Add task reminder</Text>
                   <TouchableOpacity
                     style={[
                       styles.toggleButton,
-                      reminderEnabled && { backgroundColor: getTabColor() }
+                      { backgroundColor: pastelColor },
+                      reminderEnabled && { backgroundColor: accentColor }
                     ]}
                     onPress={() => setReminderEnabled(!reminderEnabled)}
                   >
                     <View style={[
                       styles.toggleKnob,
+                      { backgroundColor: bgColor },
                       reminderEnabled && { transform: [{ translateX: 18 }] }
                     ]} />
                   </TouchableOpacity>
                 </View>
                 {reminderEnabled && (
-                  <Text style={styles.reminderText}>
+                  <Text style={[styles.reminderText, { color: mediumColor }]}>
                     Will add reminder to goals: "Remind {delegatedTo || 'person'} to {title}"
                   </Text>
                 )}
@@ -1116,11 +1317,14 @@ export default function AddTaskForm({
           )}
 
           <TouchableOpacity 
-            style={[styles.submitButton, { backgroundColor: darkColor || getTabColor() }]} 
+            style={[styles.submitButton, { 
+              backgroundColor: darkColor,
+              shadowColor: shadowColor
+            }]} 
             onPress={handleSubmit}
           >
-            <Plus size={20} color="#ffffff" />
-            <Text style={styles.submitText}>Add Task</Text>
+            <Plus size={20} color={pastelColor} />
+            <Text style={[styles.submitText, { color: pastelColor }]}>Add Task</Text>
           </TouchableOpacity>
         </ScrollView>
       </NeumorphicCard>
@@ -1132,29 +1336,37 @@ export default function AddTaskForm({
         animationType="fade"
         onRequestClose={() => setShowCustomTagModal(false)}
       >
-        <View style={styles.modalOverlay}>
-          <NeumorphicCard style={styles.modalContent}>
+        <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
+          <NeumorphicCard style={[styles.modalContent, { 
+            backgroundColor: bgColor,
+            shadowColor: shadowColor
+          }]}>
             <View style={styles.modalHeader}>
-              <Text style={styles.modalTitle}>
+              <Text style={[styles.modalTitle, { color: darkColor }]}>
                 {customTagType === 'priority' ? 'Custom Priority' : 
                  customTagType === 'goalType' ? 'Custom Goal Type' : 
                  'Custom Location'}
               </Text>
               <TouchableOpacity onPress={() => setShowCustomTagModal(false)}>
-                <X size={24} color="#A0AEC0" />
+                <X size={24} color={mediumColor} />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalLabel}>
+            <Text style={[styles.modalLabel, { color: darkColor }]}>
               {customTagType === 'cleaningLocation' ? 'Location Name' : 'Tag Text'}
             </Text>
             <TextInput
-              style={styles.modalInput}
+              style={[styles.modalInput, { 
+                backgroundColor: bgColor,
+                borderColor: pastelColor,
+                color: darkColor
+              }]}
               placeholder={
                 customTagType === 'priority' ? "Enter custom priority" : 
                 customTagType === 'goalType' ? "Enter custom goal type" : 
                 "Enter custom location"
               }
+              placeholderTextColor={mediumColor}
               value={
                 customTagType === 'priority' ? customPriorityText : 
                 customTagType === 'goalType' ? customGoalTypeText : 
@@ -1171,18 +1383,18 @@ export default function AddTaskForm({
               }}
             />
 
-            <Text style={styles.modalLabel}>Tag Color</Text>
+            <Text style={[styles.modalLabel, { color: darkColor }]}>Tag Color</Text>
             <View style={styles.colorOptionsRow}>
               {getAvailableColorOptions(customTagType).map(color => (
                 <TouchableOpacity
                   key={color}
                   style={[
                     styles.colorOption,
-                    { backgroundColor: color },
+                    { backgroundColor: color, borderColor: pastelColor },
                     ((customTagType === 'priority' ? customPriorityColor : 
                      customTagType === 'goalType' ? customGoalTypeColor :
                      customCleaningLocationColor) === color) && 
-                    styles.selectedColorOption
+                    [styles.selectedColorOption, { borderColor: darkColor }]
                   ]}
                   onPress={() => {
                     if (customTagType === 'priority') {
@@ -1199,16 +1411,16 @@ export default function AddTaskForm({
 
             <View style={styles.modalButtons}>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton]} 
+                style={[styles.modalButton, styles.cancelButton, { backgroundColor: pastelColor }]} 
                 onPress={() => setShowCustomTagModal(false)}
               >
-                <Text style={styles.cancelButtonText}>Cancel</Text>
+                <Text style={[styles.cancelButtonText, { color: mediumColor }]}>Cancel</Text>
               </TouchableOpacity>
               <TouchableOpacity 
-                style={[styles.modalButton, styles.saveButton, { backgroundColor: getTabColor() }]} 
+                style={[styles.modalButton, styles.saveButton, { backgroundColor: darkColor }]} 
                 onPress={saveCustomTag}
               >
-                <Text style={styles.saveButtonText}>Save</Text>
+                <Text style={[styles.saveButtonText, { color: pastelColor }]}>Save</Text>
               </TouchableOpacity>
             </View>
           </NeumorphicCard>
@@ -1225,7 +1437,6 @@ const styles = StyleSheet.create({
     left: 0,
     right: 0,
     bottom: 0,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
     zIndex: 1000,
@@ -1249,19 +1460,17 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
   },
   closeButton: {
     padding: 4,
   },
   input: {
-    backgroundColor: '#ffffff',
     borderRadius: 12,
     padding: 16,
     fontSize: 16,
     fontFamily: 'Quicksand-Regular',
     marginBottom: 20,
-    shadowColor: '#C8D0E0',
+    borderWidth: 1,
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -1282,18 +1491,17 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
   },
   addCustomButton: {
     flexDirection: 'row',
     alignItems: 'center',
     padding: 4,
+    borderRadius: 12,
   },
   addCustomText: {
     fontSize: 12,
     fontFamily: 'Quicksand-Medium',
     marginLeft: 2,
-    color: '#4A5568',
   },
   buttonRow: {
     flexDirection: 'row',
@@ -1305,21 +1513,17 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    backgroundColor: '#E2E8F0',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
     marginBottom: 4,
   },
   selectedOption: {
-    shadowColor: 'rgba(0, 0, 0, 0.2)',
     shadowOpacity: 0.3,
   },
   optionText: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
   },
   selectedText: {
     color: '#ffffff',
@@ -1333,15 +1537,12 @@ const styles = StyleSheet.create({
   habitFrequencyLabel: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
   },
   habitGoalInput: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#ffffff',
     borderRadius: 8,
     padding: 4,
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -1352,18 +1553,15 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     borderRadius: 15,
-    backgroundColor: '#E2E8F0',
   },
   habitGoalButtonText: {
     fontSize: 18,
     fontWeight: 'bold',
-    color: '#4A5568',
   },
   habitGoalValue: {
     paddingHorizontal: 16,
     fontSize: 16,
     fontFamily: 'Quicksand-Bold',
-    color: '#2D3748',
   },
   subtaskRow: {
     flexDirection: 'row',
@@ -1372,13 +1570,12 @@ const styles = StyleSheet.create({
   },
   subtaskInput: {
     flex: 1,
-    backgroundColor: '#ffffff',
     borderRadius: 8,
     padding: 12,
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
     marginRight: 8,
-    shadowColor: '#C8D0E0',
+    borderWidth: 1,
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.1,
     shadowRadius: 2,
@@ -1390,12 +1587,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     padding: 8,
+    borderRadius: 8,
   },
   addSubtaskText: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
     marginLeft: 4,
-    color: '#4A5568',
   },
   submitButton: {
     flexDirection: 'row',
@@ -1408,7 +1605,6 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
   },
   submitText: {
-    color: '#ffffff',
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
     marginLeft: 8,
@@ -1419,7 +1615,6 @@ const styles = StyleSheet.create({
   recurringTitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginBottom: 8,
   },
   daysRow: {
@@ -1431,10 +1626,8 @@ const styles = StyleSheet.create({
     width: 36,
     height: 36,
     borderRadius: 18,
-    backgroundColor: '#E2E8F0',
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.2,
     shadowRadius: 2,
@@ -1442,7 +1635,6 @@ const styles = StyleSheet.create({
   dayText: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
   },
   reminderRow: {
     flexDirection: 'row',
@@ -1454,33 +1646,28 @@ const styles = StyleSheet.create({
     width: 44,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#CBD5E0',
     padding: 2,
   },
   toggleKnob: {
     width: 20,
     height: 20,
     borderRadius: 10,
-    backgroundColor: '#FFFFFF',
   },
   reminderText: {
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     fontStyle: 'italic',
     marginBottom: 10,
   },
   // Modal styles
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0, 0, 0, 0.5)',
     justifyContent: 'center',
     alignItems: 'center',
   },
   modalContent: {
     width: '80%',
     padding: 20,
-    backgroundColor: '#FFFFFF',
     borderRadius: 16,
   },
   modalHeader: {
@@ -1492,23 +1679,19 @@ const styles = StyleSheet.create({
   modalTitle: {
     fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
   },
   modalLabel: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
     marginBottom: 8,
   },
   modalInput: {
-    backgroundColor: '#F7FAFC',
     borderRadius: 8,
     padding: 12,
     fontSize: 16,
     fontFamily: 'Quicksand-Regular',
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
   },
   // Updated to show colors in a single row
   colorOptionsRow: {
@@ -1524,11 +1707,9 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     marginHorizontal: 2,
     borderWidth: 1,
-    borderColor: '#E2E8F0',
   },
   selectedColorOption: {
     borderWidth: 2,
-    borderColor: '#2D3748',
   },
   modalButtons: {
     flexDirection: 'row',
@@ -1542,18 +1723,14 @@ const styles = StyleSheet.create({
     marginHorizontal: 4,
   },
   cancelButton: {
-    backgroundColor: '#E2E8F0',
   },
   saveButton: {
-    backgroundColor: '#4299E1',
   },
   cancelButtonText: {
-    color: '#4A5568',
     fontFamily: 'Quicksand-SemiBold',
     fontSize: 16,
   },
   saveButtonText: {
-    color: '#FFFFFF',
     fontFamily: 'Quicksand-SemiBold',
     fontSize: 16,
   },
