@@ -52,19 +52,19 @@ export default function MealPrep() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
-  <View>
-    <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
-    <Text style={styles.subtitle}>Plan and prepare your meals</Text>
-  </View>
-  <View style={styles.headerIcons}>
-    <TouchableOpacity 
-      style={[styles.actionButton, { backgroundColor: colors.accent }]}
-      onPress={() => router.push('/home')}
-    >
-      <Home size={20} color={colors.dark} />
-    </TouchableOpacity>
-  </View>
-</View>
+        <View>
+          <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
+          <Text style={styles.subtitle}>Plan and prepare your meals</Text>
+        </View>
+        <View style={styles.headerIcons}>
+          <TouchableOpacity 
+            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            onPress={() => router.push('/home')}
+          >
+            <Home size={20} color={colors.dark} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {mealCategories.map((category, index) => (
@@ -95,13 +95,18 @@ export default function MealPrep() {
                 </Text>
               </View>
             ) : (
-              category.tasks.map(task => (
+              category.tasks.map((task, taskIndex) => (
                 <TaskItem
                   key={task.id}
                   task={task}
                   onToggle={taskManager.toggleTask}
                   onDelete={taskManager.deleteTask}
                   onHabitIncrement={taskManager.incrementHabit}
+                  onSubtaskToggle={taskManager.toggleSubtask}
+                  onMoveUp={taskManager.moveTaskUp}
+                  onMoveDown={taskManager.moveTaskDown}
+                  isFirst={taskIndex === 0}
+                  isLast={taskIndex === category.tasks.length - 1}
                 />
               ))
             )}
