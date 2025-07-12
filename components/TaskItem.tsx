@@ -15,6 +15,7 @@ export interface Task {
   customPriorityColor?: string;
   isDelegated?: boolean;
   delegatedTo?: string;
+  delegateType?: string;
   subtasks?: { id: string; title: string; completed: boolean }[];
   category: string;
   goalType?: string;
@@ -27,6 +28,7 @@ export interface Task {
   // Cleaning specific
   frequency?: string;
   cleaningLocation?: string;
+  customCleaningLocation?: string;
   // Self-care specific
   selfCareType?: string;
   // Delegation specific
@@ -66,12 +68,12 @@ export default function TaskItem({
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
-      case 'high': return '#FC8181';
-      case 'medium': return '#F6AD55';
-      case 'low': return '#68D391';
-      case 'quick-win': return '#F6AD55';
+      case 'high': return '#FC8181'; // Red
+      case 'medium': return '#4299E1'; // Blue
+      case 'low': return '#68D391'; // Green
+      case 'quick-win': return '#F6AD55'; // Orange
       case 'custom': return task.customPriorityColor || '#4A5568';
-      default: return '#A0AEC0';
+      default: return '#A0AEC0'; // Default gray
     }
   };
 
@@ -82,6 +84,64 @@ export default function TaskItem({
       case 'Not Priority': return '#FC8181'; // Red
       case 'Wish': return '#4299E1'; // Blue
       case 'custom': return task.customGoalTypeColor || '#4A5568';
+      default: return '#A0AEC0'; // Default gray
+    }
+  };
+
+  // Function to get day of week color
+  const getDayOfWeekColor = (day?: string) => {
+    switch (day) {
+      case 'Mon': return '#FC8181'; // Red
+      case 'Tue': return '#F6AD55'; // Orange
+      case 'Wed': return '#F6E05E'; // Yellow
+      case 'Thu': return '#68D391'; // Green
+      case 'Fri': return '#4FD1C5'; // Teal
+      case 'Sat': return '#63B3ED'; // Blue
+      case 'Sun': return '#B794F4'; // Purple
+      default: return '#A0AEC0'; // Default gray
+    }
+  };
+
+  // Function to get meal type color
+  const getMealTypeColor = (type?: string) => {
+    switch (type) {
+      case 'breakfast': return '#F6E05E'; // Yellow
+      case 'lunch': return '#4FD1C5'; // Teal
+      case 'dinner': return '#9F7AEA'; // Purple
+      case 'snack': return '#68D391'; // Green
+      default: return '#A0AEC0'; // Default gray
+    }
+  };
+
+  // Function to get cleaning location color
+  const getCleaningLocationColor = (location?: string) => {
+    switch (location) {
+      case 'kitchen': return '#F6E05E'; // Yellow
+      case 'bathroom': return '#4FD1C5'; // Teal
+      case 'bedroom': return '#9F7AEA'; // Purple
+      case 'custom': return '#FC8181'; // Red
+      default: return '#A0AEC0'; // Default gray
+    }
+  };
+
+  // Function to get self-care type color
+  const getSelfCareTypeColor = (type?: string) => {
+    switch (type) {
+      case 'physical': return '#68D391'; // Green
+      case 'mental': return '#9F7AEA'; // Purple
+      case 'rest': return '#4FD1C5'; // Teal
+      case 'joy': return '#F6AD55'; // Orange
+      default: return '#A0AEC0'; // Default gray
+    }
+  };
+
+  // Function to get delegate type color
+  const getDelegateTypeColor = (type?: string) => {
+    switch (type) {
+      case 'partner': return '#63B3ED'; // Blue
+      case 'family': return '#F6AD55'; // Orange
+      case 'friends': return '#9F7AEA'; // Purple
+      case 'kids': return '#68D391'; // Green
       default: return '#A0AEC0'; // Default gray
     }
   };
@@ -171,6 +231,7 @@ export default function TaskItem({
 
   // Render tag based on task category
   const renderTag = () => {
+    // For goals category
     if (task.category === 'goals' && task.goalType) {
       // For custom goal type
       if (task.goalType === 'custom' && task.customGoalTypeText) {
@@ -197,7 +258,9 @@ export default function TaskItem({
           </Text>
         </View>
       );
-    } else if (task.priority) {
+    } 
+    // For daily tasks with priority
+    else if (task.priority) {
       // For custom priority
       if (task.priority === 'custom' && task.customPriorityText) {
         return (
@@ -224,6 +287,86 @@ export default function TaskItem({
         </View>
       );
     }
+    // For meal-prep with day of week
+    else if (task.category === 'meal-prep' && task.dayOfWeek) {
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.dayOfWeek.toUpperCase()}
+          </Text>
+        </View>
+      );
+    }
+    // For meal-prep with meal type
+    else if (task.category === 'meal-prep' && task.mealType) {
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getMealTypeColor(task.mealType) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.mealType.toUpperCase()}
+          </Text>
+        </View>
+      );
+    }
+    // For cleaning with location
+    else if (task.category === 'cleaning' && task.cleaningLocation) {
+      if (task.cleaningLocation === 'custom' && task.customCleaningLocation) {
+        return (
+          <View style={[
+            styles.priorityTag,
+            { backgroundColor: getCleaningLocationColor('custom') }
+          ]}>
+            <Text style={styles.priorityText}>
+              {task.customCleaningLocation.toUpperCase()}
+            </Text>
+          </View>
+        );
+      }
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getCleaningLocationColor(task.cleaningLocation) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.cleaningLocation.toUpperCase()}
+          </Text>
+        </View>
+      );
+    }
+    // For self-care with type
+    else if (task.category === 'self-care' && task.selfCareType) {
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getSelfCareTypeColor(task.selfCareType) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.selfCareType === 'physical' ? 'PHYSICAL' :
+             task.selfCareType === 'mental' ? 'MENTAL' :
+             task.selfCareType === 'rest' ? 'REST' : 'JOY'}
+          </Text>
+        </View>
+      );
+    }
+    // For delegation with type
+    else if (task.category === 'delegation' && task.delegateType) {
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getDelegateTypeColor(task.delegateType) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.delegateType.toUpperCase()}
+          </Text>
+        </View>
+      );
+    }
+    
     return null;
   };
 
@@ -279,6 +422,13 @@ export default function TaskItem({
             <View style={styles.taskMeta}>
               {renderTag()}
             </View>
+
+            {/* Display notes for meal prep tasks */}
+            {task.category === 'meal-prep' && task.notes && (
+              <View style={styles.notesContainer}>
+                <Text style={styles.notesText}>{task.notes}</Text>
+              </View>
+            )}
 
             {task.isHabit && task.habitGoal && (
               <View style={styles.habitProgressContainer}>
@@ -427,6 +577,20 @@ const styles = StyleSheet.create({
     fontSize: 10,
     fontFamily: 'Quicksand-SemiBold',
     textTransform: 'uppercase',
+  },
+  notesContainer: {
+    backgroundColor: '#F7FAFC',
+    borderRadius: 8,
+    padding: 8,
+    marginVertical: 4,
+    borderLeftWidth: 2,
+    borderLeftColor: '#ED8936', // Meal prep color
+  },
+  notesText: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Regular',
+    color: '#4A5568',
+    fontStyle: 'italic',
   },
   habitProgressContainer: {
     height: 8,
