@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, ChefHat, Coffee, Sandwich, Utensils, Apple, Home } from 'lucide-react-native';
+import { Plus, ChefHat, Coffee, Sandwich, Utensils, Apple, Chrome as Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -114,7 +114,6 @@ export default function MealPrep() {
                   task={task}
                   onToggle={taskManager.toggleTask}
                   onDelete={taskManager.deleteTask}
-                  onEdit={handleEditTask}
                   onHabitIncrement={taskManager.incrementHabit}
                   onSubtaskToggle={taskManager.toggleSubtask}
                   onMoveUp={taskManager.moveTaskUp}
@@ -143,15 +142,6 @@ export default function MealPrep() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="meal-prep"
-      />
-
-      <EditTaskForm
-        visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
-        onSubmit={handleUpdateTask}
-        initialTask={taskToEdit}
-        accentColor={colors.accent}
-        darkColor={colors.dark}
       />
     </SafeAreaView>
   );

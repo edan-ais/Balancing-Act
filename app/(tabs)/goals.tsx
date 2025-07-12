@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Home } from 'lucide-react-native';
+import { Plus, Chrome as Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -131,15 +131,6 @@ export default function LongTermGoals() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="goals"
-        accentColor={colors.accent}
-        darkColor={colors.dark}
-      />
-
-      <EditTaskForm
-        visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
-        onSubmit={handleUpdateTask}
-        initialTask={taskToEdit}
         accentColor={colors.accent}
         darkColor={colors.dark}
       />
