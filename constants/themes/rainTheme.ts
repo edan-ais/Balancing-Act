@@ -1,84 +1,84 @@
-// Latte Theme - Warm and diverse coffee-inspired color scheme with expanded options
-export const latteTheme = {
-  name: 'Latte Theme',
-  id: 'latte',
+// Rainstorm Theme - Cool and diverse rain-inspired color scheme with expanded options
+export const rainstormTheme = {
+  name: 'Rainstorm Theme',
+  id: 'rainstorm',
   tabColors: {
-    // Deep Espresso - rich dark brown with reddish undertones
+    // Deep Ocean Blue - deep navy with cool undertones
     daily: {
-      pastel: '#EAD9CF',   // Very light Deep Espresso with reddish undertones
-      medium: '#7D5B47',   // Medium Deep Espresso for text and icons
-      dark: '#2A1B0F',     // Very dark Deep Espresso
-      shadow: '#1A110A',   // Shadow color (darker than dark)
-      bg: '#FAF5F2',       // Ultra light background with reddish undertones
-      bgAlt: '#F5EBE5',    // Alternative background (slightly darker)
-      accent: '#3F2A1A',   // Deep Espresso (original)
-      highlight: '#6E3B28'  // Brighter highlight version with reddish tone
+      pastel: '#E1E8F0',   // Very light Deep Ocean Blue
+      medium: '#6D8CB3',   // Medium Deep Ocean Blue for text and icons
+      dark: '#1E3A5F',     // Very dark Deep Ocean Blue
+      shadow: '#102442',   // Shadow color (darker than dark)
+      bg: '#F7FAFF',       // Ultra light background with blue undertones
+      bgAlt: '#EEF4FC',    // Alternative background (slightly darker)
+      accent: '#2A4A75',   // Deep Ocean Blue (original)
+      highlight: '#3B67A5'  // Brighter highlight version with blue tone
     },
-    // Hazelnut - medium neutral brown with golden undertones
+    // Charcoal Mist - dark gray with blue undertones
     future: {
-      pastel: '#E7DCCA',   // Very light Hazelnut with more gold tint
-      medium: '#8F6E49',   // Medium Hazelnut for text and icons
-      dark: '#5E452D',     // Very dark Hazelnut
-      shadow: '#3D2D1E',   // Shadow color (darker than dark)
-      bg: '#F9F6ED',       // Ultra light background with golden undertones
-      bgAlt: '#F2EBD9',    // Alternative background (slightly darker)
-      accent: '#A67C52',   // Hazelnut (original)
-      highlight: '#BF8E5C'  // Brighter highlight version
+      pastel: '#E4E7ED',   // Very light Charcoal Mist
+      medium: '#7A8399',   // Medium Charcoal Mist for text and icons
+      dark: '#303C50',     // Very dark Charcoal Mist
+      shadow: '#1C2434',   // Shadow color (darker than dark)
+      bg: '#F7F8FA',       // Ultra light background with blue-gray undertones
+      bgAlt: '#ECEEF2',    // Alternative background (slightly darker)
+      accent: '#404D66',   // Charcoal Mist (original)
+      highlight: '#566281'  // Brighter highlight version
     },
-    // Caramel Gold - amber brown with orange undertones
+    // Slate Showers - medium gray with blue-purple undertones
     calendar: {
-      pastel: '#F5E4C7',   // Very light Caramel with orange undertones
-      medium: '#C0904F',   // Medium Caramel Gold for text and icons
-      dark: '#8C6030',     // Very dark Caramel with more orange
-      shadow: '#5E4020',   // Shadow color (darker than dark)
-      bg: '#FDF8EE',       // Ultra light background with warm orange undertones
-      bgAlt: '#F7EBD6',    // Alternative background (slightly darker)
-      accent: '#D9B382',   // Caramel Gold (original)
-      highlight: '#E9A456'  // Brighter highlight version with orange tone
+      pastel: '#E9EAEF',   // Very light Slate Showers
+      medium: '#8A91A1',   // Medium Slate Showers for text and icons
+      dark: '#4E586D',     // Very dark Slate Showers
+      shadow: '#333B4A',   // Shadow color (darker than dark)
+      bg: '#F8F9FB',       // Ultra light background with slate undertones
+      bgAlt: '#F0F1F5',    // Alternative background (slightly darker)
+      accent: '#5F6882',   // Slate Showers (original)
+      highlight: '#7784A3'  // Brighter highlight version with purple-blue tone
     },
-    // Rose Pink - soft pink with brown undertones
+    // Rain Blue - medium blue with slate undertones
     meals: {
-      pastel: '#F6DFDF',   // Very light Rose Pink
-      medium: '#C98787',   // Medium Rose Pink for text and icons
-      dark: '#A66868',     // Dark Rose Pink
-      shadow: '#7A4D4D',   // Shadow color (darker than dark)
-      bg: '#FDF7F7',       // Ultra light pink background
-      bgAlt: '#FAECEC',    // Alternative background (slightly darker)
-      accent: '#D9A6A6',   // Rose Pink (original)
-      highlight: '#E6847F'  // Brighter highlight version
+      pastel: '#E8EDF6',   // Very light Rain Blue
+      medium: '#8BA4C9',   // Medium Rain Blue for text and icons
+      dark: '#4A6FA5',     // Dark Rain Blue
+      shadow: '#2E4B76',   // Shadow color (darker than dark)
+      bg: '#F7FAFF',       // Ultra light blue background
+      bgAlt: '#EEF3FB',    // Alternative background (slightly darker)
+      accent: '#5D7FB3',   // Rain Blue (original)
+      highlight: '#6E99D3'  // Brighter highlight version
     },
-    // Lavender Mist - soft purple with warm undertones
+    // Misty Sky - light blue with gray undertones
     cleaning: {
-      pastel: '#E9E4F4',   // Very light Lavender Mist
-      medium: '#A598C7',   // Medium Lavender Mist for text and icons
-      dark: '#7B6C96',     // Dark Lavender Mist
-      shadow: '#534A67',   // Shadow color (darker than dark)
-      bg: '#F9F7FC',       // Ultra light lavender background
-      bgAlt: '#F0ECF7',    // Alternative background (slightly darker)
-      accent: '#C9BED9',   // Lavender Mist (original)
-      highlight: '#AB95E0'  // Brighter highlight version
+      pastel: '#EDF2F9',   // Very light Misty Sky
+      medium: '#AABFDD',   // Medium Misty Sky for text and icons
+      dark: '#7B9DC9',     // Dark Misty Sky
+      shadow: '#526E9D',   // Shadow color (darker than dark)
+      bg: '#F9FBFF',       // Ultra light sky background
+      bgAlt: '#F1F6FC',    // Alternative background (slightly darker)
+      accent: '#8BACD3',   // Misty Sky (original)
+      highlight: '#94B7E9'  // Brighter highlight version
     },
-    // Pistachio Green - muted sage green
+    // Silver Droplet - soft silver-blue
     selfCare: {
-      pastel: '#E4EEDE',   // Very light Pistachio Green
-      medium: '#8EAB7D',   // Medium Pistachio Green for text and icons
-      dark: '#5E7B4D',     // Dark Pistachio Green
-      shadow: '#3F5333',   // Shadow color (darker than dark)
-      bg: '#F6FAF4',       // Ultra light green background
-      bgAlt: '#EAF2E3',    // Alternative background (slightly darker)
-      accent: '#B5C9A8',   // Pistachio Green (original)
-      highlight: '#97BF71'  // Brighter highlight version
+      pastel: '#F0F3F7',   // Very light Silver Droplet
+      medium: '#B7C0D1',   // Medium Silver Droplet for text and icons
+      dark: '#92A1B9',     // Dark Silver Droplet
+      shadow: '#677590',   // Shadow color (darker than dark)
+      bg: '#FAFBFD',       // Ultra light silver background
+      bgAlt: '#F4F6FA',    // Alternative background (slightly darker)
+      accent: '#A1ADC2',   // Silver Droplet (original)
+      highlight: '#B0C0D9'  // Brighter highlight version
     },
-    // Vanilla Cream - warm off-white
+    // Storm Lavender - muted lavender with cool blue undertones
     delegate: {
-      pastel: '#F8F5EF',   // Very light Vanilla Cream
-      medium: '#D1C7B7',   // Medium Vanilla Cream for text and icons
-      dark: '#BFB3A2',     // Darker Vanilla Cream
-      shadow: '#A69986',   // Shadow color (darker than dark)
-      bg: '#FEFCF9',       // Ultra light cream background
-      bgAlt: '#F7F3EB',    // Alternative background (slightly darker)
-      accent: '#EAE0D0',   // More visible version of Vanilla Cream
-      highlight: '#F2D8B6'  // Warmer highlight version
+      pastel: '#EEEFF6',   // Very light Storm Lavender
+      medium: '#AAACC7',   // Medium Storm Lavender for text and icons
+      dark: '#7E82A8',     // Darker Storm Lavender
+      shadow: '#575A7C',   // Shadow color (darker than dark)
+      bg: '#FAFBFD',       // Ultra light lavender background
+      bgAlt: '#F3F4F9',    // Alternative background (slightly darker)
+      accent: '#8F93B6',   // More visible version of Storm Lavender
+      highlight: '#9B9FCC'  // Cooler highlight version
     }
   }
 };
