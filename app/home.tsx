@@ -7,90 +7,66 @@ import NeumorphicCard from '@/components/NeumorphicCard';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
+// Mapping between tab IDs and theme color keys
+const tabToThemeKeyMap = {
+  'index': 'daily',
+  'goals': 'future',    // "goals" tab uses "future" theme colors
+  'weekly': 'calendar', // "weekly" tab uses "calendar" theme colors
+  'meal-prep': 'meals',
+  'cleaning': 'cleaning',
+  'self-care': 'selfCare',
+  'delegation': 'delegate'
+};
+
 const tabOptions = [
   {
     id: 'index',
     title: 'Daily Tasks',
     subtitle: 'Manage your daily routines and habits',
     icon: CalendarDays,
-    colors: {
-      dark: '#4055C5',
-      pastel: '#B9C5FA',
-      bg: '#F2F5FF',
-      accent: '#D9E0FC'
-    }
+    themeKey: 'daily'
   },
   {
     id: 'goals',
     title: 'Future Tasks',
     subtitle: 'Plan your long-term goals and projects',
     icon: Target,
-    colors: {
-      dark: '#2A9958',
-      pastel: '#A9E6C0',
-      bg: '#F2FFF7',
-      accent: '#C9F2D9'
-    }
+    themeKey: 'future'  // This corresponds to 'future' in the theme
   },
   {
     id: 'weekly',
     title: 'Calendar',
     subtitle: 'Schedule and organize your time',
     icon: Calendar,
-    colors: {
-      dark: '#7E55D4',
-      pastel: '#D6C5F5',
-      bg: '#F8F5FF',
-      accent: '#E8DDFA'
-    }
+    themeKey: 'calendar'  // This corresponds to 'calendar' in the theme
   },
   {
     id: 'meal-prep',
     title: 'Meal Prep',
     subtitle: 'Plan and prepare your meals',
     icon: ChefHat,
-    colors: {
-      dark: '#DC6B15',
-      pastel: '#F8D0B0',
-      bg: '#FFF8F2',
-      accent: '#FBE2CE'
-    }
+    themeKey: 'meals'
   },
   {
     id: 'cleaning',
     title: 'Cleaning',
     subtitle: 'Maintain your space regularly',
     icon: Sparkles,
-    colors: {
-      dark: '#2578C8',
-      pastel: '#B2DAFD',
-      bg: '#F2F8FF',
-      accent: '#D4E8FE'
-    }
+    themeKey: 'cleaning'
   },
   {
     id: 'self-care',
     title: 'Self-Care',
     subtitle: 'Nurture yourself daily',
     icon: Heart,
-    colors: {
-      dark: '#D83A3A',
-      pastel: '#FCBFBF',
-      bg: '#FFF5F5',
-      accent: '#FBD8D8'
-    }
+    themeKey: 'selfCare'
   },
   {
     id: 'delegation',
     title: 'Delegation',
     subtitle: 'Share the load with others',
     icon: Users,
-    colors: {
-      dark: '#258F8A',
-      pastel: '#A9E3E0',
-      bg: '#F2FFFE',
-      accent: '#C9F0EE'
-    }
+    themeKey: 'delegate'
   }
 ];
 
@@ -99,6 +75,15 @@ export default function HomeScreen() {
   const { currentTheme, setTheme, availableThemes } = useTheme();
   const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
   const router = useRouter();
+
+  // Helper function to get tab colors from the theme
+  const getTabThemeColors = (tab) => {
+    // Get the appropriate theme key for this tab
+    const themeKey = tab.themeKey;
+    
+    // Get colors from the theme
+    return currentTheme.tabColors[themeKey];
+  };
 
   // Use primary colors from the current theme
   const primaryColors = currentTheme.tabColors.daily;
@@ -123,18 +108,10 @@ export default function HomeScreen() {
     router.replace(`/(tabs)/${firstTab === 'index' ? '' : firstTab}`);
   };
 
-  // Helper function to get tab colors from the theme
-  const getTabThemeColors = (tabId) => {
-    const categoryKey = tabId === 'index' ? 'daily' : tabId;
-    // Find the correct tab colors from the current theme, or use default
-    const defaultTabOption = tabOptions.find(t => t.id === tabId);
-    return currentTheme.tabColors[categoryKey] || defaultTabOption?.colors || primaryColors;
-  };
-
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: primaryColors.dark }]}>Balancing Act</Text>
+        <Text style={[styles.title, { color: primaryColors.medium }]}>Balancing Act</Text>
         <Text style={[styles.subtitle, { color: primaryColors.medium }]}>
           Choose which areas of life you want to focus on
         </Text>
@@ -143,7 +120,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Theme Selector */}
         <View style={styles.themeSelector}>
-          <Text style={[styles.themeSelectorTitle, { color: primaryColors.dark }]}>App Theme</Text>
+          <Text style={[styles.themeSelectorTitle, { color: primaryColors.medium }]}>App Theme</Text>
           {availableThemes.map((theme) => {
             const isSelected = currentTheme.id === theme.id;
             const themeColors = theme.tabColors.daily;
@@ -160,7 +137,7 @@ export default function HomeScreen() {
                     backgroundColor: isSelected ? themeColors.accent : primaryColors.bg,
                     borderColor: isSelected ? themeColors.dark : 'transparent',
                     borderWidth: isSelected ? 2 : 0,
-                    shadowColor: primaryColors.shadow
+                    shadowColor: themeColors.shadow || themeColors.dark
                   }
                 ]}>
                   <View style={[
@@ -171,7 +148,7 @@ export default function HomeScreen() {
                   </View>
                   <Text style={[
                     styles.themeTitle,
-                    { color: isSelected ? themeColors.dark : primaryColors.dark }
+                    { color: isSelected ? themeColors.medium : primaryColors.medium }
                   ]}>
                     {theme.name}
                   </Text>
@@ -180,7 +157,7 @@ export default function HomeScreen() {
                       styles.themeSelectedIndicator,
                       { backgroundColor: themeColors.dark }
                     ]}>
-                      <Text style={styles.themeSelectedText}>✓</Text>
+                      <Text style={[styles.themeSelectedText, { color: themeColors.pastel }]}>✓</Text>
                     </View>
                   )}
                 </NeumorphicCard>
@@ -189,13 +166,14 @@ export default function HomeScreen() {
           })}
         </View>
         
-        <Text style={[styles.sectionTitle, { color: primaryColors.dark }]}>Life Areas</Text>
+        <Text style={[styles.sectionTitle, { color: primaryColors.medium }]}>Life Areas</Text>
         <View style={styles.grid}>
           {tabOptions.map((tab) => {
             const isSelected = localSelectedTabs.includes(tab.id);
             const IconComponent = tab.icon;
+            
             // Get the appropriate colors for this tab from the current theme
-            const tabColors = getTabThemeColors(tab.id);
+            const tabColors = getTabThemeColors(tab);
             
             return (
               <TouchableOpacity
@@ -209,7 +187,7 @@ export default function HomeScreen() {
                     backgroundColor: isSelected ? tabColors.accent : primaryColors.bg,
                     borderColor: isSelected ? tabColors.dark : 'transparent',
                     borderWidth: isSelected ? 2 : 0,
-                    shadowColor: primaryColors.shadow
+                    shadowColor: tabColors.shadow || tabColors.dark
                   }
                 ]}>
                   <View style={[
@@ -224,14 +202,14 @@ export default function HomeScreen() {
                   
                   <Text style={[
                     styles.tabTitle,
-                    { color: isSelected ? tabColors.dark : primaryColors.dark }
+                    { color: isSelected ? tabColors.medium : primaryColors.medium }
                   ]}>
                     {tab.title}
                   </Text>
                   
                   <Text style={[
                     styles.tabSubtitle,
-                    { color: isSelected ? tabColors.medium || tabColors.dark : primaryColors.medium }
+                    { color: isSelected ? tabColors.medium : primaryColors.medium }
                   ]}>
                     {tab.subtitle}
                   </Text>
@@ -256,7 +234,7 @@ export default function HomeScreen() {
           styles.continueButton,
           { 
             backgroundColor: localSelectedTabs.length > 0 ? primaryColors.dark : primaryColors.pastel,
-            shadowColor: primaryColors.shadow
+            shadowColor: primaryColors.shadow || primaryColors.dark
           }
         ]}
         onPress={handleContinue}
@@ -345,7 +323,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   themeSelectedText: {
-    color: '#FFFFFF',
     fontSize: 12,
     fontFamily: 'Quicksand-Bold',
   },
