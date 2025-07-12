@@ -78,26 +78,35 @@ export default function MonthlyCalendar() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.dark }]}>Calendar</Text>
-          <Text style={styles.subtitle}>Plan your future tasks</Text>
+          <Text style={[styles.subtitle, { color: colors.medium }]}>Plan your future tasks</Text>
         </View>
         <View style={styles.monthNavigation}>
           <TouchableOpacity
-            style={[styles.homeButton, { backgroundColor: colors.accent }]}
+            style={[styles.homeButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.dark} />
+            <Home size={20} color={colors.pastel} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.navButton, { backgroundColor: colors.accent }]}
+            style={[styles.navButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => navigateMonth('prev')}
           >
-            <ChevronLeft size={20} color={colors.dark} />
+            <ChevronLeft size={20} color={colors.pastel} />
           </TouchableOpacity>
           <TouchableOpacity
-            style={[styles.navButton, { backgroundColor: colors.accent }]}
+            style={[styles.navButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => navigateMonth('next')}
           >
-            <ChevronRight size={20} color={colors.dark} />
+            <ChevronRight size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -106,7 +115,8 @@ export default function MonthlyCalendar() {
         {selectedDate && (
           <NeumorphicCard style={[styles.selectedDateCard, { 
             backgroundColor: colors.accent,
-            borderLeftColor: colors.dark 
+            borderLeftColor: colors.dark,
+            shadowColor: colors.shadow
           }]}>
             <Text style={[styles.selectedDateTitle, { color: colors.dark }]}>
               {selectedDate.toLocaleDateString('en-US', { 
@@ -119,7 +129,9 @@ export default function MonthlyCalendar() {
             
             {getTasksForDate(selectedDate).length === 0 ? (
               <View style={styles.emptyDate}>
-                <Text style={styles.emptyDateText}>No tasks scheduled for this date</Text>
+                <Text style={[styles.emptyDateText, { color: colors.medium }]}>
+                  No tasks scheduled for this date
+                </Text>
               </View>
             ) : (
               getTasksForDate(selectedDate).map(task => (
@@ -129,6 +141,7 @@ export default function MonthlyCalendar() {
                   onToggle={taskManager.toggleTask}
                   onDelete={taskManager.deleteTask}
                   onHabitIncrement={taskManager.incrementHabit}
+                  colors={colors}
                 />
               ))
             )}
@@ -136,7 +149,7 @@ export default function MonthlyCalendar() {
         )}
 
         <NeumorphicCard style={[styles.calendarCard, { 
-          shadowColor: colors.pastel,
+          shadowColor: colors.shadow,
           borderColor: colors.accent,
           borderWidth: 1 
         }]}>
@@ -148,7 +161,7 @@ export default function MonthlyCalendar() {
 
           <View style={styles.dayHeaders}>
             {dayNames.map(day => (
-              <Text key={day} style={styles.dayHeader}>{day}</Text>
+              <Text key={day} style={[styles.dayHeader, { color: colors.medium }]}>{day}</Text>
             ))}
           </View>
 
@@ -161,8 +174,13 @@ export default function MonthlyCalendar() {
                   !day && styles.emptyDayCell,
                   day && selectedDate && day.toDateString() === selectedDate.toDateString() && styles.selectedDayCell,
                   day && day.toDateString() === new Date().toDateString() && styles.todayCell,
-                  day && selectedDate && day.toDateString() === selectedDate.toDateString() && { backgroundColor: colors.dark },
-                  day && day.toDateString() === new Date().toDateString() && { backgroundColor: colors.accent },
+                  day && selectedDate && day.toDateString() === selectedDate.toDateString() && { 
+                    backgroundColor: colors.dark,
+                    shadowColor: colors.shadow
+                  },
+                  day && day.toDateString() === new Date().toDateString() && { 
+                    backgroundColor: colors.accent
+                  },
                 ]}
                 onPress={() => day && setSelectedDate(day)}
                 disabled={!day}
@@ -171,9 +189,11 @@ export default function MonthlyCalendar() {
                   <>
                     <Text style={[
                       styles.dayNumber,
+                      { color: colors.medium },
                       day.toDateString() === new Date().toDateString() && styles.todayNumber,
-                      selectedDate && day.toDateString() === selectedDate.toDateString() && styles.selectedDayNumber,
                       day.toDateString() === new Date().toDateString() && { color: colors.dark },
+                      selectedDate && day.toDateString() === selectedDate.toDateString() && styles.selectedDayNumber,
+                      selectedDate && day.toDateString() === selectedDate.toDateString() && { color: colors.pastel },
                     ]}>
                       {day.getDate()}
                     </Text>
@@ -191,11 +211,11 @@ export default function MonthlyCalendar() {
       <TouchableOpacity
         style={[styles.addButton, { 
           backgroundColor: colors.dark,
-          shadowColor: colors.dark 
+          shadowColor: colors.shadow 
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color="#ffffff" />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -203,6 +223,12 @@ export default function MonthlyCalendar() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="weekly"
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
     </SafeAreaView>
   );
@@ -227,7 +253,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginTop: 2,
   },
   monthNavigation: {
@@ -240,7 +265,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -251,7 +275,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -277,7 +300,6 @@ const styles = StyleSheet.create({
   emptyDateText: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     fontStyle: 'italic',
   },
   calendarCard: {
@@ -300,7 +322,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 12,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
     paddingVertical: 8,
   },
   calendar: {
@@ -328,13 +349,11 @@ const styles = StyleSheet.create({
   dayNumber: {
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
   },
   todayNumber: {
     fontFamily: 'Quicksand-Bold',
   },
   selectedDayNumber: {
-    color: '#ffffff',
   },
   taskIndicator: {
     width: 4,
