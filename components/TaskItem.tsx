@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Check, X, ChevronUp, ChevronDown, Edit } from 'lucide-react-native';
+import { Check, X, ChevronUp, ChevronDown, CreditCard as Edit } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
@@ -458,15 +458,6 @@ export default function TaskItem({
               </TouchableOpacity>
             </View>
             
-            {onEdit && (
-              <TouchableOpacity
-                onPress={() => onEdit(task)}
-                style={styles.editIconButton}
-              >
-                <Edit size={18} color="#4299E1" />
-              </TouchableOpacity>
-            )}
-            
             <TouchableOpacity
               onPress={() => onDelete(task.id)}
               style={styles.deleteIconButton}
@@ -628,12 +619,7 @@ const styles = StyleSheet.create({
   disabledButton: {
     opacity: 0.5,
   },
-  editIconButton: {
-    padding: 4,
-    marginLeft: 8,
-  },
   deleteIconButton: {
     padding: 4,
-    marginLeft: 8,
   },
 });
