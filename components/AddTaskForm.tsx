@@ -14,6 +14,7 @@ interface AddTaskFormProps {
     customPriorityColor?: string;
     isDelegated: boolean;
     delegatedTo: string;
+    delegateType?: string;
     subtasks: { title: string }[];
     habitGoal?: number;
     goalType?: string;
@@ -31,6 +32,7 @@ interface AddTaskFormProps {
     reminderEnabled?: boolean;
     cleaningLocation?: string;
     customCleaningLocation?: string;
+    selfCareType?: string;
   }) => void;
   category: string;
   selectedDate?: Date | null;
@@ -60,6 +62,7 @@ export default function AddTaskForm({
   const [customPriorityColor, setCustomPriorityColor] = useState('#4A5568'); // Default gray
   const [isDelegated, setIsDelegated] = useState(false);
   const [delegatedTo, setDelegatedTo] = useState('');
+  const [delegateType, setDelegateType] = useState('');
   const [subtasks, setSubtasks] = useState<string[]>(['']);
   
   // Goal specific fields
@@ -165,16 +168,15 @@ export default function AddTaskForm({
       if (category === 'self-care') {
         taskData = {
           ...taskData,
-          frequency,
           selfCareType,
         };
       }
 
-      // Delegation reminder
+      // Delegation specific fields
       if (category === 'delegation') {
         taskData = {
           ...taskData,
-          frequency,
+          delegateType,
           reminderEnabled,
         };
       }
@@ -196,6 +198,7 @@ export default function AddTaskForm({
     setCustomPriorityColor('#4A5568');
     setIsDelegated(false);
     setDelegatedTo('');
+    setDelegateType('');
     setSubtasks(['']);
     setGoalType('');
     setCustomGoalTypeText('');
@@ -837,7 +840,7 @@ export default function AddTaskForm({
             </>
           )}
 
-          {/* Self-care Tab */}
+          {/* Self-care Tab - Removed Frequency section */}
           {category === 'self-care' && (
             <>
               <View style={styles.section}>
@@ -857,26 +860,6 @@ export default function AddTaskForm({
                          type === 'mental' ? 'Mental Health' :
                          type === 'rest' ? 'Rest & Recovery' :
                          'Joy & Connection'}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Frequency</Text>
-                <View style={styles.buttonRow}>
-                  {['daily', 'weekly', 'monthly', 'seasonal'].map((freq) => (
-                    <TouchableOpacity
-                      key={freq}
-                      style={[
-                        styles.optionButton, 
-                        frequency === freq && [styles.selectedOption, {backgroundColor: getTabColor()}]
-                      ]}
-                      onPress={() => setFrequency(freq)}
-                    >
-                      <Text style={[styles.optionText, frequency === freq && styles.selectedText]}>
-                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -908,23 +891,23 @@ export default function AddTaskForm({
             </>
           )}
 
-          {/* Delegation Tab */}
+          {/* Delegation Tab - Removed Frequency, renamed field, added tag selection */}
           {category === 'delegation' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Frequency</Text>
+                <Text style={styles.sectionTitle}>Delegate To</Text>
                 <View style={styles.buttonRow}>
-                  {['daily', 'weekly', 'monthly', 'seasonal'].map((freq) => (
+                  {['partner', 'family', 'friends', 'kids'].map((type) => (
                     <TouchableOpacity
-                      key={freq}
+                      key={type}
                       style={[
                         styles.optionButton, 
-                        frequency === freq && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        delegateType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
                       ]}
-                      onPress={() => setFrequency(freq)}
+                      onPress={() => setDelegateType(type)}
                     >
-                      <Text style={[styles.optionText, frequency === freq && styles.selectedText]}>
-                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
+                      <Text style={[styles.optionText, delegateType === type && styles.selectedText]}>
+                        {type.charAt(0).toUpperCase() + type.slice(1)} Tasks
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -932,7 +915,7 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Delegate To</Text>
+                <Text style={styles.sectionTitle}>Delegate Name</Text>
                 <TextInput
                   style={styles.input}
                   placeholder="Person's name"
