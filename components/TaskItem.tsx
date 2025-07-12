@@ -314,21 +314,7 @@ export default function TaskItem({
         </View>
       );
     }
-    // For self-care with type
-    else if (task.category === 'self-care' && task.selfCareType) {
-      return (
-        <View style={[
-          styles.priorityTag,
-          { backgroundColor: getSelfCareTypeColor(task.selfCareType) }
-        ]}>
-          <Text style={styles.priorityText}>
-            {task.selfCareType === 'physical' ? 'PHYSICAL' :
-             task.selfCareType === 'mental' ? 'MENTAL' :
-             task.selfCareType === 'rest' ? 'REST' : 'JOY'}
-          </Text>
-        </View>
-      );
-    }
+
     // For delegation with type
     else if (task.category === 'delegation' && task.delegateType) {
       return (
