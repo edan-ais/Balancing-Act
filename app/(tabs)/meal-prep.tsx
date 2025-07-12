@@ -18,7 +18,6 @@ export default function MealPrep() {
   const router = useRouter();
   const { currentTheme } = useTheme();
   const colors = currentTheme.tabColors.meals;
-  const orangeColor = '#ED8936'; // Orange color for all icons
 
   const mealTasks = taskManager.tasks.filter(task => task.category === 'meal-prep');
 
@@ -36,6 +35,7 @@ export default function MealPrep() {
     setShowEditForm(false);
     setTaskToEdit(null);
   };
+  
   const mealCategories = [
     { 
       title: 'Breakfast', 
@@ -68,14 +68,19 @@ export default function MealPrep() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
-          <Text style={styles.subtitle}>Plan and prepare your meals</Text>
+          <Text style={[styles.subtitle, { color: colors.medium }]}>
+            Plan and prepare your meals
+          </Text>
         </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            style={[styles.actionButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.dark} />
+            <Home size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -83,28 +88,34 @@ export default function MealPrep() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {mealCategories.map((category, index) => (
           <NeumorphicCard key={index} style={[styles.categoryCard, { 
-            shadowColor: colors.pastel,
+            shadowColor: colors.shadow,
             borderColor: colors.accent,
             borderWidth: 1 
           }]}>
             <View style={styles.categoryHeader}>
               <View style={styles.categoryInfo}>
                 <View style={styles.categoryTitleRow}>
-                  <category.icon size={20} color={orangeColor} />
+                  <category.icon size={20} color={colors.accent} />
                   <View style={styles.categoryTextContainer}>
-                    <Text style={[styles.categoryTitle, { color: colors.dark }]}>{category.title}</Text>
-                    <Text style={styles.categorySubtitle}>{category.subtitle}</Text>
+                    <Text style={[styles.categoryTitle, { color: colors.dark }]}>
+                      {category.title}
+                    </Text>
+                    <Text style={[styles.categorySubtitle, { color: colors.medium }]}>
+                      {category.subtitle}
+                    </Text>
                   </View>
                 </View>
               </View>
-              <Text style={[styles.categoryCount, { backgroundColor: colors.accent, color: colors.dark }]}>
-                {category.tasks.length} items
-              </Text>
+              <View style={[styles.categoryCountContainer, { backgroundColor: colors.accent }]}>
+                <Text style={[styles.categoryCount, { color: colors.pastel }]}>
+                  {category.tasks.length} items
+                </Text>
+              </View>
             </View>
             
             {category.tasks.length === 0 ? (
               <View style={styles.emptyCategory}>
-                <Text style={[styles.emptyCategoryText, { color: colors.pastel }]}>
+                <Text style={[styles.emptyCategoryText, { color: colors.medium }]}>
                   No {category.title.toLowerCase()} tasks yet
                 </Text>
               </View>
@@ -122,9 +133,7 @@ export default function MealPrep() {
                   onMoveDown={taskManager.moveTaskDown}
                   isFirst={taskIndex === 0}
                   isLast={taskIndex === category.tasks.length - 1}
-                  accentColor={colors.accent}
-                  borderColor={colors.dark}
-                  habitColor={colors.dark}
+                  colors={colors}
                 />
               ))
             )}
@@ -135,11 +144,11 @@ export default function MealPrep() {
       <TouchableOpacity
         style={[styles.addButton, { 
           backgroundColor: colors.dark,
-          shadowColor: colors.dark 
+          shadowColor: colors.shadow 
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color="#ffffff" />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -149,6 +158,10 @@ export default function MealPrep() {
         category="meal-prep"
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
 
       <EditTaskForm
@@ -158,6 +171,10 @@ export default function MealPrep() {
         initialTask={taskToEdit}
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
     </SafeAreaView>
   );
@@ -182,7 +199,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginTop: 2,
   },
   headerIcons: {
@@ -195,7 +211,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -231,15 +246,16 @@ const styles = StyleSheet.create({
   categorySubtitle: {
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     marginTop: 2,
+  },
+  categoryCountContainer: {
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   categoryCount: {
     fontSize: 12,
     fontFamily: 'Quicksand-Medium',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
   },
   emptyCategory: {
     alignItems: 'center',
