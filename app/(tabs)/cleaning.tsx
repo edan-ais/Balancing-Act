@@ -148,13 +148,16 @@ export default function RepetitiveCleaning() {
                         task={task}
                         onToggle={taskManager.toggleTask}
                         onDelete={taskManager.deleteTask}
+                        onEdit={handleEditTask}
                         onHabitIncrement={taskManager.incrementHabit}
                         onSubtaskToggle={taskManager.toggleSubtask}
                         onMoveUp={taskManager.moveTaskUp}
                         onMoveDown={taskManager.moveTaskDown}
                         isFirst={taskPosition === 0}
                         isLast={taskPosition === sameFrequencyTasks.length - 1}
-                        accentColor={colors.dark}
+                        accentColor={colors.accent}
+                        borderColor={colors.dark}
+                        habitColor={colors.dark}
                       />
                     );
                   })}
@@ -180,7 +183,17 @@ export default function RepetitiveCleaning() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="cleaning"
-        accentColor={colors.dark}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );
