@@ -24,6 +24,17 @@ export default function SelfCare() {
     taskManager.addTask({ ...newTask, category: 'self-care' });
   };
 
+  const handleEditTask = (task: Task) => {
+    setTaskToEdit(task);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    taskManager.updateTask(updatedTask);
+    setShowEditForm(false);
+    setTaskToEdit(null);
+  };
+
   const careCategories = [
     { 
       title: 'Physical Health', 
@@ -125,13 +136,16 @@ export default function SelfCare() {
                       task={task}
                       onToggle={taskManager.toggleTask}
                       onDelete={taskManager.deleteTask}
+                      onEdit={handleEditTask}
                       onHabitIncrement={taskManager.incrementHabit}
                       onSubtaskToggle={taskManager.toggleSubtask}
                       onMoveUp={taskManager.moveTaskUp}
                       onMoveDown={taskManager.moveTaskDown}
                       isFirst={taskPosition === 0}
                       isLast={taskPosition === typeTasks.length - 1}
-                      accentColor={colors.dark}
+                      accentColor={colors.accent}
+                      borderColor={colors.dark}
+                      habitColor={colors.dark}
                     />
                   );
                 })
@@ -156,6 +170,17 @@ export default function SelfCare() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="self-care"
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );
