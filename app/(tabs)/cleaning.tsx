@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Home, Sun, RefreshCw, Moon, CloudSnow } from 'lucide-react-native';
+import { Plus, Chrome as Home, Sun, RefreshCw, Moon, CloudSnow } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -148,7 +148,6 @@ export default function RepetitiveCleaning() {
                         task={task}
                         onToggle={taskManager.toggleTask}
                         onDelete={taskManager.deleteTask}
-                        onEdit={handleEditTask}
                         onHabitIncrement={taskManager.incrementHabit}
                         onSubtaskToggle={taskManager.toggleSubtask}
                         onMoveUp={taskManager.moveTaskUp}
@@ -182,15 +181,6 @@ export default function RepetitiveCleaning() {
         onSubmit={handleAddTask}
         category="cleaning"
         accentColor={colors.dark}
-      />
-
-      <EditTaskForm
-        visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
-        onSubmit={handleUpdateTask}
-        initialTask={taskToEdit}
-        accentColor={colors.accent}
-        darkColor={colors.dark}
       />
     </SafeAreaView>
   );

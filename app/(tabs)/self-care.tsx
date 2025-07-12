@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Heart, Smile, Moon, Activity, Music, Home } from 'lucide-react-native';
+import { Plus, Heart, Smile, Moon, Activity, Music, Chrome as Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -24,16 +24,6 @@ export default function SelfCare() {
     taskManager.addTask({ ...newTask, category: 'self-care' });
   };
 
-  const handleEditTask = (task: Task) => {
-    setTaskToEdit(task);
-    setShowEditForm(true);
-  };
-
-  const handleUpdateTask = (updatedTask: Task) => {
-    taskManager.updateTask(updatedTask);
-    setShowEditForm(false);
-    setTaskToEdit(null);
-  };
   const careCategories = [
     { 
       title: 'Physical Health', 
@@ -135,7 +125,6 @@ export default function SelfCare() {
                       task={task}
                       onToggle={taskManager.toggleTask}
                       onDelete={taskManager.deleteTask}
-                      onEdit={handleEditTask}
                       onHabitIncrement={taskManager.incrementHabit}
                       onSubtaskToggle={taskManager.toggleSubtask}
                       onMoveUp={taskManager.moveTaskUp}
@@ -167,15 +156,6 @@ export default function SelfCare() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="self-care"
-      />
-
-      <EditTaskForm
-        visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
-        onSubmit={handleUpdateTask}
-        initialTask={taskToEdit}
-        accentColor={colors.accent}
-        darkColor={colors.dark}
       />
     </SafeAreaView>
   );

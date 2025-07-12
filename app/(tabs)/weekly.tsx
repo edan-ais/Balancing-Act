@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, ChevronLeft, ChevronRight, Home } from 'lucide-react-native';
+import { Plus, ChevronLeft, ChevronRight, Chrome as Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -12,8 +12,6 @@ import { tabColors } from './_layout';
 
 export default function MonthlyCalendar() {
   const [showAddForm, setShowAddForm] = useState(false);
-  const [showEditForm, setShowEditForm] = useState(false);
-  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const [selectedDate, setSelectedDate] = useState(new Date());
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const taskManager = useTaskManager();
@@ -26,16 +24,6 @@ export default function MonthlyCalendar() {
     taskManager.addTask({ ...newTask, category: 'weekly', scheduledDate: selectedDate });
   };
 
-  const handleEditTask = (task: Task) => {
-    setTaskToEdit(task);
-    setShowEditForm(true);
-  };
-
-  const handleUpdateTask = (updatedTask: Task) => {
-    taskManager.updateTask(updatedTask);
-    setShowEditForm(false);
-    setTaskToEdit(null);
-  };
   const getDaysInMonth = (date: Date) => {
     const year = date.getFullYear();
     const month = date.getMonth();
@@ -139,7 +127,6 @@ export default function MonthlyCalendar() {
                   task={task}
                   onToggle={taskManager.toggleTask}
                   onDelete={taskManager.deleteTask}
-                  onEdit={handleEditTask}
                   onHabitIncrement={taskManager.incrementHabit}
                 />
               ))
@@ -215,15 +202,6 @@ export default function MonthlyCalendar() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="weekly"
-      />
-
-      <EditTaskForm
-        visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
-        onSubmit={handleUpdateTask}
-        initialTask={taskToEdit}
-        accentColor={colors.accent}
-        darkColor={colors.dark}
       />
     </SafeAreaView>
   );

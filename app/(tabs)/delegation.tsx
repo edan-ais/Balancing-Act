@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Users, Heart, Home as HomeIcon, Star, BookOpen } from 'lucide-react-native';
+import { Plus, Users, Heart, Chrome as HomeIcon, Star, BookOpen } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -143,15 +143,6 @@ export default function Delegation() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="delegation"
-      />
-
-      <EditTaskForm
-        visible={showEditForm}
-        onClose={() => setShowEditForm(false)}
-        onSubmit={handleUpdateTask}
-        initialTask={taskToEdit}
-        accentColor={colors.accent}
-        darkColor={colors.dark}
       />
     </SafeAreaView>
   );
