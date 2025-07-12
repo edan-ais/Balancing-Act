@@ -128,8 +128,9 @@ export function useTaskManager(): TaskManager {
       if (category === 'meal-prep' && task.mealType) {
         sectionTasks = sectionTasks.filter(t => t.mealType === task.mealType);
       } 
-      else if (category === 'cleaning' && task.cleaningLocation) {
-        sectionTasks = sectionTasks.filter(t => t.cleaningLocation === task.cleaningLocation);
+      else if (category === 'cleaning' && task.frequency) {
+        // For cleaning tasks, filter by frequency instead of location
+        sectionTasks = sectionTasks.filter(t => t.frequency === task.frequency);
       }
       else if (category === 'self-care' && task.selfCareType) {
         sectionTasks = sectionTasks.filter(t => t.selfCareType === task.selfCareType);
@@ -174,8 +175,9 @@ export function useTaskManager(): TaskManager {
       if (category === 'meal-prep' && task.mealType) {
         sectionTasks = sectionTasks.filter(t => t.mealType === task.mealType);
       } 
-      else if (category === 'cleaning' && task.cleaningLocation) {
-        sectionTasks = sectionTasks.filter(t => t.cleaningLocation === task.cleaningLocation);
+      else if (category === 'cleaning' && task.frequency) {
+        // For cleaning tasks, filter by frequency instead of location
+        sectionTasks = sectionTasks.filter(t => t.frequency === task.frequency);
       }
       else if (category === 'self-care' && task.selfCareType) {
         sectionTasks = sectionTasks.filter(t => t.selfCareType === task.selfCareType);
