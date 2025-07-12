@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Check, X, ChevronUp, ChevronDown, CreditCard as Edit } from 'lucide-react-native';
+import { Check, X, ChevronUp, ChevronDown, CreditCard as Edit, Pencil } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
@@ -440,6 +440,15 @@ export default function TaskItem({
           </View>
 
           <View style={styles.actionIcons}>
+            {onEdit && (
+              <TouchableOpacity
+                onPress={() => onEdit(task)}
+                style={styles.editIconButton}
+              >
+                <Pencil size={18} color="#4A5568" />
+              </TouchableOpacity>
+            )}
+            
             <View style={styles.orderButtons}>
               <TouchableOpacity
                 onPress={() => onMoveUp && onMoveUp(task.id)}
@@ -607,6 +616,10 @@ const styles = StyleSheet.create({
   actionIcons: {
     flexDirection: 'row',
     alignItems: 'center',
+  },
+  editIconButton: {
+    padding: 4,
+    marginRight: 8,
   },
   orderButtons: {
     flexDirection: 'column',
