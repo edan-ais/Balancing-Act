@@ -18,7 +18,6 @@ export default function Delegation() {
   const router = useRouter();
   const { currentTheme } = useTheme();
   const colors = currentTheme.tabColors.delegate;
-  const tealColor = '#38B2AC'; // Teal color for all icons
 
   const delegationTasks = taskManager.tasks.filter(task => task.category === 'delegation');
 
@@ -36,33 +35,30 @@ export default function Delegation() {
     setShowEditForm(false);
     setTaskToEdit(null);
   };
+  
   const teamMembers = [
     { 
       name: 'Partner', 
       subtitle: 'Shared responsibilities',
       icon: Heart,
-      color: '#48BB78',
       tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('partner')),
     },
     { 
       name: 'Family', 
       subtitle: 'Extended support network',
       icon: HomeIcon,
-      color: '#4299E1',
       tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('family')),
     },
     { 
       name: 'Friends', 
       subtitle: 'Social connections',
       icon: Star,
-      color: '#9F7AEA',
       tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('friend')),
     },
     { 
       name: 'Kids', 
       subtitle: 'Learning opportunities',
       icon: BookOpen,
-      color: '#ED8936',
       tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('kid')),
     },
   ];
@@ -75,14 +71,19 @@ export default function Delegation() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.dark }]}>Delegation</Text>
-          <Text style={styles.subtitle}>Share the load with others</Text>
+          <Text style={[styles.subtitle, { color: colors.medium }]}>
+            Share the load with others
+          </Text>
         </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            style={[styles.actionButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => router.push('/home')}
           >
-            <HomeIcon size={20} color={colors.dark} />
+            <HomeIcon size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -90,26 +91,32 @@ export default function Delegation() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {teamMembers.map((member, index) => (
           <NeumorphicCard key={index} style={[styles.memberTasksCard, { 
-            shadowColor: colors.pastel,
+            shadowColor: colors.shadow,
             borderColor: colors.accent,
             borderWidth: 1 
           }]}>
             <View style={styles.memberTasksHeader}>
               <View style={styles.memberTasksInfo}>
-                <member.icon size={20} color={tealColor} />
+                <member.icon size={20} color={colors.accent} />
                 <View style={styles.memberTextContainer}>
-                  <Text style={[styles.memberTasksName, { color: colors.dark }]}>{member.name} Tasks</Text>
-                  <Text style={styles.memberSubtitle}>{member.subtitle}</Text>
+                  <Text style={[styles.memberTasksName, { color: colors.dark }]}>
+                    {member.name} Tasks
+                  </Text>
+                  <Text style={[styles.memberSubtitle, { color: colors.medium }]}>
+                    {member.subtitle}
+                  </Text>
                 </View>
               </View>
-              <View style={styles.memberTasksMeta}>
-                <Text style={[styles.memberTasksCount, { color: colors.dark }]}>{member.tasks.length}</Text>
+              <View style={[styles.memberTasksCountContainer, { backgroundColor: colors.accent }]}>
+                <Text style={[styles.memberTasksCount, { color: colors.pastel }]}>
+                  {member.tasks.length} tasks
+                </Text>
               </View>
             </View>
             
             {member.tasks.length === 0 ? (
               <View style={styles.emptyMemberTasks}>
-                <Text style={[styles.emptyMemberTasksText, { color: colors.pastel }]}>
+                <Text style={[styles.emptyMemberTasksText, { color: colors.medium }]}>
                   No tasks assigned to {member.name.toLowerCase()}
                 </Text>
               </View>
@@ -122,6 +129,7 @@ export default function Delegation() {
                   onDelete={taskManager.deleteTask}
                   onEdit={handleEditTask}
                   onHabitIncrement={taskManager.incrementHabit}
+                  colors={colors}
                 />
               ))
             )}
@@ -132,11 +140,11 @@ export default function Delegation() {
       <TouchableOpacity
         style={[styles.addButton, { 
           backgroundColor: colors.dark,
-          shadowColor: colors.dark 
+          shadowColor: colors.shadow 
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color="#ffffff" />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -144,6 +152,25 @@ export default function Delegation() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="delegation"
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
     </SafeAreaView>
   );
@@ -168,7 +195,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginTop: 2,
   },
   headerIcons: {
@@ -181,7 +207,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -214,16 +239,16 @@ const styles = StyleSheet.create({
   memberSubtitle: {
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     marginTop: 2,
   },
-  memberTasksMeta: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  memberTasksCountContainer: {
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   memberTasksCount: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 12,
+    fontFamily: 'Quicksand-Medium',
   },
   emptyMemberTasks: {
     alignItems: 'center',
