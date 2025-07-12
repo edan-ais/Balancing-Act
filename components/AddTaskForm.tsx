@@ -57,7 +57,7 @@ export default function AddTaskForm({
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
   const [habitGoal, setHabitGoal] = useState(1);
-  const [priority, setPriority] = useState('medium');
+  const [priority, setPriority] = useState('');
   const [customPriorityText, setCustomPriorityText] = useState('');
   const [customPriorityColor, setCustomPriorityColor] = useState('#4A5568'); // Default gray
   const [isDelegated, setIsDelegated] = useState(false);
@@ -84,25 +84,67 @@ export default function AddTaskForm({
   
   // Custom tag modal state
   const [showCustomTagModal, setShowCustomTagModal] = useState(false);
-  const [customTagType, setCustomTagType] = useState<'priority' | 'goalType'>('priority');
+  const [customTagType, setCustomTagType] = useState<'priority' | 'goalType' | 'cleaningLocation'>('priority');
 
   // Store created custom tags for reuse
   const [savedPriorityTags, setSavedPriorityTags] = useState<CustomTag[]>([]);
   const [savedGoalTypeTags, setSavedGoalTypeTags] = useState<CustomTag[]>([]);
+  const [savedCleaningLocationTags, setSavedCleaningLocationTags] = useState<CustomTag[]>([]);
 
-  // Color options for custom tags - single row
-  const colorOptions = [
-    '#FC8181', // Red
-    '#F6AD55', // Orange
-    '#F6E05E', // Yellow
-    '#68D391', // Green
-    '#4FD1C5', // Teal
-    '#63B3ED', // Blue
-    '#7F9CF5', // Indigo
-    '#B794F4', // Purple
-    '#F687B3', // Pink
-    '#4A5568', // Gray
-  ];
+  // Get used colors for various tag types
+  const getUsedPriorityColors = () => {
+    const usedColors = [];
+    
+    // Colors used by predefined priority tags
+    if (category === 'daily') {
+      usedColors.push('#FC8181'); // high - Red
+      usedColors.push('#4299E1'); // medium - Blue
+      usedColors.push('#68D391'); // low - Green
+      usedColors.push('#F6AD55'); // quick-win - Orange
+    }
+    
+    return usedColors;
+  };
+  
+  const getUsedGoalTypeColors = () => {
+    const usedColors = [];
+    
+    // Colors used by predefined goal type tags
+    if (category === 'goals') {
+      usedColors.push('#9F7AEA'); // TBD - Purple
+      usedColors.push('#FC8181'); // Not Priority - Red
+      usedColors.push('#4299E1'); // Wish - Blue
+    }
+    
+    return usedColors;
+  };
+
+  // Available color options for custom tags - filter out used colors
+  const getAvailableColorOptions = (type: 'priority' | 'goalType' | 'cleaningLocation') => {
+    const allColors = [
+      '#FC8181', // Red
+      '#F6AD55', // Orange
+      '#F6E05E', // Yellow
+      '#68D391', // Green
+      '#4FD1C5', // Teal
+      '#63B3ED', // Blue
+      '#4299E1', // Blue (darker)
+      '#7F9CF5', // Indigo
+      '#9F7AEA', // Purple
+      '#B794F4', // Purple (lighter)
+      '#F687B3', // Pink
+    ];
+    
+    let usedColors: string[] = [];
+    
+    if (type === 'priority') {
+      usedColors = getUsedPriorityColors();
+    } else if (type === 'goalType') {
+      usedColors = getUsedGoalTypeColors();
+    }
+    
+    return allColors.filter(color => !usedColors.includes(color));
+  };
 
   const handleSubmit = () => {
     if (title.trim()) {
@@ -160,7 +202,8 @@ export default function AddTaskForm({
         taskData = {
           ...taskData,
           frequency,
-          cleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : cleaningLocation,
+          cleaningLocation,
+          customCleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : undefined,
         };
       }
 
@@ -193,7 +236,7 @@ export default function AddTaskForm({
     setTitle('');
     setIsHabit(false);
     setHabitGoal(1);
-    setPriority('medium');
+    setPriority('');
     setCustomPriorityText('');
     setCustomPriorityColor('#4A5568');
     setIsDelegated(false);
@@ -252,7 +295,7 @@ export default function AddTaskForm({
     }
   };
 
-  const openCustomTagModal = (type: 'priority' | 'goalType') => {
+  const openCustomTagModal = (type: 'priority' | 'goalType' | 'cleaningLocation') => {
     setCustomTagType(type);
     setShowCustomTagModal(true);
   };
@@ -273,7 +316,7 @@ export default function AddTaskForm({
         
         setPriority('custom');
       }
-    } else {
+    } else if (customTagType === 'goalType') {
       if (customGoalTypeText.trim()) {
         // Create a new custom goal type tag
         const newTag: CustomTag = {
@@ -287,6 +330,21 @@ export default function AddTaskForm({
         }
         
         setGoalType('custom');
+      }
+    } else if (customTagType === 'cleaningLocation') {
+      if (customCleaningLocation.trim()) {
+        // Create a new custom cleaning location tag
+        const newTag: CustomTag = {
+          text: customCleaningLocation,
+          color: '#FC8181' // Red for custom cleaning locations
+        };
+        
+        // Only add if not already in the list
+        if (!savedCleaningLocationTags.some(tag => tag.text === newTag.text)) {
+          setSavedCleaningLocationTags([...savedCleaningLocationTags, newTag]);
+        }
+        
+        setCleaningLocation('custom');
       }
     }
     setShowCustomTagModal(false);
@@ -402,7 +460,7 @@ export default function AddTaskForm({
                     key="low"
                     style={[
                       styles.optionButton, 
-                      priority === 'low' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      priority === 'low' && [styles.selectedOption, {backgroundColor: '#68D391'}]
                     ]}
                     onPress={() => setPriority('low')}
                   >
@@ -414,7 +472,7 @@ export default function AddTaskForm({
                     key="medium"
                     style={[
                       styles.optionButton, 
-                      priority === 'medium' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      priority === 'medium' && [styles.selectedOption, {backgroundColor: '#4299E1'}]
                     ]}
                     onPress={() => setPriority('medium')}
                   >
@@ -426,7 +484,7 @@ export default function AddTaskForm({
                     key="high"
                     style={[
                       styles.optionButton, 
-                      priority === 'high' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      priority === 'high' && [styles.selectedOption, {backgroundColor: '#FC8181'}]
                     ]}
                     onPress={() => setPriority('high')}
                   >
@@ -438,7 +496,7 @@ export default function AddTaskForm({
                     key="quick-win"
                     style={[
                       styles.optionButton, 
-                      priority === 'quick-win' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      priority === 'quick-win' && [styles.selectedOption, {backgroundColor: '#F6AD55'}]
                     ]}
                     onPress={() => setPriority('quick-win')}
                   >
@@ -496,7 +554,7 @@ export default function AddTaskForm({
                     key="TBD"
                     style={[
                       styles.optionButton, 
-                      goalType === 'TBD' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      goalType === 'TBD' && [styles.selectedOption, {backgroundColor: '#9F7AEA'}]
                     ]}
                     onPress={() => setGoalType('TBD')}
                   >
@@ -508,7 +566,7 @@ export default function AddTaskForm({
                     key="Not Priority"
                     style={[
                       styles.optionButton, 
-                      goalType === 'Not Priority' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      goalType === 'Not Priority' && [styles.selectedOption, {backgroundColor: '#FC8181'}]
                     ]}
                     onPress={() => setGoalType('Not Priority')}
                   >
@@ -520,7 +578,7 @@ export default function AddTaskForm({
                     key="Wish"
                     style={[
                       styles.optionButton, 
-                      goalType === 'Wish' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      goalType === 'Wish' && [styles.selectedOption, {backgroundColor: '#4299E1'}]
                     ]}
                     onPress={() => setGoalType('Wish')}
                   >
@@ -706,7 +764,7 @@ export default function AddTaskForm({
             </>
           )}
 
-          {/* Meal Prep Tab */}
+          {/* Meal Prep Tab - Updated for day of week tags */}
           {category === 'meal-prep' && (
             <>
               <View style={styles.section}>
@@ -717,7 +775,13 @@ export default function AddTaskForm({
                       key={type}
                       style={[
                         styles.optionButton, 
-                        mealType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        mealType === type && [
+                          styles.selectedOption,
+                          type === 'breakfast' ? {backgroundColor: '#F6E05E'} :
+                          type === 'lunch' ? {backgroundColor: '#4FD1C5'} :
+                          type === 'dinner' ? {backgroundColor: '#9F7AEA'} :
+                          {backgroundColor: '#68D391'}
+                        ]
                       ]}
                       onPress={() => setMealType(type)}
                     >
@@ -732,12 +796,20 @@ export default function AddTaskForm({
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Day</Text>
                 <View style={styles.buttonRow}>
-                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
+                  {[
+                    { day: 'Mon', color: '#FC8181' }, // Red
+                    { day: 'Tue', color: '#F6AD55' }, // Orange
+                    { day: 'Wed', color: '#F6E05E' }, // Yellow
+                    { day: 'Thu', color: '#68D391' }, // Green
+                    { day: 'Fri', color: '#4FD1C5' }, // Teal
+                    { day: 'Sat', color: '#63B3ED' }, // Blue
+                    { day: 'Sun', color: '#B794F4' }  // Purple
+                  ].map(({ day, color }) => (
                     <TouchableOpacity
                       key={day}
                       style={[
                         styles.optionButton, 
-                        dayOfWeek === day && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        dayOfWeek === day && [styles.selectedOption, {backgroundColor: color}]
                       ]}
                       onPress={() => setDayOfWeek(day)}
                     >
@@ -763,7 +835,7 @@ export default function AddTaskForm({
             </>
           )}
 
-          {/* Cleaning Tab */}
+          {/* Cleaning Tab - Updated for custom location */}
           {category === 'cleaning' && (
             <>
               <View style={styles.section}>
@@ -787,32 +859,79 @@ export default function AddTaskForm({
               </View>
 
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Location</Text>
+                <View style={styles.sectionHeader}>
+                  <Text style={styles.sectionTitle}>Location</Text>
+                  <TouchableOpacity 
+                    style={styles.addCustomButton}
+                    onPress={() => openCustomTagModal('cleaningLocation')}
+                  >
+                    <Plus size={14} color={getTabColor()} />
+                    <Text style={[styles.addCustomText, { color: getTabColor() }]}>Add Custom</Text>
+                  </TouchableOpacity>
+                </View>
                 <View style={styles.buttonRow}>
-                  {['kitchen', 'bathroom', 'bedroom', 'custom'].map((loc) => (
+                  <TouchableOpacity
+                    key="kitchen"
+                    style={[
+                      styles.optionButton, 
+                      cleaningLocation === 'kitchen' && [styles.selectedOption, {backgroundColor: '#F6E05E'}]
+                    ]}
+                    onPress={() => setCleaningLocation('kitchen')}
+                  >
+                    <Text style={[styles.optionText, cleaningLocation === 'kitchen' && styles.selectedText]}>
+                      Kitchen
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="bathroom"
+                    style={[
+                      styles.optionButton, 
+                      cleaningLocation === 'bathroom' && [styles.selectedOption, {backgroundColor: '#4FD1C5'}]
+                    ]}
+                    onPress={() => setCleaningLocation('bathroom')}
+                  >
+                    <Text style={[styles.optionText, cleaningLocation === 'bathroom' && styles.selectedText]}>
+                      Bathroom
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="bedroom"
+                    style={[
+                      styles.optionButton, 
+                      cleaningLocation === 'bedroom' && [styles.selectedOption, {backgroundColor: '#9F7AEA'}]
+                    ]}
+                    onPress={() => setCleaningLocation('bedroom')}
+                  >
+                    <Text style={[styles.optionText, cleaningLocation === 'bedroom' && styles.selectedText]}>
+                      Bedroom
+                    </Text>
+                  </TouchableOpacity>
+                  
+                  {/* Display saved custom cleaning location tags */}
+                  {savedCleaningLocationTags.map((tag, index) => (
                     <TouchableOpacity
-                      key={loc}
+                      key={`saved-cleaning-${index}`}
                       style={[
                         styles.optionButton, 
-                        cleaningLocation === loc && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        cleaningLocation === 'custom' && customCleaningLocation === tag.text && [
+                          styles.selectedOption, 
+                          { backgroundColor: '#FC8181' }
+                        ]
                       ]}
-                      onPress={() => setCleaningLocation(loc)}
+                      onPress={() => {
+                        setCleaningLocation('custom');
+                        setCustomCleaningLocation(tag.text);
+                      }}
                     >
-                      <Text style={[styles.optionText, cleaningLocation === loc && styles.selectedText]}>
-                        {loc === 'custom' ? 'Other' : loc.charAt(0).toUpperCase() + loc.slice(1)}
+                      <Text style={[
+                        styles.optionText, 
+                        cleaningLocation === 'custom' && customCleaningLocation === tag.text && styles.selectedText
+                      ]}>
+                        {tag.text}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-                
-                {cleaningLocation === 'custom' && (
-                  <TextInput
-                    style={[styles.input, { marginTop: 8 }]}
-                    placeholder="Enter location"
-                    value={customCleaningLocation}
-                    onChangeText={setCustomCleaningLocation}
-                  />
-                )}
               </View>
 
               <View style={styles.section}>
@@ -846,20 +965,22 @@ export default function AddTaskForm({
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Self-Care Type</Text>
                 <View style={styles.buttonRow}>
-                  {['physical', 'mental', 'rest', 'joy'].map((type) => (
+                  {[
+                    { type: 'physical', label: 'Physical Health', color: '#68D391' },
+                    { type: 'mental', label: 'Mental Health', color: '#9F7AEA' },
+                    { type: 'rest', label: 'Rest & Recovery', color: '#4FD1C5' },
+                    { type: 'joy', label: 'Joy & Connection', color: '#F6AD55' }
+                  ].map(({ type, label, color }) => (
                     <TouchableOpacity
                       key={type}
                       style={[
                         styles.optionButton, 
-                        selfCareType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        selfCareType === type && [styles.selectedOption, {backgroundColor: color}]
                       ]}
                       onPress={() => setSelfCareType(type)}
                     >
                       <Text style={[styles.optionText, selfCareType === type && styles.selectedText]}>
-                        {type === 'physical' ? 'Physical Health' : 
-                         type === 'mental' ? 'Mental Health' :
-                         type === 'rest' ? 'Rest & Recovery' :
-                         'Joy & Connection'}
+                        {label}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -897,17 +1018,22 @@ export default function AddTaskForm({
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Delegate To</Text>
                 <View style={styles.buttonRow}>
-                  {['partner', 'family', 'friends', 'kids'].map((type) => (
+                  {[
+                    { type: 'partner', label: 'Partner Tasks', color: '#63B3ED' },
+                    { type: 'family', label: 'Family Tasks', color: '#F6AD55' },
+                    { type: 'friends', label: 'Friends Tasks', color: '#9F7AEA' },
+                    { type: 'kids', label: 'Kids Tasks', color: '#68D391' }
+                  ].map(({ type, label, color }) => (
                     <TouchableOpacity
                       key={type}
                       style={[
                         styles.optionButton, 
-                        delegateType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                        delegateType === type && [styles.selectedOption, {backgroundColor: color}]
                       ]}
                       onPress={() => setDelegateType(type)}
                     >
                       <Text style={[styles.optionText, delegateType === type && styles.selectedText]}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)} Tasks
+                        {label}
                       </Text>
                     </TouchableOpacity>
                   ))}
@@ -982,7 +1108,7 @@ export default function AddTaskForm({
         </ScrollView>
       </NeumorphicCard>
 
-      {/* Custom Tag Modal - Modified for single row of colors */}
+      {/* Custom Tag Modal - Modified for filtered color options */}
       <Modal
         transparent
         visible={showCustomTagModal}
@@ -993,46 +1119,66 @@ export default function AddTaskForm({
           <NeumorphicCard style={styles.modalContent}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>
-                {customTagType === 'priority' ? 'Custom Priority' : 'Custom Goal Type'}
+                {customTagType === 'priority' ? 'Custom Priority' : 
+                 customTagType === 'goalType' ? 'Custom Goal Type' : 
+                 'Custom Location'}
               </Text>
               <TouchableOpacity onPress={() => setShowCustomTagModal(false)}>
                 <X size={24} color="#A0AEC0" />
               </TouchableOpacity>
             </View>
 
-            <Text style={styles.modalLabel}>Tag Text</Text>
+            <Text style={styles.modalLabel}>
+              {customTagType === 'cleaningLocation' ? 'Location Name' : 'Tag Text'}
+            </Text>
             <TextInput
               style={styles.modalInput}
-              placeholder="Enter custom tag text"
-              value={customTagType === 'priority' ? customPriorityText : customGoalTypeText}
-              onChangeText={(text) => 
-                customTagType === 'priority' 
-                  ? setCustomPriorityText(text) 
-                  : setCustomGoalTypeText(text)
+              placeholder={
+                customTagType === 'priority' ? "Enter custom priority" : 
+                customTagType === 'goalType' ? "Enter custom goal type" : 
+                "Enter custom location"
               }
+              value={
+                customTagType === 'priority' ? customPriorityText : 
+                customTagType === 'goalType' ? customGoalTypeText : 
+                customCleaningLocation
+              }
+              onChangeText={(text) => {
+                if (customTagType === 'priority') {
+                  setCustomPriorityText(text);
+                } else if (customTagType === 'goalType') {
+                  setCustomGoalTypeText(text);
+                } else {
+                  setCustomCleaningLocation(text);
+                }
+              }}
             />
 
-            <Text style={styles.modalLabel}>Tag Color</Text>
-            <View style={styles.colorOptionsRow}>
-              {colorOptions.map(color => (
-                <TouchableOpacity
-                  key={color}
-                  style={[
-                    styles.colorOption,
-                    { backgroundColor: color },
-                    (customTagType === 'priority' ? customPriorityColor : customGoalTypeColor) === color && 
-                      styles.selectedColorOption
-                  ]}
-                  onPress={() => {
-                    if (customTagType === 'priority') {
-                      setCustomPriorityColor(color);
-                    } else {
-                      setCustomGoalTypeColor(color);
-                    }
-                  }}
-                />
-              ))}
-            </View>
+            {customTagType !== 'cleaningLocation' && (
+              <>
+                <Text style={styles.modalLabel}>Tag Color</Text>
+                <View style={styles.colorOptionsRow}>
+                  {getAvailableColorOptions(customTagType).map(color => (
+                    <TouchableOpacity
+                      key={color}
+                      style={[
+                        styles.colorOption,
+                        { backgroundColor: color },
+                        (customTagType === 'priority' ? customPriorityColor : customGoalTypeColor) === color && 
+                          styles.selectedColorOption
+                      ]}
+                      onPress={() => {
+                        if (customTagType === 'priority') {
+                          setCustomPriorityColor(color);
+                        } else if (customTagType === 'goalType') {
+                          setCustomGoalTypeColor(color);
+                        }
+                      }}
+                    />
+                  ))}
+                </View>
+              </>
+            )}
 
             <View style={styles.modalButtons}>
               <TouchableOpacity 
@@ -1348,13 +1494,15 @@ const styles = StyleSheet.create({
   // Updated to show colors in a single row
   colorOptionsRow: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexWrap: 'wrap',
+    justifyContent: 'flex-start',
     marginBottom: 20,
+    gap: 8,
   },
   colorOption: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 30,
+    height: 30,
+    borderRadius: 15,
     marginHorizontal: 2,
     borderWidth: 1,
     borderColor: '#E2E8F0',
