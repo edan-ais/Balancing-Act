@@ -46,6 +46,7 @@ interface TaskItemProps {
   onMoveDown?: (id: string) => void;
   isFirst?: boolean;
   isLast?: boolean;
+  colors?: any; // Theme colors for the tab
   accentColor?: string; // Optional color override
   borderColor?: string; // Optional border color override
   habitColor?: string; // Optional habit color override
@@ -62,11 +63,15 @@ export default function TaskItem({
   onMoveDown,
   isFirst,
   isLast,
+  colors,
   accentColor,
   borderColor,
   habitColor
 }: TaskItemProps) {
   const [scaleAnim] = useState(new Animated.Value(1));
+
+  // Use theme colors if provided, otherwise fallback to the old color logic
+  const themeColors = colors || {};
 
   const getPriorityColor = (priority?: string) => {
     switch (priority) {
@@ -150,19 +155,28 @@ export default function TaskItem({
     }
   };
 
-  // If override colors are provided, use them, otherwise use the category colors
-  const taskColor = borderColor || getTabColor(task.category);
-  const taskAccentColor = accentColor || taskColor;
-  const taskHabitColor = habitColor || taskColor;
+  // If theme colors provided, use them, otherwise fallback to props or category colors
+  const taskColor = colors?.dark || borderColor || getTabColor(task.category);
+  const taskAccentColor = colors?.accent || accentColor || taskColor;
+  const taskHabitColor = colors?.accent || habitColor || taskColor;
   
   // Get a lighter version of the color for borders
   const getLightBorderColor = (color: string) => {
-    // Make the border color more subtle by adding transparency
+    // If we have theme colors, use the pastel color
+    if (colors?.pastel) {
+      return colors.pastel;
+    }
+    // Otherwise make the border color more subtle by adding transparency
     return color + '40'; // Adding 40 for 25% opacity
   };
   
   // Get a lighter background color for habits based on the task category
   const getHabitBackgroundColor = (category: string) => {
+    // If we have theme colors, use the bg color
+    if (colors?.bg) {
+      return colors.bg;
+    }
+
     switch(category) {
       case 'daily': return '#E6F0FA'; // Light blue for daily tasks
       case 'goals': return '#E3F5EC'; // Light green for goals
@@ -334,10 +348,29 @@ export default function TaskItem({
     return null;
   };
 
+  // Choose text color based on completed state and theme
+  const getTextColor = (completed: boolean) => {
+    if (completed) return colors?.medium || '#A0AEC0'; // Completed tasks use medium color
+    return colors?.dark || '#2D3748'; // Active tasks use dark color
+  };
+
+  // Choose subtask text color based on completed state and theme
+  const getSubtaskTextColor = (completed: boolean) => {
+    if (completed) return colors?.medium || '#A0AEC0'; // Completed subtasks use medium color
+    return colors?.dark || '#4A5568'; // Active subtasks use dark color
+  };
+
+  // Choose icon colors based on theme
+  const getIconColor = (disabled: boolean) => {
+    if (disabled) return colors?.pastel || '#CBD5E0'; 
+    return colors?.medium || '#4A5568';
+  };
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <NeumorphicCard style={[
         styles.taskCard,
+        { backgroundColor: colors?.bg || '#FFFFFF' },
         task.isHabit ? [styles.habitCard, { backgroundColor: getHabitBackgroundColor(task.category) }] : null,
         { 
           borderColor: getLightBorderColor(taskColor),
@@ -356,16 +389,19 @@ export default function TaskItem({
               styles.checkbox,
               task.completed ? styles.checkedBox : null,
               task.isHabit ? styles.habitBox : null,
-              { backgroundColor: task.completed ? taskAccentColor : '#E2E8F0' },
+              { 
+                backgroundColor: task.completed ? taskAccentColor : (colors?.pastel || '#E2E8F0'),
+                shadowColor: colors?.shadow || '#C8D0E0'
+              },
             ]}
           >
             {task.completed ? (
-              <Check size={16} color="#ffffff" />
+              <Check size={16} color={colors?.pastel || "#ffffff"} />
             ) : (
               task.isHabit && task.habitCount !== undefined && (
                 <Text style={[
                   styles.habitCount,
-                  { color: task.completed ? '#ffffff' : taskHabitColor }
+                  { color: task.completed ? (colors?.pastel || '#ffffff') : taskHabitColor }
                 ]}>
                   {task.habitCount}
                 </Text>
@@ -378,9 +414,14 @@ export default function TaskItem({
               styles.taskTitle,
               task.completed ? styles.completedTitle : null,
               task.isHabit ? styles.habitTitle : null,
+              { color: getTextColor(task.completed) }
             ]}>
               {task.title}
-              {task.isDelegated && <Text style={styles.delegatedBadge}> → {task.delegatedTo}</Text>}
+              {task.isDelegated && (
+                <Text style={[styles.delegatedBadge, { color: colors?.accent || '#38B2AC' }]}>
+                  {" "}→ {task.delegatedTo}
+                </Text>
+              )}
             </Text>
             
             <View style={styles.taskMeta}>
@@ -389,13 +430,18 @@ export default function TaskItem({
 
             {/* Display notes for meal prep tasks */}
             {task.category === 'meal-prep' && task.notes ? (
-              <View style={styles.notesContainer}>
-                <Text style={styles.notesText}>{task.notes}</Text>
+              <View style={[styles.notesContainer, { 
+                backgroundColor: colors?.bg || '#F7FAFC',
+                borderLeftColor: colors?.accent || '#ED8936'
+              }]}>
+                <Text style={[styles.notesText, { color: colors?.medium || '#4A5568' }]}>
+                  {task.notes}
+                </Text>
               </View>
             ) : null}
 
             {task.isHabit && task.habitGoal ? (
-              <View style={styles.habitProgressContainer}>
+              <View style={[styles.habitProgressContainer, { backgroundColor: colors?.pastel || '#E2E8F0' }]}>
                 <View 
                   style={[
                     styles.habitProgressBar, 
@@ -405,7 +451,7 @@ export default function TaskItem({
                     }
                   ]} 
                 />
-                <Text style={styles.habitGoalText}>
+                <Text style={[styles.habitGoalText, { color: colors?.medium || '#4A5568' }]}>
                   {task.habitCount || 0}/{task.habitGoal}
                 </Text>
               </View>
@@ -422,15 +468,20 @@ export default function TaskItem({
                     <View 
                       style={[
                         styles.subtaskCheckbox, 
+                        { backgroundColor: colors?.pastel || '#E2E8F0' },
                         subtask.completed ? [
                           styles.subtaskCompleted,
                           { backgroundColor: taskAccentColor }
                         ] : null
                       ]} 
                     >
-                      {subtask.completed ? <Check size={8} color="#ffffff" /> : null}
+                      {subtask.completed ? <Check size={8} color={colors?.pastel || "#ffffff"} /> : null}
                     </View>
-                    <Text style={[styles.subtaskText, subtask.completed ? styles.subtaskCompletedText : null]}>
+                    <Text style={[
+                      styles.subtaskText, 
+                      { color: getSubtaskTextColor(subtask.completed) },
+                      subtask.completed ? styles.subtaskCompletedText : null
+                    ]}>
                       {subtask.title}
                     </Text>
                   </TouchableOpacity>
@@ -446,7 +497,7 @@ export default function TaskItem({
                 style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
                 disabled={isFirst}
               >
-                <ChevronUp size={16} color={isFirst ? '#CBD5E0' : '#4A5568'} />
+                <ChevronUp size={16} color={getIconColor(isFirst || false)} />
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -454,7 +505,7 @@ export default function TaskItem({
                 style={[styles.orderButton, isLast ? styles.disabledButton : null]}
                 disabled={isLast}
               >
-                <ChevronDown size={16} color={isLast ? '#CBD5E0' : '#4A5568'} />
+                <ChevronDown size={16} color={getIconColor(isLast || false)} />
               </TouchableOpacity>
             </View>
             
@@ -463,7 +514,7 @@ export default function TaskItem({
                 onPress={() => onEdit(task)}
                 style={styles.editIconButton}
               >
-                <Pencil size={18} color="#4A5568" />
+                <Pencil size={18} color={colors?.medium || "#4A5568"} />
               </TouchableOpacity>
             )}
             
@@ -484,7 +535,6 @@ const styles = StyleSheet.create({
   taskCard: {
     margin: 4,
     padding: 12,
-    backgroundColor: '#FFFFFF',
   },
   habitCard: {
     // Base habit card - specific background colors are set dynamically
@@ -500,7 +550,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -517,12 +566,10 @@ const styles = StyleSheet.create({
   taskTitle: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
     marginBottom: 4,
   },
   completedTitle: {
     textDecorationLine: 'line-through',
-    color: '#A0AEC0',
   },
   habitTitle: {
     fontStyle: 'italic',
@@ -530,7 +577,6 @@ const styles = StyleSheet.create({
   delegatedBadge: {
     fontSize: 12,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#38B2AC',
   },
   taskMeta: {
     flexDirection: 'row',
@@ -552,22 +598,18 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
   },
   notesContainer: {
-    backgroundColor: '#F7FAFC',
     borderRadius: 8,
     padding: 8,
     marginVertical: 4,
     borderLeftWidth: 2,
-    borderLeftColor: '#ED8936', // Meal prep color
   },
   notesText: {
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     fontStyle: 'italic',
   },
   habitProgressContainer: {
     height: 8,
-    backgroundColor: '#E2E8F0',
     borderRadius: 4,
     marginVertical: 4,
     overflow: 'hidden',
@@ -583,7 +625,6 @@ const styles = StyleSheet.create({
     top: -16,
     fontSize: 10,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4A5568',
   },
   subtasks: {
     marginTop: 8,
@@ -598,7 +639,6 @@ const styles = StyleSheet.create({
     width: 14,
     height: 14,
     borderRadius: 7,
-    backgroundColor: '#E2E8F0',
     marginRight: 8,
     justifyContent: 'center',
     alignItems: 'center',
@@ -607,11 +647,9 @@ const styles = StyleSheet.create({
   subtaskText: {
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
   },
   subtaskCompletedText: {
     textDecorationLine: 'line-through',
-    color: '#A0AEC0',
   },
   actionIcons: {
     flexDirection: 'row',
