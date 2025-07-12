@@ -26,12 +26,23 @@ interface AddTaskFormProps {
     reminderEnabled?: boolean;
     cleaningLocation?: string;
     customCleaningLocation?: string;
+    goalType?: string; // New field for goal type
   }) => void;
   category: string;
   selectedDate?: Date | null;
+  accentColor?: string;
+  darkColor?: string;
 }
 
-export default function AddTaskForm({ visible, onClose, onSubmit, category, selectedDate }: AddTaskFormProps) {
+export default function AddTaskForm({ 
+  visible, 
+  onClose, 
+  onSubmit, 
+  category, 
+  selectedDate,
+  accentColor,
+  darkColor 
+}: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
   const [habitGoal, setHabitGoal] = useState(1);
@@ -50,6 +61,7 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [cleaningLocation, setCleaningLocation] = useState('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
+  const [goalType, setGoalType] = useState(''); // New state for goal type
 
   const handleSubmit = () => {
     if (title.trim()) {
@@ -77,6 +89,14 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
           isRecurring,
           recurringDays: isRecurring ? recurringDays : [],
           recurringDate: isRecurring && selectedDate ? selectedDate.getDate() : undefined,
+        };
+      }
+
+      // Goal specific field
+      if (category === 'goals') {
+        taskData = {
+          ...taskData,
+          goalType, // Add goal type to task data
         };
       }
 
@@ -133,6 +153,7 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
       setReminderEnabled(false);
       setCleaningLocation('');
       setCustomCleaningLocation('');
+      setGoalType(''); // Reset goal type
       
       onClose();
     }
@@ -153,6 +174,8 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
   };
 
   const getTabColor = () => {
+    if (accentColor) return accentColor;
+    
     switch (category) {
       case 'daily': return '#2B6CB0'; // Changed to dark blue
       case 'goals': return '#48BB78';
@@ -289,54 +312,27 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
             </>
           )}
 
-          {/* Goals Tab */}
+          {/* Goals Tab - Modified section */}
           {category === 'goals' && (
             <>
               <View style={styles.section}>
-                <Text style={styles.sectionTitle}>Type</Text>
+                <Text style={styles.sectionTitle}>Goal Type</Text>
                 <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      !isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
-                    ]}
-                    onPress={() => setIsHabit(false)}
-                  >
-                    <Text style={[styles.optionText, !isHabit && styles.selectedText]}>Task</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      isHabit && [styles.selectedOption, {backgroundColor: getTabColor()}]
-                    ]}
-                    onPress={() => setIsHabit(true)}
-                  >
-                    <Text style={[styles.optionText, isHabit && styles.selectedText]}>Habit</Text>
-                  </TouchableOpacity>
+                  {['TBD', 'Not Priority', 'Wish'].map((type) => (
+                    <TouchableOpacity
+                      key={type}
+                      style={[
+                        styles.optionButton, 
+                        goalType === type && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                      ]}
+                      onPress={() => setGoalType(type)}
+                    >
+                      <Text style={[styles.optionText, goalType === type && styles.selectedText]}>
+                        {type}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
                 </View>
-                
-                {isHabit && (
-                  <View style={styles.habitFrequency}>
-                    <Text style={styles.habitFrequencyLabel}>
-                      Daily goal:
-                    </Text>
-                    <View style={styles.habitGoalInput}>
-                      <TouchableOpacity 
-                        style={styles.habitGoalButton}
-                        onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
-                      >
-                        <Text style={styles.habitGoalButtonText}>-</Text>
-                      </TouchableOpacity>
-                      <Text style={styles.habitGoalValue}>{habitGoal}</Text>
-                      <TouchableOpacity 
-                        style={styles.habitGoalButton}
-                        onPress={() => setHabitGoal(habitGoal + 1)}
-                      >
-                        <Text style={styles.habitGoalButtonText}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
               </View>
 
               <View style={styles.section}>
@@ -751,7 +747,10 @@ export default function AddTaskForm({ visible, onClose, onSubmit, category, sele
             </>
           )}
 
-          <TouchableOpacity style={[styles.submitButton, { backgroundColor: getTabColor() }]} onPress={handleSubmit}>
+          <TouchableOpacity 
+            style={[styles.submitButton, { backgroundColor: darkColor || getTabColor() }]} 
+            onPress={handleSubmit}
+          >
             <Plus size={20} color="#ffffff" />
             <Text style={styles.submitText}>Add Task</Text>
           </TouchableOpacity>
