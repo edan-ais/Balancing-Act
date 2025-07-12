@@ -26,6 +26,7 @@ export default function SelfCare() {
       title: 'Physical Health', 
       icon: Activity, 
       color: '#FF0000',
+      type: 'physical',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'physical'),
       description: 'Movement and wellness'
     },
@@ -33,6 +34,7 @@ export default function SelfCare() {
       title: 'Mental Health', 
       icon: Smile, 
       color: '#FF0000',
+      type: 'mental',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'mental'),
       description: 'Mindfulness and peace'
     },
@@ -40,6 +42,7 @@ export default function SelfCare() {
       title: 'Rest & Recovery', 
       icon: Moon, 
       color: '#FF0000',
+      type: 'rest',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'rest'),
       description: 'Sleep and relaxation'
     },
@@ -47,6 +50,7 @@ export default function SelfCare() {
       title: 'Joy & Connection', 
       icon: Music, 
       color: '#FF0000',
+      type: 'joy',
       tasks: selfCareTasks.filter(t => t.selfCareType === 'joy'),
       description: 'Relationships and fun'
     },
@@ -73,47 +77,65 @@ export default function SelfCare() {
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
-        {careCategories.map((category, index) => (
-          <NeumorphicCard key={index} style={[styles.categoryCard, { 
-            shadowColor: colors.pastel,
-            borderColor: colors.accent,
-            borderWidth: 1 
-          }]}>
-            <View style={styles.categoryHeader}>
-              <View style={styles.categoryInfo}>
-                <View style={styles.categoryTitleRow}>
-                  <category.icon size={24} color={category.color} />
-                  <View style={styles.categoryTextContainer}>
-                    <Text style={[styles.categoryTitle, { color: colors.dark }]}>{category.title}</Text>
-                    <Text style={styles.categoryDescription}>{category.description}</Text>
+        {careCategories.map((category, index) => {
+          // Get all tasks with the same self-care type that are not completed
+          const typeTasks = selfCareTasks.filter(t => 
+            t.selfCareType === category.type && !t.completed
+          );
+          
+          return (
+            <NeumorphicCard key={index} style={[styles.categoryCard, { 
+              shadowColor: colors.pastel,
+              borderColor: colors.accent,
+              borderWidth: 1 
+            }]}>
+              <View style={styles.categoryHeader}>
+                <View style={styles.categoryInfo}>
+                  <View style={styles.categoryTitleRow}>
+                    <category.icon size={24} color={category.color} />
+                    <View style={styles.categoryTextContainer}>
+                      <Text style={[styles.categoryTitle, { color: colors.dark }]}>{category.title}</Text>
+                      <Text style={styles.categoryDescription}>{category.description}</Text>
+                    </View>
                   </View>
                 </View>
+                <View style={styles.categoryMeta}>
+                  <Text style={styles.categoryCount}>{category.tasks.length}</Text>
+                  <Text style={styles.categoryLabel}>tasks</Text>
+                </View>
               </View>
-              <View style={styles.categoryMeta}>
-                <Text style={styles.categoryCount}>{category.tasks.length}</Text>
-                <Text style={styles.categoryLabel}>tasks</Text>
-              </View>
-            </View>
-            
-            {category.tasks.length === 0 ? (
-              <View style={styles.emptyCategory}>
-                <Text style={[styles.emptyCategoryText, { color: colors.pastel }]}>
-                  No {category.title.toLowerCase()} activities yet
-                </Text>
-              </View>
-            ) : (
-              category.tasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={taskManager.toggleTask}
-                  onDelete={taskManager.deleteTask}
-                  onHabitIncrement={taskManager.incrementHabit}
-                />
-              ))
-            )}
-          </NeumorphicCard>
-        ))}
+              
+              {category.tasks.length === 0 ? (
+                <View style={styles.emptyCategory}>
+                  <Text style={[styles.emptyCategoryText, { color: colors.pastel }]}>
+                    No {category.title.toLowerCase()} activities yet
+                  </Text>
+                </View>
+              ) : (
+                category.tasks.map((task, taskIndex) => {
+                  // Find position of this task in the self-care type group
+                  const taskPosition = typeTasks.findIndex(t => t.id === task.id);
+                  
+                  return (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onToggle={taskManager.toggleTask}
+                      onDelete={taskManager.deleteTask}
+                      onHabitIncrement={taskManager.incrementHabit}
+                      onSubtaskToggle={taskManager.toggleSubtask}
+                      onMoveUp={taskManager.moveTaskUp}
+                      onMoveDown={taskManager.moveTaskDown}
+                      isFirst={taskPosition === 0}
+                      isLast={taskPosition === typeTasks.length - 1}
+                      accentColor={colors.dark}
+                    />
+                  );
+                })
+              )}
+            </NeumorphicCard>
+          );
+        })}
       </ScrollView>
 
       <TouchableOpacity
