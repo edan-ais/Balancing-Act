@@ -102,17 +102,6 @@ export default function TaskItem({
     }
   };
 
-  // Function to get meal type color
-  const getMealTypeColor = (type?: string) => {
-    switch (type) {
-      case 'breakfast': return '#F6E05E'; // Yellow
-      case 'lunch': return '#4FD1C5'; // Teal
-      case 'dinner': return '#9F7AEA'; // Purple
-      case 'snack': return '#68D391'; // Green
-      default: return '#A0AEC0'; // Default gray
-    }
-  };
-
   // Function to get cleaning location color
   const getCleaningLocationColor = (location?: string) => {
     switch (location) {
@@ -287,7 +276,7 @@ export default function TaskItem({
         </View>
       );
     }
-    // For meal-prep with day of week
+    // For meal-prep with day of week only (not meal type)
     else if (task.category === 'meal-prep' && task.dayOfWeek) {
       return (
         <View style={[
@@ -296,19 +285,6 @@ export default function TaskItem({
         ]}>
           <Text style={styles.priorityText}>
             {task.dayOfWeek.toUpperCase()}
-          </Text>
-        </View>
-      );
-    }
-    // For meal-prep with meal type
-    else if (task.category === 'meal-prep' && task.mealType) {
-      return (
-        <View style={[
-          styles.priorityTag,
-          { backgroundColor: getMealTypeColor(task.mealType) }
-        ]}>
-          <Text style={styles.priorityText}>
-            {task.mealType.toUpperCase()}
           </Text>
         </View>
       );
