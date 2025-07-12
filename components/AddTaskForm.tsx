@@ -38,6 +38,11 @@ interface AddTaskFormProps {
   darkColor?: string;
 }
 
+interface CustomTag {
+  text: string;
+  color: string;
+}
+
 export default function AddTaskForm({ 
   visible, 
   onClose, 
@@ -77,7 +82,11 @@ export default function AddTaskForm({
   const [showCustomTagModal, setShowCustomTagModal] = useState(false);
   const [customTagType, setCustomTagType] = useState<'priority' | 'goalType'>('priority');
 
-  // Color options for custom tags
+  // Store created custom tags for reuse
+  const [savedPriorityTags, setSavedPriorityTags] = useState<CustomTag[]>([]);
+  const [savedGoalTypeTags, setSavedGoalTypeTags] = useState<CustomTag[]>([]);
+
+  // Color options for custom tags - single row
   const colorOptions = [
     '#FC8181', // Red
     '#F6AD55', // Orange
@@ -242,11 +251,49 @@ export default function AddTaskForm({
 
   const saveCustomTag = () => {
     if (customTagType === 'priority') {
-      setPriority('custom');
+      if (customPriorityText.trim()) {
+        // Create a new custom priority tag
+        const newTag: CustomTag = {
+          text: customPriorityText,
+          color: customPriorityColor
+        };
+        
+        // Only add if not already in the list
+        if (!savedPriorityTags.some(tag => tag.text === newTag.text)) {
+          setSavedPriorityTags([...savedPriorityTags, newTag]);
+        }
+        
+        setPriority('custom');
+      }
     } else {
-      setGoalType('custom');
+      if (customGoalTypeText.trim()) {
+        // Create a new custom goal type tag
+        const newTag: CustomTag = {
+          text: customGoalTypeText,
+          color: customGoalTypeColor
+        };
+        
+        // Only add if not already in the list
+        if (!savedGoalTypeTags.some(tag => tag.text === newTag.text)) {
+          setSavedGoalTypeTags([...savedGoalTypeTags, newTag]);
+        }
+        
+        setGoalType('custom');
+      }
     }
     setShowCustomTagModal(false);
+  };
+
+  const selectSavedCustomTag = (tag: CustomTag, type: 'priority' | 'goalType') => {
+    if (type === 'priority') {
+      setPriority('custom');
+      setCustomPriorityText(tag.text);
+      setCustomPriorityColor(tag.color);
+    } else {
+      setGoalType('custom');
+      setCustomGoalTypeText(tag.text);
+      setCustomGoalTypeColor(tag.color);
+    }
   };
   
   if (!visible) return null;
@@ -346,36 +393,66 @@ export default function AddTaskForm({
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Priority</Text>
                 <View style={styles.buttonRow}>
-                  {['low', 'medium', 'high', 'quick-win', 'custom'].map((prio) => (
+                  {['low', 'medium', 'high', 'quick-win'].map((prio) => (
                     <TouchableOpacity
                       key={prio}
                       style={[
                         styles.optionButton, 
                         priority === prio && [
                           styles.selectedOption, 
-                          prio === 'custom' 
-                            ? { backgroundColor: customPriorityColor }
-                            : { backgroundColor: getTabColor() }
+                          { backgroundColor: getTabColor() }
                         ]
                       ]}
-                      onPress={() => {
-                        if (prio === 'custom') {
-                          openCustomTagModal('priority');
-                        } else {
-                          setPriority(prio);
-                        }
-                      }}
+                      onPress={() => setPriority(prio)}
                     >
                       <Text style={[styles.optionText, priority === prio && styles.selectedText]}>
-                        {prio === 'custom' 
-                          ? (customPriorityText || 'Custom') 
-                          : prio === 'quick-win' 
-                            ? 'Quick Win' 
-                            : prio.charAt(0).toUpperCase() + prio.slice(1)}
+                        {prio === 'quick-win' 
+                          ? 'Quick Win' 
+                          : prio.charAt(0).toUpperCase() + prio.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
+                  <TouchableOpacity
+                    key="custom-new"
+                    style={[
+                      styles.optionButton,
+                      styles.addCustomButton
+                    ]}
+                    onPress={() => openCustomTagModal('priority')}
+                  >
+                    <Plus size={14} color="#4A5568" />
+                    <Text style={styles.optionText}>Custom</Text>
+                  </TouchableOpacity>
                 </View>
+                
+                {/* Display saved custom priority tags */}
+                {savedPriorityTags.length > 0 && (
+                  <View style={styles.savedTagsContainer}>
+                    <Text style={styles.savedTagsTitle}>Saved Tags:</Text>
+                    <View style={styles.buttonRow}>
+                      {savedPriorityTags.map((tag, index) => (
+                        <TouchableOpacity
+                          key={`saved-priority-${index}`}
+                          style={[
+                            styles.optionButton,
+                            priority === 'custom' && customPriorityText === tag.text && [
+                              styles.selectedOption,
+                              { backgroundColor: tag.color }
+                            ]
+                          ]}
+                          onPress={() => selectSavedCustomTag(tag, 'priority')}
+                        >
+                          <Text style={[
+                            styles.optionText,
+                            priority === 'custom' && customPriorityText === tag.text && styles.selectedText
+                          ]}>
+                            {tag.text}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
               </View>
             </>
           )}
@@ -386,32 +463,64 @@ export default function AddTaskForm({
               <View style={styles.section}>
                 <Text style={styles.sectionTitle}>Goal Type</Text>
                 <View style={styles.buttonRow}>
-                  {['TBD', 'Not Priority', 'Wish', 'custom'].map((type) => (
+                  {['TBD', 'Not Priority', 'Wish'].map((type) => (
                     <TouchableOpacity
                       key={type}
                       style={[
                         styles.optionButton, 
                         goalType === type && [
                           styles.selectedOption, 
-                          type === 'custom' 
-                            ? { backgroundColor: customGoalTypeColor }
-                            : { backgroundColor: getTabColor() }
+                          { backgroundColor: getTabColor() }
                         ]
                       ]}
-                      onPress={() => {
-                        if (type === 'custom') {
-                          openCustomTagModal('goalType');
-                        } else {
-                          setGoalType(type);
-                        }
-                      }}
+                      onPress={() => setGoalType(type)}
                     >
                       <Text style={[styles.optionText, goalType === type && styles.selectedText]}>
-                        {type === 'custom' ? (customGoalTypeText || 'Custom') : type}
+                        {type}
                       </Text>
                     </TouchableOpacity>
                   ))}
+                  <TouchableOpacity
+                    key="custom-goal-new"
+                    style={[
+                      styles.optionButton,
+                      styles.addCustomButton
+                    ]}
+                    onPress={() => openCustomTagModal('goalType')}
+                  >
+                    <Plus size={14} color="#4A5568" />
+                    <Text style={styles.optionText}>Custom</Text>
+                  </TouchableOpacity>
                 </View>
+                
+                {/* Display saved custom goal type tags */}
+                {savedGoalTypeTags.length > 0 && (
+                  <View style={styles.savedTagsContainer}>
+                    <Text style={styles.savedTagsTitle}>Saved Tags:</Text>
+                    <View style={styles.buttonRow}>
+                      {savedGoalTypeTags.map((tag, index) => (
+                        <TouchableOpacity
+                          key={`saved-goalType-${index}`}
+                          style={[
+                            styles.optionButton,
+                            goalType === 'custom' && customGoalTypeText === tag.text && [
+                              styles.selectedOption,
+                              { backgroundColor: tag.color }
+                            ]
+                          ]}
+                          onPress={() => selectSavedCustomTag(tag, 'goalType')}
+                        >
+                          <Text style={[
+                            styles.optionText,
+                            goalType === 'custom' && customGoalTypeText === tag.text && styles.selectedText
+                          ]}>
+                            {tag.text}
+                          </Text>
+                        </TouchableOpacity>
+                      ))}
+                    </View>
+                  </View>
+                )}
               </View>
 
               <View style={styles.section}>
@@ -836,7 +945,7 @@ export default function AddTaskForm({
         </ScrollView>
       </NeumorphicCard>
 
-      {/* Custom Tag Modal */}
+      {/* Custom Tag Modal - Modified for single row of colors */}
       <Modal
         transparent
         visible={showCustomTagModal}
@@ -867,7 +976,7 @@ export default function AddTaskForm({
             />
 
             <Text style={styles.modalLabel}>Tag Color</Text>
-            <View style={styles.colorOptionsContainer}>
+            <View style={styles.colorOptionsRow}>
               {colorOptions.map(color => (
                 <TouchableOpacity
                   key={color}
@@ -1183,18 +1292,17 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
-  colorOptionsContainer: {
+  // Updated to show colors in a single row
+  colorOptionsRow: {
     flexDirection: 'row',
-    flexWrap: 'wrap',
     justifyContent: 'space-between',
     marginBottom: 20,
   },
   colorOption: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginBottom: 8,
-    marginHorizontal: 4,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
+    marginHorizontal: 2,
     borderWidth: 1,
     borderColor: '#E2E8F0',
   },
@@ -1228,5 +1336,21 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontFamily: 'Quicksand-SemiBold',
     fontSize: 16,
+  },
+  // New styles for saved tags
+  savedTagsContainer: {
+    marginTop: 8,
+  },
+  savedTagsTitle: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Medium',
+    color: '#718096',
+    marginBottom: 4,
+  },
+  addCustomButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 4,
   },
 });
