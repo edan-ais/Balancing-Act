@@ -15,6 +15,7 @@ export interface Task {
   delegatedTo?: string;
   subtasks?: { id: string; title: string; completed: boolean }[];
   category: string;
+  goalType?: string; // Add goalType for goals category
 }
 
 interface TaskItemProps {
@@ -55,6 +56,16 @@ export default function TaskItem({
       case 'low': return '#68D391';
       case 'quick-win': return '#F6AD55';
       default: return '#A0AEC0';
+    }
+  };
+
+  // Function to get goal type tag color
+  const getGoalTypeColor = (goalType?: string) => {
+    switch (goalType) {
+      case 'TBD': return '#9F7AEA'; // Purple
+      case 'Not Priority': return '#FC8181'; // Red
+      case 'Wish': return '#4299E1'; // Blue
+      default: return '#A0AEC0'; // Default gray
     }
   };
 
@@ -141,6 +152,36 @@ export default function TaskItem({
     ? (task.habitCount / task.habitGoal) * 100
     : 0;
 
+  // Render tag based on task category
+  const renderTag = () => {
+    if (task.category === 'goals' && task.goalType) {
+      // Render goal type tag for goals category
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getGoalTypeColor(task.goalType) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.goalType.toUpperCase()}
+          </Text>
+        </View>
+      );
+    } else if (task.priority) {
+      // Render priority tag for other categories
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getPriorityColor(task.priority) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.priority === 'quick-win' ? 'QUICK WIN' : task.priority.toUpperCase()}
+          </Text>
+        </View>
+      );
+    }
+    return null;
+  };
+
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <NeumorphicCard style={[
@@ -191,16 +232,7 @@ export default function TaskItem({
             </Text>
             
             <View style={styles.taskMeta}>
-              {task.priority && (
-                <View style={[
-                  styles.priorityTag,
-                  { backgroundColor: getPriorityColor(task.priority) }
-                ]}>
-                  <Text style={styles.priorityText}>
-                    {task.priority === 'quick-win' ? 'QUICK WIN' : task.priority.toUpperCase()}
-                  </Text>
-                </View>
-              )}
+              {renderTag()}
             </View>
 
             {task.isHabit && task.habitGoal && (
