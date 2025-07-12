@@ -74,6 +74,7 @@ export default function DailyTasks() {
                     task={task}
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
+                    onEdit={handleEditTask}
                     onHabitIncrement={taskManager.incrementHabit}
                     onSubtaskToggle={taskManager.toggleSubtask}
                     onMoveUp={taskManager.moveTaskUp}
@@ -94,6 +95,7 @@ export default function DailyTasks() {
                     task={task}
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
+                    onEdit={handleEditTask}
                     onHabitIncrement={taskManager.incrementHabit}
                     onSubtaskToggle={taskManager.toggleSubtask}
                     onMoveUp={taskManager.moveTaskUp}
@@ -123,13 +125,23 @@ export default function DailyTasks() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="daily"
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
-  // Keep your existing styles
   container: {
     flex: 1,
   },
