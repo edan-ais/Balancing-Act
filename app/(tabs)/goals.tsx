@@ -134,6 +134,15 @@ export default function LongTermGoals() {
         accentColor={colors.accent}
         darkColor={colors.dark}
       />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+      />
     </SafeAreaView>
   );
 }
