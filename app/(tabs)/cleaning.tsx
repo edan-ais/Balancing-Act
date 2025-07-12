@@ -25,25 +25,29 @@ export default function RepetitiveCleaning() {
   const cleaningSchedule = [
     { 
       title: 'Daily', 
-      frequency: 'Every day', 
+      frequency: 'daily',
+      frequencyDisplay: 'Every day', 
       tasks: cleaningTasks.filter(t => t.frequency === 'daily'),
       icon: Sun
     },
     { 
       title: 'Weekly', 
-      frequency: 'Every week', 
+      frequency: 'weekly',
+      frequencyDisplay: 'Every week', 
       tasks: cleaningTasks.filter(t => t.frequency === 'weekly'),
       icon: RefreshCw
     },
     { 
       title: 'Monthly', 
-      frequency: 'Every month', 
+      frequency: 'monthly',
+      frequencyDisplay: 'Every month', 
       tasks: cleaningTasks.filter(t => t.frequency === 'monthly'),
       icon: Moon
     },
     { 
       title: 'Seasonal', 
-      frequency: 'Every season', 
+      frequency: 'seasonal',
+      frequencyDisplay: 'Every season', 
       tasks: cleaningTasks.filter(t => t.frequency === 'seasonal'),
       icon: CloudSnow
     },
@@ -99,7 +103,7 @@ export default function RepetitiveCleaning() {
                 <schedule.icon size={20} color={blueColor} />
                 <View>
                   <Text style={[styles.scheduleTitle, { color: colors.dark }]}>{schedule.title}</Text>
-                  <Text style={styles.scheduleFrequency}>{schedule.frequency}</Text>
+                  <Text style={styles.scheduleFrequency}>{schedule.frequencyDisplay}</Text>
                 </View>
               </View>
               <Text style={[styles.scheduleCount, { backgroundColor: colors.accent, color: colors.dark }]}>
@@ -116,21 +120,31 @@ export default function RepetitiveCleaning() {
             ) : (
               getTasksGroupedByLocation(schedule.tasks).map((locationGroup, locationIndex) => (
                 <View key={locationIndex} style={styles.locationGroup}>
-                  {locationGroup.tasks.map((task, taskIndex) => (
-                    <TaskItem
-                      key={task.id}
-                      task={task}
-                      onToggle={taskManager.toggleTask}
-                      onDelete={taskManager.deleteTask}
-                      onHabitIncrement={taskManager.incrementHabit}
-                      onSubtaskToggle={taskManager.toggleSubtask}
-                      onMoveUp={taskManager.moveTaskUp}
-                      onMoveDown={taskManager.moveTaskDown}
-                      isFirst={taskIndex === 0}
-                      isLast={taskIndex === locationGroup.tasks.length - 1}
-                      accentColor={colors.dark}
-                    />
-                  ))}
+                  {locationGroup.tasks.map((task, taskIndex) => {
+                    // Get all tasks with the same frequency
+                    const sameFrequencyTasks = cleaningTasks.filter(t => 
+                      t.frequency === schedule.frequency
+                    );
+                    
+                    // Find position of this task in the frequency group
+                    const taskPosition = sameFrequencyTasks.findIndex(t => t.id === task.id);
+                    
+                    return (
+                      <TaskItem
+                        key={task.id}
+                        task={task}
+                        onToggle={taskManager.toggleTask}
+                        onDelete={taskManager.deleteTask}
+                        onHabitIncrement={taskManager.incrementHabit}
+                        onSubtaskToggle={taskManager.toggleSubtask}
+                        onMoveUp={taskManager.moveTaskUp}
+                        onMoveDown={taskManager.moveTaskDown}
+                        isFirst={taskPosition === 0}
+                        isLast={taskPosition === sameFrequencyTasks.length - 1}
+                        accentColor={colors.dark}
+                      />
+                    );
+                  })}
                 </View>
               ))
             )}
