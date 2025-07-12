@@ -119,10 +119,27 @@ export function useTaskManager(): TaskManager {
       const isCompleted = task.completed;
       const category = task.category;
       
-      // Find tasks in the same section (completed/uncompleted) and category
-      const sectionTasks = prevTasks.filter(t => 
+      // Define grouping criteria based on task category
+      let sectionTasks = prevTasks.filter(t => 
         t.category === category && t.completed === isCompleted
       );
+      
+      // Apply additional filtering based on category-specific tags
+      if (category === 'meal-prep' && task.mealType) {
+        sectionTasks = sectionTasks.filter(t => t.mealType === task.mealType);
+      } 
+      else if (category === 'cleaning' && task.cleaningLocation) {
+        sectionTasks = sectionTasks.filter(t => t.cleaningLocation === task.cleaningLocation);
+      }
+      else if (category === 'self-care' && task.selfCareType) {
+        sectionTasks = sectionTasks.filter(t => t.selfCareType === task.selfCareType);
+      }
+      else if (category === 'delegation' && task.delegateType) {
+        sectionTasks = sectionTasks.filter(t => t.delegateType === task.delegateType);
+      }
+      else if (category === 'goals' && task.goalType) {
+        sectionTasks = sectionTasks.filter(t => t.goalType === task.goalType);
+      }
       
       const sectionIndex = sectionTasks.findIndex(t => t.id === id);
       if (sectionIndex <= 0) return prevTasks; // Already at the top of its section
@@ -148,10 +165,27 @@ export function useTaskManager(): TaskManager {
       const isCompleted = task.completed;
       const category = task.category;
       
-      // Find tasks in the same section (completed/uncompleted) and category
-      const sectionTasks = prevTasks.filter(t => 
+      // Define grouping criteria based on task category
+      let sectionTasks = prevTasks.filter(t => 
         t.category === category && t.completed === isCompleted
       );
+      
+      // Apply additional filtering based on category-specific tags
+      if (category === 'meal-prep' && task.mealType) {
+        sectionTasks = sectionTasks.filter(t => t.mealType === task.mealType);
+      } 
+      else if (category === 'cleaning' && task.cleaningLocation) {
+        sectionTasks = sectionTasks.filter(t => t.cleaningLocation === task.cleaningLocation);
+      }
+      else if (category === 'self-care' && task.selfCareType) {
+        sectionTasks = sectionTasks.filter(t => t.selfCareType === task.selfCareType);
+      }
+      else if (category === 'delegation' && task.delegateType) {
+        sectionTasks = sectionTasks.filter(t => t.delegateType === task.delegateType);
+      }
+      else if (category === 'goals' && task.goalType) {
+        sectionTasks = sectionTasks.filter(t => t.goalType === task.goalType);
+      }
       
       const sectionIndex = sectionTasks.findIndex(t => t.id === id);
       if (sectionIndex === sectionTasks.length - 1) return prevTasks; // Already at the bottom of its section
