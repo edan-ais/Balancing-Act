@@ -89,7 +89,7 @@ return (
     justifyContent: 'center',
     marginTop: offsetY, // Move down when focused
   }}>
-    <Icon size={size} color={tabColors[colorKey].dark} />
+    <Icon size={size} color={tabColors[colorKey].pastel} />
   </View>
 );
 };
@@ -120,7 +120,7 @@ const colorKey = routeToColorMap[routeName] || activeColorKey;
 return {
       headerShown: false,
       tabBarStyle: {
-        backgroundColor: tabColors[activeColorKey].medium,
+        backgroundColor: tabColors[activeColorKey].dark,
         borderTopWidth: 0,
         elevation: 8,
         height: 120, // Taller footer
@@ -160,11 +160,11 @@ return {
       tabBarLabelStyle: {
         // Position label below icon
         marginTop: 4,
-        color: tabColors[colorKey].medium, // Explicitly set label color here
+        color: tabColors[colorKey].pastel, // Use pastel color for label text
       },
       tabBarLabelPosition: 'below-icon',
-      tabBarActiveTintColor: tabColors[colorKey].dark,
-      tabBarInactiveTintColor: tabColors[colorKey].medium,
+      tabBarActiveTintColor: tabColors[colorKey].pastel,
+      tabBarInactiveTintColor: tabColors[colorKey].pastel,
       // Explicitly handle the label component to override default behavior
       tabBarLabel: ({ focused, color }) => {
         if (focused) return null;
@@ -175,7 +175,7 @@ return {
         return (
           <Text 
             style={{
-              color: tabColors[colorKey].medium, // Use medium color for text
+              color: tabColors[colorKey].pastel, // Use pastel color for text
               fontFamily: 'Quicksand-SemiBold',
               fontSize: 10,
               marginTop: 4,
@@ -208,7 +208,6 @@ return {
           tabBarIcon: ({ size, focused }) => {
             return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
           },
-          // No longer using the TabLabel component directly as it might not be getting called
         }}
         listeners={{
           focus: () => setFocusedTab(config.name),
