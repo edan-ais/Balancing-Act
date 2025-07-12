@@ -5,6 +5,7 @@ import { useRouter } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette } from 'lucide-react-native';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import { useTabContext } from '@/contexts/TabContext';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const tabOptions = [
   {
@@ -95,6 +96,7 @@ const tabOptions = [
 
 export default function HomeScreen() {
   const { selectedTabs, setSelectedTabs } = useTabContext();
+  const { currentTheme, setTheme, availableThemes } = useTheme();
   const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
   const router = useRouter();
 
@@ -129,15 +131,43 @@ export default function HomeScreen() {
         {/* Theme Selector */}
         <View style={styles.themeSelector}>
           <Text style={styles.themeSelectorTitle}>App Theme</Text>
-          <NeumorphicCard style={styles.themeOption}>
-            <View style={styles.themeIconContainer}>
-              <Palette size={20} color="#4055C5" />
-            </View>
-            <Text style={styles.themeTitle}>Balance Theme</Text>
-            <View style={styles.themeSelectedIndicator}>
-              <Text style={styles.themeSelectedText}>✓</Text>
-            </View>
-          </NeumorphicCard>
+          {availableThemes.map((theme) => (
+            <TouchableOpacity
+              key={theme.id}
+              onPress={() => setTheme(theme.id)}
+              style={styles.themeOptionContainer}
+            >
+              <NeumorphicCard style={[
+                styles.themeOption,
+                {
+                  backgroundColor: currentTheme.id === theme.id ? theme.tabColors.daily.accent : '#F5F7FA',
+                  borderColor: currentTheme.id === theme.id ? theme.tabColors.daily.dark : 'transparent',
+                  borderWidth: currentTheme.id === theme.id ? 2 : 0,
+                }
+              ]}>
+                <View style={[
+                  styles.themeIconContainer,
+                  { backgroundColor: currentTheme.id === theme.id ? theme.tabColors.daily.dark : '#E2E8F0' }
+                ]}>
+                  <Palette size={20} color={currentTheme.id === theme.id ? '#FFFFFF' : '#4A5568'} />
+                </View>
+                <Text style={[
+                  styles.themeTitle,
+                  { color: currentTheme.id === theme.id ? theme.tabColors.daily.dark : '#4055C5' }
+                ]}>
+                  {theme.name}
+                </Text>
+                {currentTheme.id === theme.id && (
+                  <View style={[
+                    styles.themeSelectedIndicator,
+                    { backgroundColor: theme.tabColors.daily.dark }
+                  ]}>
+                    <Text style={styles.themeSelectedText}>✓</Text>
+                  </View>
+                )}
+              </NeumorphicCard>
+            </TouchableOpacity>
+          ))}
         </View>
         
         <Text style={styles.sectionTitle}>Life Areas</Text>
@@ -248,6 +278,9 @@ const styles = StyleSheet.create({
   themeSelector: {
     marginVertical: 16,
     paddingHorizontal: 8,
+  },
+  themeOptionContainer: {
+    marginBottom: 8,
   },
   themeSelectorTitle: {
     fontSize: 18,

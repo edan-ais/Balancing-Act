@@ -8,7 +8,7 @@ import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
-import { tabColors } from './_layout';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function MealPrep() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -16,7 +16,8 @@ export default function MealPrep() {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const taskManager = useTaskManager();
   const router = useRouter();
-  const colors = tabColors.meals;
+  const { currentTheme } = useTheme();
+  const colors = currentTheme.tabColors.meals;
   const orangeColor = '#ED8936'; // Orange color for all icons
 
   const mealTasks = taskManager.tasks.filter(task => task.category === 'meal-prep');

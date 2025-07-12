@@ -8,7 +8,7 @@ import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
-import { tabColors } from './_layout';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function Delegation() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -16,7 +16,8 @@ export default function Delegation() {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const taskManager = useTaskManager();
   const router = useRouter();
-  const colors = tabColors.delegate;
+  const { currentTheme } = useTheme();
+  const colors = currentTheme.tabColors.delegate;
   const tealColor = '#38B2AC'; // Teal color for all icons
 
   const delegationTasks = taskManager.tasks.filter(task => task.category === 'delegation');

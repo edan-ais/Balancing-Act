@@ -8,7 +8,7 @@ import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
-import { tabColors } from './_layout'; // Import from tab layout
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function RepetitiveCleaning() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -16,7 +16,8 @@ export default function RepetitiveCleaning() {
   const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const taskManager = useTaskManager();
   const router = useRouter();
-  const colors = tabColors.cleaning;
+  const { currentTheme } = useTheme();
+  const colors = currentTheme.tabColors.cleaning;
   const blueColor = '#4299E1'; // Blue color for all icons
 
   const cleaningTasks = taskManager.tasks.filter(task => task.category === 'cleaning');

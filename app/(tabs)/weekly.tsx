@@ -8,7 +8,7 @@ import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
-import { tabColors } from './_layout';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export default function MonthlyCalendar() {
   const [showAddForm, setShowAddForm] = useState(false);
@@ -16,7 +16,8 @@ export default function MonthlyCalendar() {
   const [currentMonth, setCurrentMonth] = useState(new Date());
   const taskManager = useTaskManager();
   const router = useRouter();
-  const colors = tabColors.calendar;
+  const { currentTheme } = useTheme();
+  const colors = currentTheme.tabColors.calendar;
 
   const weeklyTasks = taskManager.tasks.filter(task => task.category === 'weekly');
 
