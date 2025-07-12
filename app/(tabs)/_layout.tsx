@@ -69,18 +69,18 @@ export default function TabLayout() {
   const { selectedTabs } = useTabContext();
   const { currentTheme } = useTheme();
   const tabColors = currentTheme.tabColors;
-  
+
   // Custom tab icon component to ensure proper re-rendering
   const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
     const colorKey = routeToColorMap[name];
-    
+
     // Calculate offset to keep icon visually centered when scaled
     const offsetY = focused ? 8 : 0; // Adjust this value as needed
-    
+
     return (
       <View style={{ 
         transform: [{ scale: focused ? 1.8 : 1 }],
-        shadowColor: focused ? tabColors[colorKey].dark : 'transparent',
+        shadowColor: focused ? tabColors[colorKey].shadow : 'transparent', // Using shadow color
         shadowOffset: { width: 0, height: 0 },
         shadowOpacity: focused ? 0.8 : 0,
         shadowRadius: focused ? 10 : 0,
@@ -89,24 +89,24 @@ export default function TabLayout() {
         justifyContent: 'center',
         marginTop: offsetY, // Move down when focused
       }}>
-        <Icon size={size} color={tabColors[colorKey].dark} />
+        <Icon size={size} color={tabColors[colorKey].dark} /> {/* Using dark for icons */}
       </View>
     );
   };
-  
+
   // Custom tab label component with proper styling
   const TabLabel = ({ name, focused }) => {
     const colorKey = routeToColorMap[name];
-    
+
     if (focused) return null;
-    
+
     const config = tabConfig[name];
     if (!config) return null;
-    
+
     return (
       <Text 
         style={{
-          color: tabColors[colorKey].dark,
+          color: tabColors[colorKey].medium, // Using medium for text
           fontFamily: 'Quicksand-SemiBold',
           fontSize: 10,
           marginTop: 4,
@@ -119,23 +119,23 @@ export default function TabLayout() {
       </Text>
     );
   };
-  
+
   // Get the currently focused tab for background color
   const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
   const activeColorKey = routeToColorMap[focusedTab];
-  
+
   // Filter out any selectedTabs that don't have valid configurations
   const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
-  
+
   // Create a Set for quick lookups
   const selectedTabsSet = new Set(validSelectedTabs);
-  
+
   // Function to check if a tab is selected
   const isTabSelected = (tabId) => selectedTabsSet.has(tabId);
-  
+
   // Calculate the flex value based on the number of visible tabs
   const visibleTabCount = validSelectedTabs.length;
-  
+
   return (
     <Tabs
       screenOptions={({ route }) => {
@@ -145,7 +145,7 @@ export default function TabLayout() {
         return {
           headerShown: false,
           tabBarStyle: {
-            backgroundColor: tabColors[activeColorKey].accent,
+            backgroundColor: tabColors[activeColorKey].medium, // Using medium for tab bar background
             borderTopWidth: 0,
             elevation: 8,
             height: 120, // Taller footer
@@ -155,7 +155,7 @@ export default function TabLayout() {
             paddingTop: 30, // This centers the icons vertically
             paddingBottom: 60, // This centers the icons vertically
             // Add shadow with color matching active tab
-            shadowColor: tabColors[activeColorKey].dark,
+            shadowColor: tabColors[activeColorKey].shadow, // Using shadow color
             shadowOffset: { width: 0, height: -3 },
             shadowOpacity: 0.3,
             shadowRadius: 6,
@@ -176,6 +176,7 @@ export default function TabLayout() {
             // Make each visible tab take equal space
             flex: isSelected ? 1 : 0,
             width: isSelected ? `${100 / visibleTabCount}%` : 0,
+            backgroundColor: tabColors[activeColorKey].bgAlt, // Using bgAlt for tab items
           },
           tabBarIconStyle: {
             // Ensure icon is centered
@@ -204,8 +205,8 @@ export default function TabLayout() {
             name={config.name}
             options={{
               title: config.title,
-              tabBarActiveTintColor: tabColors[colorKey].dark,
-              tabBarInactiveTintColor: tabColors[colorKey].dark,
+              tabBarActiveTintColor: tabColors[colorKey].dark, // Using dark for active icons/text
+              tabBarInactiveTintColor: tabColors[colorKey].medium, // Using medium for inactive icons/text
               tabBarIcon: ({ size, focused }) => {
                 return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
               },
