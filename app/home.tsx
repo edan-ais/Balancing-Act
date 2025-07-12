@@ -100,6 +100,9 @@ export default function HomeScreen() {
   const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
   const router = useRouter();
 
+  // Get the primary colors from the current theme
+  const primaryColors = currentTheme.tabColors.daily;
+
   const toggleTab = (tabId: string) => {
     if (localSelectedTabs.includes(tabId)) {
       // Don't allow removing all tabs
@@ -121,60 +124,69 @@ export default function HomeScreen() {
   };
 
   return (
-    <SafeAreaView style={styles.container}>
+    <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
-        <Text style={styles.title}>Balancing Act</Text>
-        <Text style={styles.subtitle}>Choose which areas of life you want to focus on</Text>
+        <Text style={[styles.title, { color: primaryColors.dark }]}>Balancing Act</Text>
+        <Text style={[styles.subtitle, { color: primaryColors.medium }]}>
+          Choose which areas of life you want to focus on
+        </Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Theme Selector */}
         <View style={styles.themeSelector}>
-          <Text style={styles.themeSelectorTitle}>App Theme</Text>
-          {availableThemes.map((theme) => (
-            <TouchableOpacity
-              key={theme.id}
-              onPress={() => setTheme(theme.id)}
-              style={styles.themeOptionContainer}
-            >
-              <NeumorphicCard style={[
-                styles.themeOption,
-                {
-                  backgroundColor: currentTheme.id === theme.id ? theme.tabColors.daily.accent : '#F5F7FA',
-                  borderColor: currentTheme.id === theme.id ? theme.tabColors.daily.dark : 'transparent',
-                  borderWidth: currentTheme.id === theme.id ? 2 : 0,
-                }
-              ]}>
-                <View style={[
-                  styles.themeIconContainer,
-                  { backgroundColor: currentTheme.id === theme.id ? theme.tabColors.daily.dark : '#E2E8F0' }
+          <Text style={[styles.themeSelectorTitle, { color: primaryColors.dark }]}>App Theme</Text>
+          {availableThemes.map((theme) => {
+            const themeColors = theme.tabColors.daily;
+            const isSelected = currentTheme.id === theme.id;
+            
+            return (
+              <TouchableOpacity
+                key={theme.id}
+                onPress={() => setTheme(theme.id)}
+                style={styles.themeOptionContainer}
+              >
+                <NeumorphicCard style={[
+                  styles.themeOption,
+                  {
+                    backgroundColor: isSelected ? themeColors.accent : primaryColors.bg,
+                    borderColor: isSelected ? themeColors.dark : 'transparent',
+                    borderWidth: isSelected ? 2 : 0,
+                    shadowColor: primaryColors.shadow
+                  }
                 ]}>
-                  <Palette size={20} color={currentTheme.id === theme.id ? '#FFFFFF' : '#4A5568'} />
-                </View>
-                <Text style={[
-                  styles.themeTitle,
-                  { color: currentTheme.id === theme.id ? theme.tabColors.daily.dark : '#4055C5' }
-                ]}>
-                  {theme.name}
-                </Text>
-                {currentTheme.id === theme.id && (
                   <View style={[
-                    styles.themeSelectedIndicator,
-                    { backgroundColor: theme.tabColors.daily.dark }
+                    styles.themeIconContainer,
+                    { backgroundColor: isSelected ? themeColors.dark : primaryColors.pastel }
                   ]}>
-                    <Text style={styles.themeSelectedText}>✓</Text>
+                    <Palette size={20} color={isSelected ? '#FFFFFF' : primaryColors.medium} />
                   </View>
-                )}
-              </NeumorphicCard>
-            </TouchableOpacity>
-          ))}
+                  <Text style={[
+                    styles.themeTitle,
+                    { color: isSelected ? themeColors.dark : primaryColors.dark }
+                  ]}>
+                    {theme.name}
+                  </Text>
+                  {isSelected && (
+                    <View style={[
+                      styles.themeSelectedIndicator,
+                      { backgroundColor: themeColors.dark }
+                    ]}>
+                      <Text style={styles.themeSelectedText}>✓</Text>
+                    </View>
+                  )}
+                </NeumorphicCard>
+              </TouchableOpacity>
+            );
+          })}
         </View>
         
-        <Text style={styles.sectionTitle}>Life Areas</Text>
+        <Text style={[styles.sectionTitle, { color: primaryColors.dark }]}>Life Areas</Text>
         <View style={styles.grid}>
           {tabOptions.map((tab) => {
             const isSelected = localSelectedTabs.includes(tab.id);
             const IconComponent = tab.icon;
+            const tabColors = currentTheme.tabColors[tab.id === 'index' ? 'daily' : tab.id] || tab.colors;
             
             return (
               <TouchableOpacity
@@ -185,31 +197,32 @@ export default function HomeScreen() {
                 <NeumorphicCard style={[
                   styles.tabOption,
                   {
-                    backgroundColor: isSelected ? tab.colors.accent : '#F5F7FA',
-                    borderColor: isSelected ? tab.colors.dark : 'transparent',
+                    backgroundColor: isSelected ? tabColors.accent : primaryColors.bg,
+                    borderColor: isSelected ? tabColors.dark : 'transparent',
                     borderWidth: isSelected ? 2 : 0,
+                    shadowColor: primaryColors.shadow
                   }
                 ]}>
                   <View style={[
                     styles.iconContainer,
-                    { backgroundColor: isSelected ? tab.colors.dark : '#E2E8F0' }
+                    { backgroundColor: isSelected ? tabColors.dark : primaryColors.pastel }
                   ]}>
                     <IconComponent 
                       size={24} 
-                      color={isSelected ? '#FFFFFF' : '#4A5568'} 
+                      color={isSelected ? '#FFFFFF' : primaryColors.medium} 
                     />
                   </View>
                   
                   <Text style={[
                     styles.tabTitle,
-                    { color: isSelected ? tab.colors.dark : '#2D3748' }
+                    { color: isSelected ? tabColors.dark : primaryColors.dark }
                   ]}>
                     {tab.title}
                   </Text>
                   
                   <Text style={[
                     styles.tabSubtitle,
-                    { color: isSelected ? tab.colors.dark : '#4A5568' }
+                    { color: isSelected ? tabColors.dark : primaryColors.medium }
                   ]}>
                     {tab.subtitle}
                   </Text>
@@ -217,7 +230,7 @@ export default function HomeScreen() {
                   {isSelected && (
                     <View style={[
                       styles.selectedIndicator,
-                      { backgroundColor: tab.colors.dark }
+                      { backgroundColor: tabColors.dark }
                     ]}>
                       <Text style={styles.selectedText}>✓</Text>
                     </View>
@@ -233,15 +246,23 @@ export default function HomeScreen() {
         style={[
           styles.continueButton,
           { 
-            backgroundColor: localSelectedTabs.length > 0 ? '#4055C5' : '#CBD5E0',
-            shadowColor: localSelectedTabs.length > 0 ? '#4055C5' : '#CBD5E0'
+            backgroundColor: localSelectedTabs.length > 0 ? primaryColors.dark : primaryColors.pastel,
+            shadowColor: primaryColors.shadow
           }
         ]}
         onPress={handleContinue}
         disabled={localSelectedTabs.length === 0}
       >
-        <Text style={styles.continueText}>Continue</Text>
-        <ArrowRight size={20} color="#FFFFFF" />
+        <Text style={[
+          styles.continueText, 
+          { color: localSelectedTabs.length > 0 ? '#FFFFFF' : primaryColors.medium }
+        ]}>
+          Continue
+        </Text>
+        <ArrowRight 
+          size={20} 
+          color={localSelectedTabs.length > 0 ? '#FFFFFF' : primaryColors.medium} 
+        />
       </TouchableOpacity>
     </SafeAreaView>
   );
@@ -250,7 +271,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#F5F7FA',
   },
   header: {
     paddingHorizontal: 20,
@@ -261,13 +281,11 @@ const styles = StyleSheet.create({
   title: {
     fontSize: 32,
     fontFamily: 'Quicksand-Bold',
-    color: '#2D3748',
     marginBottom: 8,
   },
   subtitle: {
     fontSize: 16,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     textAlign: 'center',
     lineHeight: 22,
   },
@@ -285,7 +303,6 @@ const styles = StyleSheet.create({
   themeSelectorTitle: {
     fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
     marginBottom: 12,
     paddingLeft: 8,
   },
@@ -293,14 +310,12 @@ const styles = StyleSheet.create({
     padding: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#F2F5FF',
     position: 'relative',
   },
   themeIconContainer: {
     width: 40,
     height: 40,
     borderRadius: 20,
-    backgroundColor: '#D9E0FC',
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
@@ -308,7 +323,6 @@ const styles = StyleSheet.create({
   themeTitle: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#4055C5',
   },
   themeSelectedIndicator: {
     position: 'absolute',
@@ -318,7 +332,6 @@ const styles = StyleSheet.create({
     width: 24,
     height: 24,
     borderRadius: 12,
-    backgroundColor: '#4055C5',
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -330,7 +343,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
-    color: '#2D3748',
     marginTop: 8,
     marginBottom: 12,
     paddingLeft: 16,
@@ -399,7 +411,6 @@ const styles = StyleSheet.create({
     elevation: 8,
   },
   continueText: {
-    color: '#FFFFFF',
     fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
     marginRight: 8,
