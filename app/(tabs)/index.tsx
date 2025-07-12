@@ -55,7 +55,7 @@ export default function DailyTasks() {
             }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.dark} />
+            <Home size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
