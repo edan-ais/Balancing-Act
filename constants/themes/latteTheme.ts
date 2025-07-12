@@ -2,6 +2,16 @@
 export const latteTheme = {
   name: 'Latte Theme',
   id: 'latte',
+  backgroundImage: '/images/latte-background.jpg', // Main theme background image
+  tabBackgrounds: {
+    daily: '/images/latte-daily-background.jpg',
+    future: '/images/latte-future-background.jpg',
+    calendar: '/images/latte-calendar-background.jpg',
+    meals: '/images/latte-meals-background.jpg',
+    cleaning: '/images/latte-cleaning-background.jpg',
+    selfCare: '/images/latte-selfcare-background.jpg',
+    delegate: '/images/latte-delegate-background.jpg',
+  },
   tabColors: {
     // Deep Espresso - rich dark brown with reddish undertones
     daily: {
