@@ -10,12 +10,16 @@ export interface Task {
   isHabit?: boolean;
   habitCount?: number;
   habitGoal?: number;
-  priority?: 'high' | 'medium' | 'low' | 'quick-win';
+  priority?: 'high' | 'medium' | 'low' | 'quick-win' | 'custom';
+  customPriorityText?: string;
+  customPriorityColor?: string;
   isDelegated?: boolean;
   delegatedTo?: string;
   subtasks?: { id: string; title: string; completed: boolean }[];
   category: string;
-  goalType?: string; // Add goalType for goals category
+  goalType?: string;
+  customGoalTypeText?: string;
+  customGoalTypeColor?: string;
 }
 
 interface TaskItemProps {
@@ -55,6 +59,7 @@ export default function TaskItem({
       case 'medium': return '#F6AD55';
       case 'low': return '#68D391';
       case 'quick-win': return '#F6AD55';
+      case 'custom': return task.customPriorityColor || '#4A5568';
       default: return '#A0AEC0';
     }
   };
@@ -65,6 +70,7 @@ export default function TaskItem({
       case 'TBD': return '#9F7AEA'; // Purple
       case 'Not Priority': return '#FC8181'; // Red
       case 'Wish': return '#4299E1'; // Blue
+      case 'custom': return task.customGoalTypeColor || '#4A5568';
       default: return '#A0AEC0'; // Default gray
     }
   };
@@ -155,7 +161,21 @@ export default function TaskItem({
   // Render tag based on task category
   const renderTag = () => {
     if (task.category === 'goals' && task.goalType) {
-      // Render goal type tag for goals category
+      // For custom goal type
+      if (task.goalType === 'custom' && task.customGoalTypeText) {
+        return (
+          <View style={[
+            styles.priorityTag,
+            { backgroundColor: task.customGoalTypeColor || '#4A5568' }
+          ]}>
+            <Text style={styles.priorityText}>
+              {task.customGoalTypeText.toUpperCase()}
+            </Text>
+          </View>
+        );
+      }
+      
+      // For predefined goal types
       return (
         <View style={[
           styles.priorityTag,
@@ -167,7 +187,21 @@ export default function TaskItem({
         </View>
       );
     } else if (task.priority) {
-      // Render priority tag for other categories
+      // For custom priority
+      if (task.priority === 'custom' && task.customPriorityText) {
+        return (
+          <View style={[
+            styles.priorityTag,
+            { backgroundColor: task.customPriorityColor || '#4A5568' }
+          ]}>
+            <Text style={styles.priorityText}>
+              {task.customPriorityText.toUpperCase()}
+            </Text>
+          </View>
+        );
+      }
+      
+      // For predefined priorities
       return (
         <View style={[
           styles.priorityTag,
