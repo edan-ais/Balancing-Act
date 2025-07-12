@@ -39,7 +39,6 @@ interface AddTaskFormProps {
 }
 
 interface CustomTag {
-  id: string;
   text: string;
   color: string;
 }
@@ -82,8 +81,6 @@ export default function AddTaskForm({
   // Custom tag modal state
   const [showCustomTagModal, setShowCustomTagModal] = useState(false);
   const [customTagType, setCustomTagType] = useState<'priority' | 'goalType'>('priority');
-  const [isEditingTag, setIsEditingTag] = useState(false);
-  const [editingTagId, setEditingTagId] = useState<string | null>(null);
 
   // Store created custom tags for reuse
   const [savedPriorityTags, setSavedPriorityTags] = useState<CustomTag[]>([]);
@@ -109,12 +106,8 @@ export default function AddTaskForm({
         title: title.trim(),
         isHabit,
         priority,
-        customPriorityText: priority.startsWith('custom-') ? 
-          savedPriorityTags.find(tag => `custom-${tag.id}` === priority)?.text : 
-          undefined,
-        customPriorityColor: priority.startsWith('custom-') ? 
-          savedPriorityTags.find(tag => `custom-${tag.id}` === priority)?.color : 
-          undefined,
+        customPriorityText: priority === 'custom' ? customPriorityText : undefined,
+        customPriorityColor: priority === 'custom' ? customPriorityColor : undefined,
         isDelegated,
         delegatedTo: isDelegated ? delegatedTo : '',
         subtasks: subtasks.filter(s => s.trim()).map(s => ({ title: s.trim() })),
@@ -143,12 +136,8 @@ export default function AddTaskForm({
         taskData = {
           ...taskData,
           goalType,
-          customGoalTypeText: goalType.startsWith('custom-') ? 
-            savedGoalTypeTags.find(tag => `custom-${tag.id}` === goalType)?.text : 
-            undefined,
-          customGoalTypeColor: goalType.startsWith('custom-') ? 
-            savedGoalTypeTags.find(tag => `custom-${tag.id}` === goalType)?.color : 
-            undefined,
+          customGoalTypeText: goalType === 'custom' ? customGoalTypeText : undefined,
+          customGoalTypeColor: goalType === 'custom' ? customGoalTypeColor : undefined,
         };
       }
 
@@ -255,127 +244,47 @@ export default function AddTaskForm({
     }
   };
 
-  const openCustomTagModal = (type: 'priority' | 'goalType', isEditing = false, tagId = null) => {
+  const openCustomTagModal = (type: 'priority' | 'goalType') => {
     setCustomTagType(type);
-    setIsEditingTag(isEditing);
-    setEditingTagId(tagId);
-    
-    if (isEditing && tagId) {
-      // Pre-fill form with existing tag data
-      const tags = type === 'priority' ? savedPriorityTags : savedGoalTypeTags;
-      const tag = tags.find(t => t.id === tagId);
-      
-      if (tag) {
-        if (type === 'priority') {
-          setCustomPriorityText(tag.text);
-          setCustomPriorityColor(tag.color);
-        } else {
-          setCustomGoalTypeText(tag.text);
-          setCustomGoalTypeColor(tag.color);
-        }
-      }
-    } else {
-      // Reset for new tag
-      if (type === 'priority') {
-        setCustomPriorityText('');
-        setCustomPriorityColor('#4A5568');
-      } else {
-        setCustomGoalTypeText('');
-        setCustomGoalTypeColor('#4A5568');
-      }
-    }
-    
     setShowCustomTagModal(true);
   };
 
   const saveCustomTag = () => {
     if (customTagType === 'priority') {
       if (customPriorityText.trim()) {
-        // Generate a unique ID for this tag
-        const tagId = isEditingTag && editingTagId ? 
-          editingTagId : 
-          Date.now().toString();
-        
         // Create a new custom priority tag
         const newTag: CustomTag = {
-          id: tagId,
           text: customPriorityText,
           color: customPriorityColor
         };
         
-        if (isEditingTag && editingTagId) {
-          // Update existing tag
-          setSavedPriorityTags(savedPriorityTags.map(tag => 
-            tag.id === editingTagId ? newTag : tag
-          ));
-        } else {
-          // Add new tag
+        // Only add if not already in the list
+        if (!savedPriorityTags.some(tag => tag.text === newTag.text)) {
           setSavedPriorityTags([...savedPriorityTags, newTag]);
         }
         
-        // Select this tag
-        setPriority(`custom-${tagId}`);
+        setPriority('custom');
       }
     } else {
       if (customGoalTypeText.trim()) {
-        // Generate a unique ID for this tag
-        const tagId = isEditingTag && editingTagId ? 
-          editingTagId : 
-          Date.now().toString();
-        
         // Create a new custom goal type tag
         const newTag: CustomTag = {
-          id: tagId,
           text: customGoalTypeText,
           color: customGoalTypeColor
         };
         
-        if (isEditingTag && editingTagId) {
-          // Update existing tag
-          setSavedGoalTypeTags(savedGoalTypeTags.map(tag => 
-            tag.id === editingTagId ? newTag : tag
-          ));
-        } else {
-          // Add new tag
+        // Only add if not already in the list
+        if (!savedGoalTypeTags.some(tag => tag.text === newTag.text)) {
           setSavedGoalTypeTags([...savedGoalTypeTags, newTag]);
         }
         
-        // Select this tag
-        setGoalType(`custom-${tagId}`);
+        setGoalType('custom');
       }
     }
-    
     setShowCustomTagModal(false);
-    setIsEditingTag(false);
-    setEditingTagId(null);
   };
   
   if (!visible) return null;
-
-  // Determine which priority tags to display
-  const priorityTags = [
-    { id: 'low', text: 'Low', color: getTabColor() },
-    { id: 'medium', text: 'Medium', color: getTabColor() },
-    { id: 'high', text: 'High', color: getTabColor() },
-    { id: 'quick-win', text: 'Quick Win', color: getTabColor() },
-    ...savedPriorityTags.map(tag => ({ 
-      id: `custom-${tag.id}`, 
-      text: tag.text, 
-      color: tag.color 
-    }))
-  ];
-
-  // Determine which goal type tags to display
-  const goalTypeTags = [
-    { id: 'TBD', text: 'TBD', color: getTabColor() },
-    { id: 'Not Priority', text: 'Not Priority', color: getTabColor() },
-    { id: 'Wish', text: 'Wish', color: getTabColor() },
-    ...savedGoalTypeTags.map(tag => ({ 
-      id: `custom-${tag.id}`, 
-      text: tag.text, 
-      color: tag.color 
-    }))
-  ];
 
   return (
     <View style={styles.overlay}>
@@ -481,21 +390,76 @@ export default function AddTaskForm({
                   </TouchableOpacity>
                 </View>
                 <View style={styles.buttonRow}>
-                  {priorityTags.map((tag) => (
+                  <TouchableOpacity
+                    key="low"
+                    style={[
+                      styles.optionButton, 
+                      priority === 'low' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setPriority('low')}
+                  >
+                    <Text style={[styles.optionText, priority === 'low' && styles.selectedText]}>
+                      Low
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="medium"
+                    style={[
+                      styles.optionButton, 
+                      priority === 'medium' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setPriority('medium')}
+                  >
+                    <Text style={[styles.optionText, priority === 'medium' && styles.selectedText]}>
+                      Medium
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="high"
+                    style={[
+                      styles.optionButton, 
+                      priority === 'high' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setPriority('high')}
+                  >
+                    <Text style={[styles.optionText, priority === 'high' && styles.selectedText]}>
+                      High
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="quick-win"
+                    style={[
+                      styles.optionButton, 
+                      priority === 'quick-win' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setPriority('quick-win')}
+                  >
+                    <Text style={[styles.optionText, priority === 'quick-win' && styles.selectedText]}>
+                      Quick Win
+                    </Text>
+                  </TouchableOpacity>
+                  
+                  {/* Display saved custom priority tags */}
+                  {savedPriorityTags.map((tag, index) => (
                     <TouchableOpacity
-                      key={tag.id}
+                      key={`saved-priority-${index}`}
                       style={[
                         styles.optionButton, 
-                        priority === tag.id && [
+                        priority === 'custom' && customPriorityText === tag.text && [
                           styles.selectedOption, 
-                          tag.id.startsWith('custom-') 
-                            ? { backgroundColor: tag.color }
-                            : { backgroundColor: getTabColor() }
+                          { backgroundColor: tag.color }
                         ]
                       ]}
-                      onPress={() => setPriority(tag.id)}
+                      onPress={() => {
+                        setPriority('custom');
+                        setCustomPriorityText(tag.text);
+                        setCustomPriorityColor(tag.color);
+                      }}
                     >
-                      <Text style={[styles.optionText, priority === tag.id && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        priority === 'custom' && customPriorityText === tag.text && styles.selectedText
+                      ]}>
                         {tag.text}
                       </Text>
                     </TouchableOpacity>
@@ -520,21 +484,64 @@ export default function AddTaskForm({
                   </TouchableOpacity>
                 </View>
                 <View style={styles.buttonRow}>
-                  {goalTypeTags.map((tag) => (
+                  <TouchableOpacity
+                    key="TBD"
+                    style={[
+                      styles.optionButton, 
+                      goalType === 'TBD' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setGoalType('TBD')}
+                  >
+                    <Text style={[styles.optionText, goalType === 'TBD' && styles.selectedText]}>
+                      TBD
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="Not Priority"
+                    style={[
+                      styles.optionButton, 
+                      goalType === 'Not Priority' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setGoalType('Not Priority')}
+                  >
+                    <Text style={[styles.optionText, goalType === 'Not Priority' && styles.selectedText]}>
+                      Not Priority
+                    </Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    key="Wish"
+                    style={[
+                      styles.optionButton, 
+                      goalType === 'Wish' && [styles.selectedOption, {backgroundColor: getTabColor()}]
+                    ]}
+                    onPress={() => setGoalType('Wish')}
+                  >
+                    <Text style={[styles.optionText, goalType === 'Wish' && styles.selectedText]}>
+                      Wish
+                    </Text>
+                  </TouchableOpacity>
+                  
+                  {/* Display saved custom goal type tags */}
+                  {savedGoalTypeTags.map((tag, index) => (
                     <TouchableOpacity
-                      key={tag.id}
+                      key={`saved-goalType-${index}`}
                       style={[
                         styles.optionButton, 
-                        goalType === tag.id && [
+                        goalType === 'custom' && customGoalTypeText === tag.text && [
                           styles.selectedOption, 
-                          tag.id.startsWith('custom-') 
-                            ? { backgroundColor: tag.color }
-                            : { backgroundColor: getTabColor() }
+                          { backgroundColor: tag.color }
                         ]
                       ]}
-                      onPress={() => setGoalType(tag.id)}
+                      onPress={() => {
+                        setGoalType('custom');
+                        setCustomGoalTypeText(tag.text);
+                        setCustomGoalTypeColor(tag.color);
+                      }}
                     >
-                      <Text style={[styles.optionText, goalType === tag.id && styles.selectedText]}>
+                      <Text style={[
+                        styles.optionText, 
+                        goalType === 'custom' && customGoalTypeText === tag.text && styles.selectedText
+                      ]}>
                         {tag.text}
                       </Text>
                     </TouchableOpacity>
