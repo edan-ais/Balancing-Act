@@ -94,32 +94,6 @@ return (
 );
 };
 
-// Custom tab label component with proper styling
-const TabLabel = ({ name, focused }) => {
-const colorKey = routeToColorMap[name];
-
-if (focused) return null;
-
-const config = tabConfig[name];
-if (!config) return null;
-
-return (
-  <Text 
-    style={{
-      color: tabColors[colorKey].medium,
-      fontFamily: 'Quicksand-SemiBold',
-      fontSize: 10,
-      marginTop: 4,
-      textAlign: 'center',
-    }}
-    numberOfLines={1}
-    ellipsizeMode="tail"
-  >
-    {config.title}
-  </Text>
-);
-};
-
 // Get the currently focused tab for background color
 const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
 const activeColorKey = routeToColorMap[focusedTab];
@@ -141,6 +115,7 @@ return (
 screenOptions={({ route }) => {
 const routeName = route.name;
 const isSelected = isTabSelected(routeName);
+const colorKey = routeToColorMap[routeName] || activeColorKey;
 
 return {
       headerShown: false,
@@ -185,8 +160,34 @@ return {
       tabBarLabelStyle: {
         // Position label below icon
         marginTop: 4,
+        color: tabColors[colorKey].medium, // Explicitly set label color here
       },
       tabBarLabelPosition: 'below-icon',
+      tabBarActiveTintColor: tabColors[colorKey].dark,
+      tabBarInactiveTintColor: tabColors[colorKey].medium,
+      // Explicitly handle the label component to override default behavior
+      tabBarLabel: ({ focused, color }) => {
+        if (focused) return null;
+        
+        const config = tabConfig[routeName];
+        if (!config) return null;
+        
+        return (
+          <Text 
+            style={{
+              color: tabColors[colorKey].medium, // Use medium color for text
+              fontFamily: 'Quicksand-SemiBold',
+              fontSize: 10,
+              marginTop: 4,
+              textAlign: 'center',
+            }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {config.title}
+          </Text>
+        );
+      }
     };
   }}>
   
@@ -204,13 +205,10 @@ return {
         name={config.name}
         options={{
           title: config.title,
-          tabBarActiveTintColor: tabColors[colorKey].dark,
-          tabBarInactiveTintColor: tabColors[colorKey].medium,
           tabBarIcon: ({ size, focused }) => {
             return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
           },
-          tabBarLabel: ({ focused }) => <TabLabel name={config.name} focused={focused} />,
-          // We no longer need tabBarButton to hide tabs since we're using display:none in tabBarItemStyle
+          // No longer using the TabLabel component directly as it might not be getting called
         }}
         listeners={{
           focus: () => setFocusedTab(config.name),
