@@ -49,6 +49,24 @@ export default function RepetitiveCleaning() {
     },
   ];
 
+  // Group tasks by cleaning location within each frequency
+  const getTasksGroupedByLocation = (tasks) => {
+    const locationGroups = {};
+    
+    tasks.forEach(task => {
+      const locationKey = task.cleaningLocation || 'other';
+      if (!locationGroups[locationKey]) {
+        locationGroups[locationKey] = [];
+      }
+      locationGroups[locationKey].push(task);
+    });
+    
+    return Object.entries(locationGroups).map(([location, locationTasks]) => ({
+      location,
+      tasks: locationTasks,
+    }));
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
@@ -96,15 +114,24 @@ export default function RepetitiveCleaning() {
                 </Text>
               </View>
             ) : (
-              schedule.tasks.map(task => (
-                <TaskItem
-                  key={task.id}
-                  task={task}
-                  onToggle={taskManager.toggleTask}
-                  onDelete={taskManager.deleteTask}
-                  onHabitIncrement={taskManager.incrementHabit}
-                  themeColor={colors.dark}
-                />
+              getTasksGroupedByLocation(schedule.tasks).map((locationGroup, locationIndex) => (
+                <View key={locationIndex} style={styles.locationGroup}>
+                  {locationGroup.tasks.map((task, taskIndex) => (
+                    <TaskItem
+                      key={task.id}
+                      task={task}
+                      onToggle={taskManager.toggleTask}
+                      onDelete={taskManager.deleteTask}
+                      onHabitIncrement={taskManager.incrementHabit}
+                      onSubtaskToggle={taskManager.toggleSubtask}
+                      onMoveUp={taskManager.moveTaskUp}
+                      onMoveDown={taskManager.moveTaskDown}
+                      isFirst={taskIndex === 0}
+                      isLast={taskIndex === locationGroup.tasks.length - 1}
+                      accentColor={colors.dark}
+                    />
+                  ))}
+                </View>
               ))
             )}
           </NeumorphicCard>
@@ -126,7 +153,7 @@ export default function RepetitiveCleaning() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="cleaning"
-        themeColor={colors.dark}
+        accentColor={colors.dark}
       />
     </SafeAreaView>
   );
@@ -214,6 +241,9 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Quicksand-Regular',
     fontStyle: 'italic',
+  },
+  locationGroup: {
+    marginBottom: 8,
   },
   addButton: {
     position: 'absolute',
