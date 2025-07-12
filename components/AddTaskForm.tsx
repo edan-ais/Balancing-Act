@@ -32,6 +32,7 @@ interface AddTaskFormProps {
     reminderEnabled?: boolean;
     cleaningLocation?: string;
     customCleaningLocation?: string;
+    customCleaningLocationColor?: string;
     selfCareType?: string;
   }) => void;
   category: string;
@@ -80,6 +81,7 @@ export default function AddTaskForm({
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [cleaningLocation, setCleaningLocation] = useState('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
+  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState('#4A5568'); // Default gray
   const [selfCareType, setSelfCareType] = useState('');
   
   // Custom tag modal state
@@ -118,6 +120,19 @@ export default function AddTaskForm({
     
     return usedColors;
   };
+  
+  const getUsedCleaningLocationColors = () => {
+    const usedColors = [];
+    
+    // Colors used by predefined cleaning location tags
+    if (category === 'cleaning') {
+      usedColors.push('#F6E05E'); // kitchen - Yellow
+      usedColors.push('#4FD1C5'); // bathroom - Teal
+      usedColors.push('#9F7AEA'); // bedroom - Purple
+    }
+    
+    return usedColors;
+  };
 
   // Available color options for custom tags - filter out used colors
   const getAvailableColorOptions = (type: 'priority' | 'goalType' | 'cleaningLocation') => {
@@ -141,6 +156,8 @@ export default function AddTaskForm({
       usedColors = getUsedPriorityColors();
     } else if (type === 'goalType') {
       usedColors = getUsedGoalTypeColors();
+    } else if (type === 'cleaningLocation') {
+      usedColors = getUsedCleaningLocationColors();
     }
     
     return allColors.filter(color => !usedColors.includes(color));
@@ -204,6 +221,7 @@ export default function AddTaskForm({
           frequency,
           cleaningLocation,
           customCleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : undefined,
+          customCleaningLocationColor: cleaningLocation === 'custom' ? customCleaningLocationColor : undefined,
         };
       }
 
@@ -255,6 +273,7 @@ export default function AddTaskForm({
     setReminderEnabled(false);
     setCleaningLocation('');
     setCustomCleaningLocation('');
+    setCustomCleaningLocationColor('#4A5568');
     setSelfCareType('');
   };
 
@@ -336,7 +355,7 @@ export default function AddTaskForm({
         // Create a new custom cleaning location tag
         const newTag: CustomTag = {
           text: customCleaningLocation,
-          color: '#FC8181' // Red for custom cleaning locations
+          color: customCleaningLocationColor
         };
         
         // Only add if not already in the list
@@ -777,10 +796,7 @@ export default function AddTaskForm({
                         styles.optionButton, 
                         mealType === type && [
                           styles.selectedOption,
-                          type === 'breakfast' ? {backgroundColor: '#F6E05E'} :
-                          type === 'lunch' ? {backgroundColor: '#4FD1C5'} :
-                          type === 'dinner' ? {backgroundColor: '#9F7AEA'} :
-                          {backgroundColor: '#68D391'}
+                          {backgroundColor: getTabColor()}
                         ]
                       ]}
                       onPress={() => setMealType(type)}
@@ -835,7 +851,7 @@ export default function AddTaskForm({
             </>
           )}
 
-          {/* Cleaning Tab - Updated for custom location */}
+          {/* Cleaning Tab - Updated for custom location with color wheel */}
           {category === 'cleaning' && (
             <>
               <View style={styles.section}>
@@ -915,12 +931,13 @@ export default function AddTaskForm({
                         styles.optionButton, 
                         cleaningLocation === 'custom' && customCleaningLocation === tag.text && [
                           styles.selectedOption, 
-                          { backgroundColor: '#FC8181' }
+                          { backgroundColor: tag.color }
                         ]
                       ]}
                       onPress={() => {
                         setCleaningLocation('custom');
                         setCustomCleaningLocation(tag.text);
+                        setCustomCleaningLocationColor(tag.color);
                       }}
                     >
                       <Text style={[
@@ -1154,31 +1171,31 @@ export default function AddTaskForm({
               }}
             />
 
-            {customTagType !== 'cleaningLocation' && (
-              <>
-                <Text style={styles.modalLabel}>Tag Color</Text>
-                <View style={styles.colorOptionsRow}>
-                  {getAvailableColorOptions(customTagType).map(color => (
-                    <TouchableOpacity
-                      key={color}
-                      style={[
-                        styles.colorOption,
-                        { backgroundColor: color },
-                        (customTagType === 'priority' ? customPriorityColor : customGoalTypeColor) === color && 
-                          styles.selectedColorOption
-                      ]}
-                      onPress={() => {
-                        if (customTagType === 'priority') {
-                          setCustomPriorityColor(color);
-                        } else if (customTagType === 'goalType') {
-                          setCustomGoalTypeColor(color);
-                        }
-                      }}
-                    />
-                  ))}
-                </View>
-              </>
-            )}
+            <Text style={styles.modalLabel}>Tag Color</Text>
+            <View style={styles.colorOptionsRow}>
+              {getAvailableColorOptions(customTagType).map(color => (
+                <TouchableOpacity
+                  key={color}
+                  style={[
+                    styles.colorOption,
+                    { backgroundColor: color },
+                    ((customTagType === 'priority' ? customPriorityColor : 
+                     customTagType === 'goalType' ? customGoalTypeColor :
+                     customCleaningLocationColor) === color) && 
+                    styles.selectedColorOption
+                  ]}
+                  onPress={() => {
+                    if (customTagType === 'priority') {
+                      setCustomPriorityColor(color);
+                    } else if (customTagType === 'goalType') {
+                      setCustomGoalTypeColor(color);
+                    } else {
+                      setCustomCleaningLocationColor(color);
+                    }
+                  }}
+                />
+              ))}
+            </View>
 
             <View style={styles.modalButtons}>
               <TouchableOpacity 
