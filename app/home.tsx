@@ -100,7 +100,7 @@ export default function HomeScreen() {
   const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
   const router = useRouter();
 
-  // Get the primary colors from the current theme
+  // Use primary colors from the current theme
   const primaryColors = currentTheme.tabColors.daily;
 
   const toggleTab = (tabId: string) => {
@@ -123,6 +123,14 @@ export default function HomeScreen() {
     router.replace(`/(tabs)/${firstTab === 'index' ? '' : firstTab}`);
   };
 
+  // Helper function to get tab colors from the theme
+  const getTabThemeColors = (tabId) => {
+    const categoryKey = tabId === 'index' ? 'daily' : tabId;
+    // Find the correct tab colors from the current theme, or use default
+    const defaultTabOption = tabOptions.find(t => t.id === tabId);
+    return currentTheme.tabColors[categoryKey] || defaultTabOption?.colors || primaryColors;
+  };
+
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
@@ -137,8 +145,8 @@ export default function HomeScreen() {
         <View style={styles.themeSelector}>
           <Text style={[styles.themeSelectorTitle, { color: primaryColors.dark }]}>App Theme</Text>
           {availableThemes.map((theme) => {
-            const themeColors = theme.tabColors.daily;
             const isSelected = currentTheme.id === theme.id;
+            const themeColors = theme.tabColors.daily;
             
             return (
               <TouchableOpacity
@@ -159,7 +167,7 @@ export default function HomeScreen() {
                     styles.themeIconContainer,
                     { backgroundColor: isSelected ? themeColors.dark : primaryColors.pastel }
                   ]}>
-                    <Palette size={20} color={isSelected ? '#FFFFFF' : primaryColors.medium} />
+                    <Palette size={20} color={isSelected ? themeColors.pastel : primaryColors.medium} />
                   </View>
                   <Text style={[
                     styles.themeTitle,
@@ -186,7 +194,8 @@ export default function HomeScreen() {
           {tabOptions.map((tab) => {
             const isSelected = localSelectedTabs.includes(tab.id);
             const IconComponent = tab.icon;
-            const tabColors = currentTheme.tabColors[tab.id === 'index' ? 'daily' : tab.id] || tab.colors;
+            // Get the appropriate colors for this tab from the current theme
+            const tabColors = getTabThemeColors(tab.id);
             
             return (
               <TouchableOpacity
@@ -209,7 +218,7 @@ export default function HomeScreen() {
                   ]}>
                     <IconComponent 
                       size={24} 
-                      color={isSelected ? '#FFFFFF' : primaryColors.medium} 
+                      color={isSelected ? tabColors.pastel : primaryColors.medium} 
                     />
                   </View>
                   
@@ -222,7 +231,7 @@ export default function HomeScreen() {
                   
                   <Text style={[
                     styles.tabSubtitle,
-                    { color: isSelected ? tabColors.dark : primaryColors.medium }
+                    { color: isSelected ? tabColors.medium || tabColors.dark : primaryColors.medium }
                   ]}>
                     {tab.subtitle}
                   </Text>
@@ -232,7 +241,7 @@ export default function HomeScreen() {
                       styles.selectedIndicator,
                       { backgroundColor: tabColors.dark }
                     ]}>
-                      <Text style={styles.selectedText}>✓</Text>
+                      <Text style={[styles.selectedText, { color: tabColors.pastel }]}>✓</Text>
                     </View>
                   )}
                 </NeumorphicCard>
@@ -255,13 +264,13 @@ export default function HomeScreen() {
       >
         <Text style={[
           styles.continueText, 
-          { color: localSelectedTabs.length > 0 ? '#FFFFFF' : primaryColors.medium }
+          { color: localSelectedTabs.length > 0 ? primaryColors.pastel : primaryColors.medium }
         ]}>
           Continue
         </Text>
         <ArrowRight 
           size={20} 
-          color={localSelectedTabs.length > 0 ? '#FFFFFF' : primaryColors.medium} 
+          color={localSelectedTabs.length > 0 ? primaryColors.pastel : primaryColors.medium} 
         />
       </TouchableOpacity>
     </SafeAreaView>
@@ -394,7 +403,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   selectedText: {
-    color: '#FFFFFF',
     fontSize: 12,
     fontFamily: 'Quicksand-Bold',
   },
