@@ -295,7 +295,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: getCleaningLocationColor('custom') }
+            { backgroundColor: task.customCleaningLocationColor || '#4A5568' }
           ]}>
             <Text style={styles.priorityText}>
               {task.customCleaningLocation.toUpperCase()}
