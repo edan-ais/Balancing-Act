@@ -336,15 +336,15 @@ export default function TaskItem({
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <NeumorphicCard style={[
         styles.taskCard,
-        task.isHabit && [styles.habitCard, { backgroundColor: getHabitBackgroundColor(task.category) }],
+        task.isHabit ? [styles.habitCard, { backgroundColor: getHabitBackgroundColor(task.category) }] : null,
         { 
           borderColor: getLightBorderColor(taskColor),
           borderWidth: 1,
           // Add left border accent for habits
-          ...(task.isHabit && {
+          ...(task.isHabit ? {
             borderLeftWidth: 4,
             borderLeftColor: taskColor
-          })
+          } : {})
         }
       ]}>
         <View style={styles.taskHeader}>
@@ -352,8 +352,8 @@ export default function TaskItem({
             onPress={task.isHabit ? handleHabitIncrement : handleToggle}
             style={[
               styles.checkbox,
-              task.completed && styles.checkedBox,
-              task.isHabit && styles.habitBox,
+              task.completed ? styles.checkedBox : null,
+              task.isHabit ? styles.habitBox : null,
               { backgroundColor: task.completed ? taskAccentColor : '#E2E8F0' },
             ]}
           >
@@ -374,8 +374,8 @@ export default function TaskItem({
           <View style={styles.taskContent}>
             <Text style={[
               styles.taskTitle,
-              task.completed && styles.completedTitle,
-              task.isHabit && styles.habitTitle,
+              task.completed ? styles.completedTitle : null,
+              task.isHabit ? styles.habitTitle : null,
             ]}>
               {task.title}
               {task.isDelegated && <Text style={styles.delegatedBadge}> → {task.delegatedTo}</Text>}
@@ -386,13 +386,13 @@ export default function TaskItem({
             </View>
 
             {/* Display notes for meal prep tasks */}
-            {task.category === 'meal-prep' && task.notes && (
+            {task.category === 'meal-prep' && task.notes ? (
               <View style={styles.notesContainer}>
                 <Text style={styles.notesText}>{task.notes}</Text>
               </View>
-            )}
+            ) : null}
 
-            {task.isHabit && task.habitGoal && (
+            {task.isHabit && task.habitGoal ? (
               <View style={styles.habitProgressContainer}>
                 <View 
                   style={[
@@ -407,9 +407,9 @@ export default function TaskItem({
                   {task.habitCount || 0}/{task.habitGoal}
                 </Text>
               </View>
-            )}
+            ) : null}
 
-            {task.subtasks && task.subtasks.length > 0 && (
+            {task.subtasks && task.subtasks.length > 0 ? (
               <View style={styles.subtasks}>
                 {task.subtasks.map(subtask => (
                   <TouchableOpacity 
@@ -420,28 +420,28 @@ export default function TaskItem({
                     <View 
                       style={[
                         styles.subtaskCheckbox, 
-                        subtask.completed && [
+                        subtask.completed ? [
                           styles.subtaskCompleted,
                           { backgroundColor: taskAccentColor }
-                        ]
+                        ] : null
                       ]} 
                     >
-                      {subtask.completed && <Check size={8} color="#ffffff" />}
+                      {subtask.completed ? <Check size={8} color="#ffffff" /> : null}
                     </View>
-                    <Text style={[styles.subtaskText, subtask.completed && styles.subtaskCompletedText]}>
+                    <Text style={[styles.subtaskText, subtask.completed ? styles.subtaskCompletedText : null]}>
                       {subtask.title}
                     </Text>
                   </TouchableOpacity>
                 ))}
               </View>
-            )}
+            ) : null}
           </View>
 
           <View style={styles.actionIcons}>
             <View style={styles.orderButtons}>
               <TouchableOpacity
                 onPress={() => onMoveUp && onMoveUp(task.id)}
-                style={[styles.orderButton, isFirst && styles.disabledButton]}
+                style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
                 disabled={isFirst}
               >
                 <ChevronUp size={16} color={isFirst ? '#CBD5E0' : '#718096'} />
@@ -449,7 +449,7 @@ export default function TaskItem({
               
               <TouchableOpacity
                 onPress={() => onMoveDown && onMoveDown(task.id)}
-                style={[styles.orderButton, isLast && styles.disabledButton]}
+                style={[styles.orderButton, isLast ? styles.disabledButton : null]}
                 disabled={isLast}
               >
                 <ChevronDown size={16} color={isLast ? '#CBD5E0' : '#718096'} />
