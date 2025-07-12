@@ -3,47 +3,54 @@ export const latteTheme = {
   name: 'Latte Theme',
   id: 'latte',
   tabColors: {
+    // Deep Espresso - rich dark brown with reddish undertones
     daily: {
-      pastel: '#F0E6D8', // Very light Deep Espresso
+      pastel: '#EAD9CF', // Very light Deep Espresso with reddish undertones
       dark: '#2A1B0F',   // Very dark Deep Espresso
-      bg: '#FAF7F4',     // Ultra light Deep Espresso background
+      bg: '#FAF5F2',     // Ultra light background with reddish undertones
       accent: '#3F2A1A'  // Deep Espresso (original)
     },
+    // Hazelnut - medium neutral brown with golden undertones
     future: {
-      pastel: '#E5D7C7', // Very light Hazelnut
+      pastel: '#E7DCCA', // Very light Hazelnut with more gold tint
       dark: '#5E452D',   // Very dark Hazelnut
-      bg: '#F8F4EF',     // Ultra light Hazelnut background
+      bg: '#F9F6ED',     // Ultra light background with golden undertones
       accent: '#A67C52'  // Hazelnut (original)
     },
+    // Caramel Gold - amber brown with orange undertones
     calendar: {
-      pastel: '#F1E3CB', // Very light Caramel Gold
-      dark: '#8C7449',   // Very dark Caramel Gold
-      bg: '#FBF7F0',     // Ultra light Caramel Gold background
+      pastel: '#F5E4C7', // Very light Caramel with orange undertones
+      dark: '#8C6030',   // Very dark Caramel with more orange
+      bg: '#FDF8EE',     // Ultra light background with warm orange undertones
       accent: '#D9B382'  // Caramel Gold (original)
     },
+    // Rose Pink - soft pink with brown undertones
     meals: {
-      pastel: '#F2DADA', // Very light Rose Pink
-      dark: '#8F6B6B',   // Very dark Rose Pink
-      bg: '#FCF6F6',     // Ultra light Rose Pink background
+      pastel: '#F6DFDF', // Very light Rose Pink
+      dark: '#A66868',   // Dark Rose Pink
+      bg: '#FDF7F7',     // Ultra light pink background
       accent: '#D9A6A6'  // Rose Pink (original)
     },
+    // Lavender Mist - soft purple with warm undertones
     cleaning: {
-      pastel: '#E8E4F0', // Very light Lavender Mist
-      dark: '#7B6C96',   // Very dark Lavender Mist
-      bg: '#F9F7FC',     // Ultra light Lavender Mist background
+      pastel: '#E9E4F4', // Very light Lavender Mist
+      dark: '#7B6C96',   // Dark Lavender Mist
+      bg: '#F9F7FC',     // Ultra light lavender background
       accent: '#C9BED9'  // Lavender Mist (original)
     },
+    // Pistachio Green - muted sage green
     selfCare: {
-      pastel: '#DFE9D8', // Very light Pistachio Green
-      dark: '#5E7B4D',   // Very dark Pistachio Green
-      bg: '#F6FAF4',     // Ultra light Pistachio Green background
+      pastel: '#E4EEDE', // Very light Pistachio Green
+      dark: '#5E7B4D',   // Dark Pistachio Green
+      bg: '#F6FAF4',     // Ultra light green background
       accent: '#B5C9A8'  // Pistachio Green (original)
     },
+    // Vanilla Cream - warm off-white
     delegate: {
-      pastel: '#FAF8F3', // Very light Vanilla Cream
-      dark: '#B2A99A',   // Darker Vanilla Cream (still relatively light)
-      bg: '#FFFDF9',     // Ultra light Vanilla Cream background
-      accent: '#F5F0E6'  // Vanilla Cream (original)
+      pastel: '#F8F5EF', // Very light Vanilla Cream
+      dark: '#BFB3A2',   // Darker Vanilla Cream
+      bg: '#FEFCF9',     // Ultra light cream background
+      accent: '#EAE0D0'  // More visible version of Vanilla Cream
     }
   }
 };
