@@ -114,12 +114,16 @@ export default function MealPrep() {
                   task={task}
                   onToggle={taskManager.toggleTask}
                   onDelete={taskManager.deleteTask}
+                  onEdit={handleEditTask}
                   onHabitIncrement={taskManager.incrementHabit}
                   onSubtaskToggle={taskManager.toggleSubtask}
                   onMoveUp={taskManager.moveTaskUp}
                   onMoveDown={taskManager.moveTaskDown}
                   isFirst={taskIndex === 0}
                   isLast={taskIndex === category.tasks.length - 1}
+                  accentColor={colors.accent}
+                  borderColor={colors.dark}
+                  habitColor={colors.dark}
                 />
               ))
             )}
@@ -142,6 +146,17 @@ export default function MealPrep() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="meal-prep"
+        accentColor={colors.accent}
+        darkColor={colors.dark}
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );
