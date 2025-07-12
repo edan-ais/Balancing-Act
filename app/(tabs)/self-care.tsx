@@ -110,18 +110,19 @@ export default function SelfCare() {
                   <View style={styles.categoryTitleRow}>
                     <category.icon size={24} color={colors.accent} />
                     <View style={styles.categoryTextContainer}>
-                      <Text style={[styles.categoryTitle, { color: colors.dark }]}>
-                        {category.title}
-                      </Text>
+                      <Text style={[styles.categoryTitle, { color: colors.dark }]}>{category.title}</Text>
                       <Text style={[styles.categoryDescription, { color: colors.medium }]}>
                         {category.description}
                       </Text>
                     </View>
                   </View>
                 </View>
-                <View style={[styles.categoryMeta, { backgroundColor: colors.accent, padding: 6, borderRadius: 12 }]}>
-                  <Text style={[styles.categoryCount, { color: colors.pastel }]}>
-                    {category.tasks.length} tasks
+                <View style={styles.categoryMeta}>
+                  <Text style={[styles.categoryCount, { color: colors.medium }]}>
+                    {category.tasks.length}
+                  </Text>
+                  <Text style={[styles.categoryLabel, { color: colors.medium }]}>
+                    tasks
                   </Text>
                 </View>
               </View>
@@ -271,8 +272,13 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryCount: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Medium',
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+  },
+  categoryLabel: {
+    fontSize: 10,
+    fontFamily: 'Quicksand-Regular',
+    marginTop: 2,
   },
   emptyCategory: {
     alignItems: 'center',
