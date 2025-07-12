@@ -6,11 +6,14 @@ import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
+import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
 import { tabColors } from './_layout';
 
 export default function DailyTasks() {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const taskManager = useTaskManager();
   const router = useRouter();
   const colors = tabColors.daily;
@@ -23,6 +26,16 @@ export default function DailyTasks() {
     taskManager.addTask({ ...newTask, category: 'daily' });
   };
 
+  const handleEditTask = (task: Task) => {
+    setTaskToEdit(task);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    taskManager.updateTask(updatedTask);
+    setShowEditForm(false);
+    setTaskToEdit(null);
+  };
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
@@ -61,6 +74,7 @@ export default function DailyTasks() {
                     task={task}
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
+                    onEdit={handleEditTask}
                     onHabitIncrement={taskManager.incrementHabit}
                     onSubtaskToggle={taskManager.toggleSubtask}
                     onMoveUp={taskManager.moveTaskUp}
@@ -81,6 +95,7 @@ export default function DailyTasks() {
                     task={task}
                     onToggle={taskManager.toggleTask}
                     onDelete={taskManager.deleteTask}
+                    onEdit={handleEditTask}
                     onHabitIncrement={taskManager.incrementHabit}
                     onSubtaskToggle={taskManager.toggleSubtask}
                     onMoveUp={taskManager.moveTaskUp}
@@ -110,6 +125,15 @@ export default function DailyTasks() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="daily"
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );

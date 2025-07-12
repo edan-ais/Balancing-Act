@@ -6,11 +6,14 @@ import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import TaskItem from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
+import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
 import { tabColors } from './_layout';
 
 export default function SelfCare() {
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showEditForm, setShowEditForm] = useState(false);
+  const [taskToEdit, setTaskToEdit] = useState<Task | null>(null);
   const taskManager = useTaskManager();
   const router = useRouter();
   const colors = tabColors.selfCare;
@@ -21,6 +24,16 @@ export default function SelfCare() {
     taskManager.addTask({ ...newTask, category: 'self-care' });
   };
 
+  const handleEditTask = (task: Task) => {
+    setTaskToEdit(task);
+    setShowEditForm(true);
+  };
+
+  const handleUpdateTask = (updatedTask: Task) => {
+    taskManager.updateTask(updatedTask);
+    setShowEditForm(false);
+    setTaskToEdit(null);
+  };
   const careCategories = [
     { 
       title: 'Physical Health', 
@@ -122,6 +135,7 @@ export default function SelfCare() {
                       task={task}
                       onToggle={taskManager.toggleTask}
                       onDelete={taskManager.deleteTask}
+                      onEdit={handleEditTask}
                       onHabitIncrement={taskManager.incrementHabit}
                       onSubtaskToggle={taskManager.toggleSubtask}
                       onMoveUp={taskManager.moveTaskUp}
@@ -153,6 +167,15 @@ export default function SelfCare() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="self-care"
+      />
+
+      <EditTaskForm
+        visible={showEditForm}
+        onClose={() => setShowEditForm(false)}
+        onSubmit={handleUpdateTask}
+        initialTask={taskToEdit}
+        accentColor={colors.accent}
+        darkColor={colors.dark}
       />
     </SafeAreaView>
   );

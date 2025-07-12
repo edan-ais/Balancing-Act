@@ -6,6 +6,7 @@ export interface TaskManager {
   addTask: (task: Omit<Task, 'id' | 'completed'>) => void;
   toggleTask: (id: string) => void;
   deleteTask: (id: string) => void;
+  updateTask: (updatedTask: Task) => void;
   incrementHabit: (id: string) => void;
   toggleSubtask: (taskId: string, subtaskId: string) => void;
   rolloverTasks: () => void;
@@ -42,6 +43,11 @@ export function useTaskManager(): TaskManager {
     setTasks(prev => prev.filter(task => task.id !== id));
   };
 
+  const updateTask = (updatedTask: Task) => {
+    setTasks(prev => prev.map(task => 
+      task.id === updatedTask.id ? updatedTask : task
+    ));
+  };
   const incrementHabit = (id: string) => {
     setTasks(prev => prev.map(task => {
       if (task.id === id && task.isHabit) {
@@ -209,6 +215,7 @@ export function useTaskManager(): TaskManager {
     addTask,
     toggleTask,
     deleteTask,
+    updateTask,
     incrementHabit,
     toggleSubtask,
     rolloverTasks,
