@@ -2,7 +2,7 @@
 export const latteTheme = {
   name: 'Latte Theme',
   id: 'latte',
-  backgroundImage: '/images/latte-background.jpg', // Main theme background image
+  backgroundImage: '/images/Cafe.png', // Main theme background image
   tabBackgrounds: {
     daily: '/images/latte-daily-background.jpg',
     future: '/images/latte-future-background.jpg',
