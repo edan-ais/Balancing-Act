@@ -18,7 +18,6 @@ export default function RepetitiveCleaning() {
   const router = useRouter();
   const { currentTheme } = useTheme();
   const colors = currentTheme.tabColors.cleaning;
-  const blueColor = '#4299E1'; // Blue color for all icons
 
   const cleaningTasks = taskManager.tasks.filter(task => task.category === 'cleaning');
 
@@ -36,6 +35,7 @@ export default function RepetitiveCleaning() {
     setShowEditForm(false);
     setTaskToEdit(null);
   };
+  
   const cleaningSchedule = [
     { 
       title: 'Daily', 
@@ -90,14 +90,19 @@ export default function RepetitiveCleaning() {
       <View style={styles.header}>
         <View>
           <Text style={[styles.title, { color: colors.dark }]}>Cleaning Tasks</Text>
-          <Text style={styles.subtitle}>Maintain your space regularly</Text>
+          <Text style={[styles.subtitle, { color: colors.medium }]}>
+            Maintain your space regularly
+          </Text>
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity 
-            style={[styles.actionButton, { backgroundColor: colors.accent }]}
+            style={[styles.actionButton, { 
+              backgroundColor: colors.accent,
+              shadowColor: colors.shadow
+            }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.dark} />
+            <Home size={20} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -107,27 +112,33 @@ export default function RepetitiveCleaning() {
           <NeumorphicCard 
             key={index} 
             style={[styles.scheduleCard, { 
-              shadowColor: colors.pastel,
+              shadowColor: colors.shadow,
               borderColor: colors.accent,
               borderWidth: 1 
             }]}
           >
             <View style={styles.scheduleHeader}>
               <View style={styles.scheduleTitleRow}>
-                <schedule.icon size={20} color={blueColor} />
+                <schedule.icon size={20} color={colors.accent} />
                 <View>
-                  <Text style={[styles.scheduleTitle, { color: colors.dark }]}>{schedule.title}</Text>
-                  <Text style={styles.scheduleFrequency}>{schedule.frequencyDisplay}</Text>
+                  <Text style={[styles.scheduleTitle, { color: colors.dark }]}>
+                    {schedule.title}
+                  </Text>
+                  <Text style={[styles.scheduleFrequency, { color: colors.medium }]}>
+                    {schedule.frequencyDisplay}
+                  </Text>
                 </View>
               </View>
-              <Text style={[styles.scheduleCount, { backgroundColor: colors.accent, color: colors.dark }]}>
-                {schedule.tasks.length} tasks
-              </Text>
+              <View style={[styles.scheduleCountContainer, { backgroundColor: colors.accent }]}>
+                <Text style={[styles.scheduleCount, { color: colors.pastel }]}>
+                  {schedule.tasks.length} tasks
+                </Text>
+              </View>
             </View>
             
             {schedule.tasks.length === 0 ? (
               <View style={styles.emptySchedule}>
-                <Text style={[styles.emptyScheduleText, { color: colors.pastel }]}>
+                <Text style={[styles.emptyScheduleText, { color: colors.medium }]}>
                   No {schedule.title.toLowerCase()} cleaning tasks
                 </Text>
               </View>
@@ -156,9 +167,7 @@ export default function RepetitiveCleaning() {
                         onMoveDown={taskManager.moveTaskDown}
                         isFirst={taskPosition === 0}
                         isLast={taskPosition === sameFrequencyTasks.length - 1}
-                        accentColor={colors.accent}
-                        borderColor={colors.dark}
-                        habitColor={colors.dark}
+                        colors={colors}
                       />
                     );
                   })}
@@ -172,11 +181,11 @@ export default function RepetitiveCleaning() {
       <TouchableOpacity
         style={[styles.addButton, { 
           backgroundColor: colors.dark,
-          shadowColor: colors.dark 
+          shadowColor: colors.shadow 
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color="#ffffff" />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -186,6 +195,10 @@ export default function RepetitiveCleaning() {
         category="cleaning"
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
 
       <EditTaskForm
@@ -195,6 +208,10 @@ export default function RepetitiveCleaning() {
         initialTask={taskToEdit}
         accentColor={colors.accent}
         darkColor={colors.dark}
+        bgColor={colors.bg}
+        mediumColor={colors.medium}
+        pastelColor={colors.pastel}
+        shadowColor={colors.shadow}
       />
     </SafeAreaView>
   );
@@ -219,7 +236,6 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 14,
     fontFamily: 'Quicksand-Medium',
-    color: '#4A5568',
     marginTop: 2,
   },
   headerActions: {
@@ -232,7 +248,6 @@ const styles = StyleSheet.create({
     borderRadius: 20,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowColor: '#C8D0E0',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 4,
@@ -263,16 +278,17 @@ const styles = StyleSheet.create({
   scheduleFrequency: {
     fontSize: 12,
     fontFamily: 'Quicksand-Regular',
-    color: '#4A5568',
     marginTop: 2,
     marginLeft: 8,
+  },
+  scheduleCountContainer: {
+    borderRadius: 12,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
   },
   scheduleCount: {
     fontSize: 12,
     fontFamily: 'Quicksand-Medium',
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 12,
   },
   emptySchedule: {
     alignItems: 'center',
