@@ -1,49 +1,49 @@
-// Latte Theme - Expanded warm coffee-inspired color scheme
+// Latte Theme - Warm and diverse coffee-inspired color scheme
 export const latteTheme = {
   name: 'Latte Theme',
   id: 'latte',
   tabColors: {
     daily: {
-      pastel: '#E6D2B5', // Light caramel
-      dark: '#5D4A2E',   // Rich espresso brown
+      pastel: '#DBC093', // Lightened Caramel Gold
+      dark: '#3F2A1A',   // Deep Espresso
       bg: '#FFF9F0',     // Warm cream background
-      accent: '#C9A66B'  // Golden caramel accent
+      accent: '#A67C52'  // Hazelnut
     },
     future: {
-      pastel: '#D7C3AA', // Soft hazelnut
-      dark: '#3F2A1A',   // Deep chocolate brown
-      bg: '#FCF7EF',     // Ivory white
-      accent: '#B69B7B'  // Medium hazelnut
+      pastel: '#E2DBCC', // Light cream
+      dark: '#7D6B5D',   // Cacao Dust
+      bg: '#FBF8F3',     // Cream background
+      accent: '#D9B382'  // Caramel Gold
     },
     calendar: {
-      pastel: '#E8D6BC', // Light macchiato
-      dark: '#704B24',   // Cinnamon brown
-      bg: '#FFFBF5',     // Soft eggshell
-      accent: '#D9B382'  // Warm honey accent
+      pastel: '#D9A6A6', // Rose Pink
+      dark: '#A67C52',   // Hazelnut
+      bg: '#FCF9F4',     // Warm white background
+      accent: '#C17F59'  // Chai Spice
     },
     meals: {
-      pastel: '#F0DFCA', // Vanilla cream
-      dark: '#8B5A2B',   // Maple syrup brown
-      bg: '#FFFDF7',     // Whipped cream white
-      accent: '#E0C9A6'  // Butterscotch accent
+      pastel: '#C9BED9', // Lavender Mist
+      dark: '#8A7355',   // Medium brown
+      bg: '#F9F6F1',     // Off-white background
+      accent: '#D9A6A6'  // Rose Pink
     },
     cleaning: {
-      pastel: '#C9BBAA', // Almond milk
-      dark: '#49392A',   // Dark roast coffee
-      bg: '#F8F6F2',     // Oat milk white
-      accent: '#A99880'  // Toasted almond accent
+      pastel: '#B5C9A8', // Pistachio Green
+      dark: '#3F2A1A',   // Deep Espresso
+      bg: '#F8F5F0',     // Warm cream background
+      accent: '#8BA6C1'  // Blue Berry
     },
     selfCare: {
-      pastel: '#F2DBC0', // Chai latte
-      dark: '#8D634F',   // Cinnamon spice
-      bg: '#FFF8F5',     // Soft rose white
-      accent: '#D9AD8B'  // Warm terracotta
+      pastel: '#F5F0E6', // Vanilla Cream
+      dark: '#A67C52',   // Hazelnut
+      bg: '#FFFBF5',     // Soft eggshell
+      accent: '#C9BED9'  // Lavender Mist
     },
     delegate: {
-      pastel: '#D5CBB5', // Pale mocha
-      dark: '#61513D',   // Walnut brown
-      bg: '#F7F5EF',     // Pale parchment
-      accent: '#A69678'  // Medium taupe
+      pastel: '#D9B382', // Caramel Gold
+      dark: '#7D6B5D',   // Cacao Dust
+      bg: '#F9F6F1',     // Off-white background
+      accent: '#B5C9A8'  // Pistachio Green
     }
   }
 };
