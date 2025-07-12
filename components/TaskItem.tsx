@@ -440,6 +440,24 @@ export default function TaskItem({
           </View>
 
           <View style={styles.actionIcons}>
+            <View style={styles.orderButtons}>
+              <TouchableOpacity
+                onPress={() => onMoveUp && onMoveUp(task.id)}
+                style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
+                disabled={isFirst}
+              >
+                <ChevronUp size={16} color={isFirst ? '#CBD5E0' : '#4A5568'} />
+              </TouchableOpacity>
+              
+              <TouchableOpacity
+                onPress={() => onMoveDown && onMoveDown(task.id)}
+                style={[styles.orderButton, isLast ? styles.disabledButton : null]}
+                disabled={isLast}
+              >
+                <ChevronDown size={16} color={isLast ? '#CBD5E0' : '#4A5568'} />
+              </TouchableOpacity>
+            </View>
+            
             {onEdit && (
               <TouchableOpacity
                 onPress={() => onEdit(task)}
@@ -448,24 +466,6 @@ export default function TaskItem({
                 <Pencil size={18} color="#4A5568" />
               </TouchableOpacity>
             )}
-            
-            <View style={styles.orderButtons}>
-              <TouchableOpacity
-                onPress={() => onMoveUp && onMoveUp(task.id)}
-                style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
-                disabled={isFirst}
-              >
-                <ChevronUp size={16} color={isFirst ? '#CBD5E0' : '#718096'} />
-              </TouchableOpacity>
-              
-              <TouchableOpacity
-                onPress={() => onMoveDown && onMoveDown(task.id)}
-                style={[styles.orderButton, isLast ? styles.disabledButton : null]}
-                disabled={isLast}
-              >
-                <ChevronDown size={16} color={isLast ? '#CBD5E0' : '#718096'} />
-              </TouchableOpacity>
-            </View>
             
             <TouchableOpacity
               onPress={() => onDelete(task.id)}
@@ -617,10 +617,6 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
   },
-  editIconButton: {
-    padding: 4,
-    marginRight: 8,
-  },
   orderButtons: {
     flexDirection: 'column',
     marginRight: 8,
@@ -631,6 +627,10 @@ const styles = StyleSheet.create({
   },
   disabledButton: {
     opacity: 0.5,
+  },
+  editIconButton: {
+    padding: 4,
+    marginRight: 8,
   },
   deleteIconButton: {
     padding: 4,
