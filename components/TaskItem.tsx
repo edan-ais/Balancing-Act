@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
-import { Check, X, ChevronUp, ChevronDown, CreditCard as Edit, Pencil } from 'lucide-react-native';
+import { Check, X, ChevronUp, ChevronDown, Pencil } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 export interface Task {
