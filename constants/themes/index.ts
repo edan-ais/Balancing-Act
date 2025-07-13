@@ -22,6 +22,10 @@ export interface TabColors {
 export interface Theme {
   name: string;
   id: string;
+  backgroundImage?: string;
+  tabBackgrounds?: {
+    [key: string]: string;
+  };
   tabColors: TabColors;
 }
 

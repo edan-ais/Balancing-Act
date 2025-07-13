@@ -105,6 +105,13 @@ export default function TabLayout() {
     }
   }, [focusedTab, setCurrentTab, activeColorKey]);
 
+  // Update the current tab in the ThemeContext when focused tab changes
+  useEffect(() => {
+    if (setCurrentTab) {
+      setCurrentTab(activeColorKey);
+    }
+  }, [focusedTab, setCurrentTab, activeColorKey]);
+
   // Filter out any selectedTabs that don't have valid configurations
   const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
 
