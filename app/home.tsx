@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette } from 'lucide-react-native';
+import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette, Coffee, Cloud, CloudRain } from 'lucide-react-native';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
@@ -36,39 +36,46 @@ const tabOptions = [
   {
     id: 'weekly',
     title: 'Calendar',
-    subtitle: 'Organize your tasks over time',
+    subtitle: 'Organize your time',
     icon: Calendar,
     themeKey: 'calendar'
   },
   {
     id: 'meal-prep',
     title: 'Meal Prep',
-    subtitle: 'Plan your meals and snacks',
+    subtitle: 'Plan your meals',
     icon: ChefHat,
     themeKey: 'meals'
   },
   {
     id: 'cleaning',
     title: 'Cleaning',
-    subtitle: 'Keep all your spaces tidy',
+    subtitle: 'Keep space tidy',
     icon: Sparkles,
     themeKey: 'cleaning'
   },
   {
     id: 'self-care',
     title: 'Self-Care',
-    subtitle: 'Nurture yourself to feel refreshed',
+    subtitle: 'Nurture yourself',
     icon: Heart,
     themeKey: 'selfCare'
   },
   {
     id: 'delegation',
     title: 'Delegation',
-    subtitle: 'Share the load with loved ones',
+    subtitle: 'Share the load',
     icon: Users,
     themeKey: 'delegate'
   }
 ];
+
+// Theme icons mapping
+const themeIcons = {
+  'balance': Palette,
+  'latte': Coffee,
+  'rainstorm': CloudRain
+};
 
 export default function HomeScreen() {
   const { selectedTabs, setSelectedTabs } = useTabContext();
@@ -87,6 +94,11 @@ export default function HomeScreen() {
 
   // Use primary colors from the current theme
   const primaryColors = currentTheme.tabColors.daily;
+
+  // Helper function to get the appropriate icon for a theme
+  const getThemeIcon = (themeId) => {
+    return themeIcons[themeId] || Palette;
+  };
 
   const toggleTab = (tabId: string) => {
     if (localSelectedTabs.includes(tabId)) {
@@ -124,6 +136,7 @@ export default function HomeScreen() {
           {availableThemes.map((theme) => {
             const isSelected = currentTheme.id === theme.id;
             const themeColors = theme.tabColors.daily;
+            const ThemeIconComponent = getThemeIcon(theme.id);
             
             return (
               <TouchableOpacity
@@ -144,7 +157,7 @@ export default function HomeScreen() {
                     styles.themeIconContainer,
                     { backgroundColor: isSelected ? themeColors.dark : primaryColors.medium }
                   ]}>
-                    <Palette size={20} color={isSelected ? themeColors.pastel : primaryColors.pastel} />
+                    <ThemeIconComponent size={20} color={isSelected ? themeColors.pastel : primaryColors.pastel} />
                   </View>
                   <Text style={[
                     styles.themeTitle,
