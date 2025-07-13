@@ -59,9 +59,13 @@ export default function MonthlyCalendar() {
   };
 
   const getTasksForDate = (date: Date) => {
+    if (!date) return [];
+    
     return weeklyTasks.filter(task => {
-      // In a real app, you'd compare task.scheduledDate with the date
-      return false; // Placeholder
+      if (!task.scheduledDate) return false;
+      
+      const taskDate = new Date(task.scheduledDate);
+      return taskDate.toDateString() === date.toDateString();
     });
   };
 
@@ -223,6 +227,7 @@ export default function MonthlyCalendar() {
         onClose={() => setShowAddForm(false)}
         onSubmit={handleAddTask}
         category="weekly"
+        selectedDate={selectedDate}
         accentColor={colors.accent}
         darkColor={colors.dark}
         bgColor={colors.bg}

@@ -1,42 +1,25 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, StyleSheet, TouchableOpacity, ScrollView, Modal } from 'react-native';
-import { Plus, X, Calendar as CalendarIcon } from 'lucide-react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  Modal,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  Switch,
+  Alert,
+} from 'react-native';
+import { X, Plus, Minus } from 'lucide-react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import NeumorphicCard from './NeumorphicCard';
 
 interface AddTaskFormProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (task: {
-    title: string;
-    isHabit: boolean;
-    priority: string;
-    customPriorityText?: string;
-    customPriorityColor?: string;
-    isDelegated: boolean;
-    delegatedTo: string;
-    delegateType?: string;
-    subtasks: { title: string }[];
-    habitGoal?: number;
-    goalType?: string;
-    customGoalTypeText?: string;
-    customGoalTypeColor?: string;
-    // Other fields
-    mealType?: string;
-    dayOfWeek?: string;
-    specificDate?: Date;
-    notes?: string;
-    frequency?: string;
-    recurringDays?: string[];
-    recurringDate?: number;
-    isRecurring?: boolean;
-    reminderEnabled?: boolean;
-    cleaningLocation?: string;
-    customCleaningLocation?: string;
-    customCleaningLocationColor?: string;
-    selfCareType?: string;
-  }) => void;
+  onSubmit: (task: any) => void;
   category: string;
-  selectedDate?: Date | null;
+  selectedDate?: Date; // For calendar tasks
   accentColor?: string;
   darkColor?: string;
   bgColor?: string;
@@ -45,16 +28,11 @@ interface AddTaskFormProps {
   shadowColor?: string;
 }
 
-interface CustomTag {
-  text: string;
-  color: string;
-}
-
-export default function AddTaskForm({ 
-  visible, 
-  onClose, 
-  onSubmit, 
-  category, 
+export default function AddTaskForm({
+  visible,
+  onClose,
+  onSubmit,
+  category,
   selectedDate,
   accentColor = '#4055C5',
   darkColor = '#2B6CB0',
@@ -65,210 +43,33 @@ export default function AddTaskForm({
 }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
-  const [habitGoal, setHabitGoal] = useState(1);
-  const [priority, setPriority] = useState('');
+  const [habitGoal, setHabitGoal] = useState('');
+  const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState('#4A5568'); // Default gray
-  const [isDelegated, setIsDelegated] = useState(false);
-  const [delegatedTo, setDelegatedTo] = useState('');
-  const [delegateType, setDelegateType] = useState('');
-  const [subtasks, setSubtasks] = useState<string[]>(['']);
-  
-  // Goal specific fields
-  const [goalType, setGoalType] = useState('');
+  const [customPriorityColor, setCustomPriorityColor] = useState('#4A5568');
+  const [goalType, setGoalType] = useState<string>('');
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState('#4A5568'); // Default gray
-
-  // New state variables for category-specific fields
-  const [mealType, setMealType] = useState('');
-  const [dayOfWeek, setDayOfWeek] = useState('');
+  const [customGoalTypeColor, setCustomGoalTypeColor] = useState('#4A5568');
+  const [mealType, setMealType] = useState<string>('');
+  const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
-  const [frequency, setFrequency] = useState('');
-  const [isRecurring, setIsRecurring] = useState(false);
-  const [recurringDays, setRecurringDays] = useState<string[]>([]);
-  const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [cleaningLocation, setCleaningLocation] = useState('');
+  const [frequency, setFrequency] = useState<string>('');
+  const [cleaningLocation, setCleaningLocation] = useState<string>('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
-  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState('#4A5568'); // Default gray
-  const [selfCareType, setSelfCareType] = useState('');
-  
-  // Custom tag modal state
-  const [showCustomTagModal, setShowCustomTagModal] = useState(false);
-  const [customTagType, setCustomTagType] = useState<'priority' | 'goalType' | 'cleaningLocation'>('priority');
-
-  // Store created custom tags for reuse
-  const [savedPriorityTags, setSavedPriorityTags] = useState<CustomTag[]>([]);
-  const [savedGoalTypeTags, setSavedGoalTypeTags] = useState<CustomTag[]>([]);
-  const [savedCleaningLocationTags, setSavedCleaningLocationTags] = useState<CustomTag[]>([]);
-
-  // Get used colors for various tag types
-  const getUsedPriorityColors = () => {
-    const usedColors = [];
-    
-    // Colors used by predefined priority tags
-    if (category === 'daily') {
-      usedColors.push('#FC8181'); // high - Red
-      usedColors.push('#4299E1'); // medium - Blue
-      usedColors.push('#68D391'); // low - Green
-      usedColors.push('#F6AD55'); // quick-win - Orange
-    }
-    
-    return usedColors;
-  };
-  
-  const getUsedGoalTypeColors = () => {
-    const usedColors = [];
-    
-    // Colors used by predefined goal type tags
-    if (category === 'goals') {
-      usedColors.push('#9F7AEA'); // TBD - Purple
-      usedColors.push('#FC8181'); // Not Priority - Red
-      usedColors.push('#4299E1'); // Wish - Blue
-    }
-    
-    return usedColors;
-  };
-  
-  const getUsedCleaningLocationColors = () => {
-    const usedColors = [];
-    
-    // Colors used by predefined cleaning location tags
-    if (category === 'cleaning') {
-      usedColors.push('#F6E05E'); // kitchen - Yellow
-      usedColors.push('#4FD1C5'); // bathroom - Teal
-      usedColors.push('#9F7AEA'); // bedroom - Purple
-    }
-    
-    return usedColors;
-  };
-
-  // Available color options for custom tags - filter out used colors
-  const getAvailableColorOptions = (type: 'priority' | 'goalType' | 'cleaningLocation') => {
-    const allColors = [
-      '#FC8181', // Red
-      '#F6AD55', // Orange
-      '#F6E05E', // Yellow
-      '#68D391', // Green
-      '#4FD1C5', // Teal
-      '#63B3ED', // Blue
-      '#4299E1', // Blue (darker)
-      '#7F9CF5', // Indigo
-      '#9F7AEA', // Purple
-      '#B794F4', // Purple (lighter)
-      '#F687B3', // Pink
-    ];
-    
-    let usedColors: string[] = [];
-    
-    if (type === 'priority') {
-      usedColors = getUsedPriorityColors();
-    } else if (type === 'goalType') {
-      usedColors = getUsedGoalTypeColors();
-    } else if (type === 'cleaningLocation') {
-      usedColors = getUsedCleaningLocationColors();
-    }
-    
-    return allColors.filter(color => !usedColors.includes(color));
-  };
-
-  const handleSubmit = () => {
-    if (title.trim()) {
-      const baseTask = {
-        title: title.trim(),
-        isHabit,
-        priority,
-        customPriorityText: priority === 'custom' ? customPriorityText : undefined,
-        customPriorityColor: priority === 'custom' ? customPriorityColor : undefined,
-        isDelegated,
-        delegatedTo: isDelegated ? delegatedTo : '',
-        subtasks: subtasks.filter(s => s.trim()).map(s => ({ title: s.trim() })),
-      };
-
-      // Add habit goal if it's a habit
-      if (isHabit) {
-        baseTask.habitGoal = habitGoal;
-      }
-
-      // Add category-specific fields
-      let taskData = { ...baseTask };
-
-      // Weekly calendar specific fields
-      if (category === 'weekly') {
-        taskData = {
-          ...taskData,
-          isRecurring,
-          recurringDays: isRecurring ? recurringDays : [],
-          recurringDate: isRecurring && selectedDate ? selectedDate.getDate() : undefined,
-        };
-      }
-
-      // Goal specific field
-      if (category === 'goals') {
-        taskData = {
-          ...taskData,
-          goalType,
-          customGoalTypeText: goalType === 'custom' ? customGoalTypeText : undefined,
-          customGoalTypeColor: goalType === 'custom' ? customGoalTypeColor : undefined,
-        };
-      }
-
-      // Meal prep specific fields
-      if (category === 'meal-prep') {
-        taskData = {
-          ...taskData,
-          mealType,
-          dayOfWeek,
-          notes,
-        };
-      }
-
-      // Cleaning specific fields
-      if (category === 'cleaning') {
-        taskData = {
-          ...taskData,
-          frequency,
-          cleaningLocation,
-          customCleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : undefined,
-          customCleaningLocationColor: cleaningLocation === 'custom' ? customCleaningLocationColor : undefined,
-        };
-      }
-
-      // Self-care specific fields
-      if (category === 'self-care') {
-        taskData = {
-          ...taskData,
-          selfCareType,
-        };
-      }
-
-      // Delegation specific fields
-      if (category === 'delegation') {
-        taskData = {
-          ...taskData,
-          delegateType,
-          reminderEnabled,
-        };
-      }
-
-      onSubmit(taskData);
-
-      // Reset all fields
-      resetForm();
-      onClose();
-    }
-  };
+  const [selfCareType, setSelfCareType] = useState<string>('');
+  const [delegatedTo, setDelegatedTo] = useState('');
+  const [delegateType, setDelegateType] = useState<string>('');
+  const [reminderEnabled, setReminderEnabled] = useState(false);
+  const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
+  const [errors, setErrors] = useState<string[]>([]);
 
   const resetForm = () => {
     setTitle('');
     setIsHabit(false);
-    setHabitGoal(1);
+    setHabitGoal('');
     setPriority('');
     setCustomPriorityText('');
     setCustomPriorityColor('#4A5568');
-    setIsDelegated(false);
-    setDelegatedTo('');
-    setDelegateType('');
-    setSubtasks(['']);
     setGoalType('');
     setCustomGoalTypeText('');
     setCustomGoalTypeColor('#4A5568');
@@ -276,1234 +77,737 @@ export default function AddTaskForm({
     setDayOfWeek('');
     setNotes('');
     setFrequency('');
-    setIsRecurring(false);
-    setRecurringDays([]);
-    setReminderEnabled(false);
     setCleaningLocation('');
     setCustomCleaningLocation('');
-    setCustomCleaningLocationColor('#4A5568');
     setSelfCareType('');
+    setDelegatedTo('');
+    setDelegateType('');
+    setReminderEnabled(false);
+    setSubtasks([]);
+    setErrors([]);
+  };
+
+  const validateForm = (): string[] => {
+    const validationErrors: string[] = [];
+
+    // Check if title is provided
+    if (!title.trim()) {
+      validationErrors.push('Task name is required');
+    }
+
+    // Category-specific validation
+    switch (category) {
+      case 'daily':
+        if (!priority) {
+          validationErrors.push('Priority is required for daily tasks');
+        }
+        if (priority === 'custom' && !customPriorityText.trim()) {
+          validationErrors.push('Custom priority text is required');
+        }
+        break;
+
+      case 'goals':
+        if (!goalType) {
+          validationErrors.push('Goal type is required for future tasks');
+        }
+        if (goalType === 'custom' && !customGoalTypeText.trim()) {
+          validationErrors.push('Custom goal type text is required');
+        }
+        break;
+
+      case 'meal-prep':
+        if (!mealType) {
+          validationErrors.push('Meal type is required for meal prep tasks');
+        }
+        break;
+
+      case 'cleaning':
+        if (!frequency) {
+          validationErrors.push('Frequency is required for cleaning tasks');
+        }
+        if (!cleaningLocation) {
+          validationErrors.push('Location is required for cleaning tasks');
+        }
+        if (cleaningLocation === 'custom' && !customCleaningLocation.trim()) {
+          validationErrors.push('Custom location is required');
+        }
+        break;
+
+      case 'self-care':
+        if (!selfCareType) {
+          validationErrors.push('Self-care type is required for self-care tasks');
+        }
+        break;
+
+      case 'delegation':
+        if (!delegateType) {
+          validationErrors.push('Delegate type is required for delegation tasks');
+        }
+        if (!delegatedTo.trim()) {
+          validationErrors.push('Person to delegate to is required');
+        }
+        break;
+
+      case 'weekly':
+        // For calendar tasks, we don't require additional validation beyond title
+        // The selectedDate is handled automatically
+        break;
+    }
+
+    // Habit-specific validation
+    if (isHabit && (!habitGoal || parseInt(habitGoal) <= 0)) {
+      validationErrors.push('Valid habit goal is required for habits');
+    }
+
+    return validationErrors;
+  };
+
+  const handleClose = () => {
+    resetForm();
+    onClose();
+  };
+
+  const handleSubmit = () => {
+    const validationErrors = validateForm();
+    
+    if (validationErrors.length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+
+    const newTask = {
+      title: title.trim(),
+      isHabit,
+      habitGoal: isHabit && habitGoal ? parseInt(habitGoal) : undefined,
+      priority: priority || undefined,
+      customPriorityText: priority === 'custom' ? customPriorityText : undefined,
+      customPriorityColor: priority === 'custom' ? customPriorityColor : undefined,
+      goalType: goalType || undefined,
+      customGoalTypeText: goalType === 'custom' ? customGoalTypeText : undefined,
+      customGoalTypeColor: goalType === 'custom' ? customGoalTypeColor : undefined,
+      mealType: mealType || undefined,
+      dayOfWeek: dayOfWeek || undefined,
+      notes: notes || undefined,
+      frequency: frequency || undefined,
+      cleaningLocation: cleaningLocation || undefined,
+      customCleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : undefined,
+      selfCareType: selfCareType || undefined,
+      delegatedTo: delegatedTo || undefined,
+      delegateType: delegateType || undefined,
+      reminderEnabled,
+      subtasks: subtasks.length > 0 ? subtasks : undefined,
+      scheduledDate: selectedDate, // For calendar tasks
+    };
+
+    onSubmit(newTask);
+    handleClose();
   };
 
   const addSubtask = () => {
-    setSubtasks([...subtasks, '']);
+    const newSubtask = {
+      id: Date.now().toString(),
+      title: '',
+      completed: false,
+    };
+    setSubtasks([...subtasks, newSubtask]);
   };
 
-  const updateSubtask = (index: number, value: string) => {
-    const newSubtasks = [...subtasks];
-    newSubtasks[index] = value;
-    setSubtasks(newSubtasks);
+  const removeSubtask = (id: string) => {
+    setSubtasks(subtasks.filter(subtask => subtask.id !== id));
   };
 
-  const removeSubtask = (index: number) => {
-    setSubtasks(subtasks.filter((_, i) => i !== index));
+  const updateSubtask = (id: string, title: string) => {
+    setSubtasks(subtasks.map(subtask => 
+      subtask.id === id ? { ...subtask, title } : subtask
+    ));
   };
-
-  const getTabColor = () => {
-    if (accentColor) return accentColor;
-    
-    switch (category) {
-      case 'daily': return '#2B6CB0';
-      case 'goals': return '#48BB78';
-      case 'weekly': return '#9F7AEA';
-      case 'meal-prep': return '#ED8936';
-      case 'cleaning': return '#4299E1';
-      case 'self-care': return '#F56565';
-      case 'delegation': return '#38B2AC';
-      default: return '#2B6CB0';
-    }
-  };
-
-  const toggleRecurringDay = (day: string) => {
-    if (recurringDays.includes(day)) {
-      setRecurringDays(recurringDays.filter(d => d !== day));
-    } else {
-      setRecurringDays([...recurringDays, day]);
-    }
-  };
-
-  const openCustomTagModal = (type: 'priority' | 'goalType' | 'cleaningLocation') => {
-    setCustomTagType(type);
-    setShowCustomTagModal(true);
-  };
-
-  const saveCustomTag = () => {
-    if (customTagType === 'priority') {
-      if (customPriorityText.trim()) {
-        // Create a new custom priority tag
-        const newTag: CustomTag = {
-          text: customPriorityText,
-          color: customPriorityColor
-        };
-        
-        // Only add if not already in the list
-        if (!savedPriorityTags.some(tag => tag.text === newTag.text)) {
-          setSavedPriorityTags([...savedPriorityTags, newTag]);
-        }
-        
-        setPriority('custom');
-      }
-    } else if (customTagType === 'goalType') {
-      if (customGoalTypeText.trim()) {
-        // Create a new custom goal type tag
-        const newTag: CustomTag = {
-          text: customGoalTypeText,
-          color: customGoalTypeColor
-        };
-        
-        // Only add if not already in the list
-        if (!savedGoalTypeTags.some(tag => tag.text === newTag.text)) {
-          setSavedGoalTypeTags([...savedGoalTypeTags, newTag]);
-        }
-        
-        setGoalType('custom');
-      }
-    } else if (customTagType === 'cleaningLocation') {
-      if (customCleaningLocation.trim()) {
-        // Create a new custom cleaning location tag
-        const newTag: CustomTag = {
-          text: customCleaningLocation,
-          color: customCleaningLocationColor
-        };
-        
-        // Only add if not already in the list
-        if (!savedCleaningLocationTags.some(tag => tag.text === newTag.text)) {
-          setSavedCleaningLocationTags([...savedCleaningLocationTags, newTag]);
-        }
-        
-        setCleaningLocation('custom');
-      }
-    }
-    setShowCustomTagModal(false);
-  };
-  
-  if (!visible) return null;
 
   return (
-    <View style={[styles.overlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
-      <NeumorphicCard style={[styles.form, { backgroundColor: bgColor, shadowColor: shadowColor }]}>
-        <ScrollView showsVerticalScrollIndicator={false} style={styles.scrollView}>
-          <View style={styles.header}>
-            <Text style={[styles.title, { color: darkColor }]}>Add New Task</Text>
-            <TouchableOpacity onPress={onClose} style={styles.closeButton}>
-              <X size={24} color={mediumColor} />
-            </TouchableOpacity>
-          </View>
+    <Modal visible={visible} animationType="slide" presentationStyle="pageSheet">
+      <SafeAreaView style={[styles.container, { backgroundColor: bgColor }]}>
+        <View style={[styles.header, { borderBottomColor: pastelColor }]}>
+          <Text style={[styles.title, { color: darkColor }]}>Add New Task</Text>
+          <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
+            <X size={24} color={mediumColor} />
+          </TouchableOpacity>
+        </View>
 
-          <TextInput
-            style={[styles.input, { 
-              backgroundColor: bgColor,
-              borderColor: pastelColor,
-              color: darkColor,
+        <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+          {/* Error Messages */}
+          {errors.length > 0 && (
+            <NeumorphicCard style={[styles.errorCard, { 
+              backgroundColor: '#FED7D7',
+              borderLeftColor: '#FC8181',
               shadowColor: shadowColor
-            }]}
-            placeholder="Task title"
-            placeholderTextColor={mediumColor}
-            value={title}
-            onChangeText={setTitle}
-            autoFocus
-          />
+            }]}>
+              <Text style={[styles.errorTitle, { color: '#C53030' }]}>Please fix the following:</Text>
+              {errors.map((error, index) => (
+                <Text key={index} style={[styles.errorText, { color: '#C53030' }]}>
+                  • {error}
+                </Text>
+              ))}
+            </NeumorphicCard>
+          )}
 
-          {/* Daily Tab */}
-          {category === 'daily' && (
-            <>
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Type</Text>
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      !isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
-                    ]}
-                    onPress={() => setIsHabit(false)}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      !isHabit && [styles.selectedText, { color: pastelColor }]
-                    ]}>Task</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
-                    ]}
-                    onPress={() => setIsHabit(true)}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      isHabit && [styles.selectedText, { color: pastelColor }]
-                    ]}>Habit</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                {isHabit && (
-                  <View style={styles.habitFrequency}>
-                    <Text style={[styles.habitFrequencyLabel, { color: mediumColor }]}>
-                      Daily goal:
-                    </Text>
-                    <View style={[styles.habitGoalInput, { 
-                      backgroundColor: bgColor,
-                      shadowColor: shadowColor
-                    }]}>
-                      <TouchableOpacity 
-                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
-                        onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
-                      >
-                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>-</Text>
-                      </TouchableOpacity>
-                      <Text style={[styles.habitGoalValue, { color: darkColor }]}>{habitGoal}</Text>
-                      <TouchableOpacity 
-                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
-                        onPress={() => setHabitGoal(habitGoal + 1)}
-                      >
-                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
-                )}
-              </View>
+          <NeumorphicCard style={[styles.formCard, { shadowColor: shadowColor }]}>
+            <Text style={[styles.label, { color: darkColor }]}>Task Name *</Text>
+            <TextInput
+              style={[styles.input, { 
+                borderColor: errors.some(e => e.includes('Task name')) ? '#FC8181' : pastelColor, 
+                backgroundColor: bgColor,
+                color: darkColor
+              }]}
+              value={title}
+              onChangeText={(text) => {
+                setTitle(text);
+                if (errors.length > 0) {
+                  setErrors(errors.filter(e => !e.includes('Task name')));
+                }
+              }}
+              placeholder="Enter task name"
+              placeholderTextColor={mediumColor}
+              multiline
+            />
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
-                {subtasks.map((subtask, index) => (
-                  <View key={index} style={styles.subtaskRow}>
-                    <TextInput
-                      style={[styles.subtaskInput, { 
-                        backgroundColor: bgColor,
-                        borderColor: pastelColor,
-                        color: darkColor,
-                        shadowColor: shadowColor
-                      }]}
-                      placeholder={`Subtask ${index + 1}`}
-                      placeholderTextColor={mediumColor}
-                      value={subtask}
-                      onChangeText={(value) => updateSubtask(index, value)}
-                    />
-                    {subtasks.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
-                        <X size={16} color="#FC8181" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
-                <TouchableOpacity 
-                  onPress={addSubtask} 
-                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
-                >
-                  <Plus size={16} color={pastelColor} />
-                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
-                </TouchableOpacity>
-              </View>
+            {/* Habit Settings */}
+            <View style={styles.switchRow}>
+              <Text style={[styles.label, { color: darkColor }]}>Is this a habit?</Text>
+              <Switch
+                value={isHabit}
+                onValueChange={setIsHabit}
+                trackColor={{ false: pastelColor, true: accentColor }}
+                thumbColor="#ffffff"
+              />
+            </View>
 
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Priority</Text>
-                  <TouchableOpacity 
-                    style={[styles.addCustomButton, { backgroundColor: pastelColor }]}
-                    onPress={() => openCustomTagModal('priority')}
-                  >
-                    <Plus size={14} color={mediumColor} />
-                    <Text style={[styles.addCustomText, { color: mediumColor }]}>Add Custom</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    key="low"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      priority === 'low' && [styles.selectedOption, {backgroundColor: '#68D391'}]
-                    ]}
-                    onPress={() => setPriority('low')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      priority === 'low' && styles.selectedText
-                    ]}>
-                      Low
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="medium"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      priority === 'medium' && [styles.selectedOption, {backgroundColor: '#4299E1'}]
-                    ]}
-                    onPress={() => setPriority('medium')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      priority === 'medium' && styles.selectedText
-                    ]}>
-                      Medium
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="high"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      priority === 'high' && [styles.selectedOption, {backgroundColor: '#FC8181'}]
-                    ]}
-                    onPress={() => setPriority('high')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      priority === 'high' && styles.selectedText
-                    ]}>
-                      High
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="quick-win"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      priority === 'quick-win' && [styles.selectedOption, {backgroundColor: '#F6AD55'}]
-                    ]}
-                    onPress={() => setPriority('quick-win')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      priority === 'quick-win' && styles.selectedText
-                    ]}>
-                      Quick Win
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  {/* Display saved custom priority tags */}
-                  {savedPriorityTags.map((tag, index) => (
+            {isHabit && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Daily Goal *</Text>
+                <TextInput
+                  style={[styles.input, { 
+                    borderColor: errors.some(e => e.includes('habit goal')) ? '#FC8181' : pastelColor, 
+                    backgroundColor: bgColor,
+                    color: darkColor
+                  }]}
+                  value={habitGoal}
+                  onChangeText={(text) => {
+                    setHabitGoal(text);
+                    if (errors.length > 0) {
+                      setErrors(errors.filter(e => !e.includes('habit goal')));
+                    }
+                  }}
+                  placeholder="e.g., 3"
+                  placeholderTextColor={mediumColor}
+                  keyboardType="numeric"
+                />
+              </>
+            )}
+
+            {/* Daily Tasks - Priority */}
+            {category === 'daily' && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Priority *</Text>
+                <View style={styles.optionGrid}>
+                  {['high', 'medium', 'low', 'quick-win', 'custom'].map((option) => (
                     <TouchableOpacity
-                      key={`saved-priority-${index}`}
+                      key={option}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        priority === 'custom' && customPriorityText === tag.text && [
-                          styles.selectedOption, 
-                          { backgroundColor: tag.color }
-                        ]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        priority === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Priority')) && { borderColor: '#FC8181', borderWidth: 1 }
                       ]}
                       onPress={() => {
-                        setPriority('custom');
-                        setCustomPriorityText(tag.text);
-                        setCustomPriorityColor(tag.color);
+                        setPriority(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Priority')));
+                        }
                       }}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        priority === 'custom' && customPriorityText === tag.text && styles.selectedText
+                        priority === option && { color: pastelColor }
                       ]}>
-                        {tag.text}
+                        {option === 'quick-win' ? 'Quick Win' : option.charAt(0).toUpperCase() + option.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
-            </>
-          )}
 
-          {/* Goals Tab - Modified section */}
-          {category === 'goals' && (
-            <>
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Goal Type</Text>
-                  <TouchableOpacity 
-                    style={[styles.addCustomButton, { backgroundColor: pastelColor }]}
-                    onPress={() => openCustomTagModal('goalType')}
-                  >
-                    <Plus size={14} color={mediumColor} />
-                    <Text style={[styles.addCustomText, { color: mediumColor }]}>Add Custom</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    key="TBD"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      goalType === 'TBD' && [styles.selectedOption, {backgroundColor: '#9F7AEA'}]
-                    ]}
-                    onPress={() => setGoalType('TBD')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      goalType === 'TBD' && styles.selectedText
-                    ]}>
-                      TBD
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="Not Priority"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      goalType === 'Not Priority' && [styles.selectedOption, {backgroundColor: '#FC8181'}]
-                    ]}
-                    onPress={() => setGoalType('Not Priority')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      goalType === 'Not Priority' && styles.selectedText
-                    ]}>
-                      Not Priority
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="Wish"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      goalType === 'Wish' && [styles.selectedOption, {backgroundColor: '#4299E1'}]
-                    ]}
-                    onPress={() => setGoalType('Wish')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      goalType === 'Wish' && styles.selectedText
-                    ]}>
-                      Wish
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  {/* Display saved custom goal type tags */}
-                  {savedGoalTypeTags.map((tag, index) => (
+                {priority === 'custom' && (
+                  <>
+                    <Text style={[styles.label, { color: darkColor }]}>Custom Priority Text *</Text>
+                    <TextInput
+                      style={[styles.input, { 
+                        borderColor: errors.some(e => e.includes('Custom priority')) ? '#FC8181' : pastelColor, 
+                        backgroundColor: bgColor,
+                        color: darkColor
+                      }]}
+                      value={customPriorityText}
+                      onChangeText={(text) => {
+                        setCustomPriorityText(text);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Custom priority')));
+                        }
+                      }}
+                      placeholder="Enter custom priority"
+                      placeholderTextColor={mediumColor}
+                    />
+                  </>
+                )}
+              </>
+            )}
+
+            {/* Goals - Goal Type */}
+            {category === 'goals' && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Goal Type *</Text>
+                <View style={styles.optionGrid}>
+                  {['TBD', 'Not Priority', 'Wish', 'custom'].map((option) => (
                     <TouchableOpacity
-                      key={`saved-goalType-${index}`}
+                      key={option}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        goalType === 'custom' && customGoalTypeText === tag.text && [
-                          styles.selectedOption, 
-                          { backgroundColor: tag.color }
-                        ]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        goalType === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Goal type')) && { borderColor: '#FC8181', borderWidth: 1 }
                       ]}
                       onPress={() => {
-                        setGoalType('custom');
-                        setCustomGoalTypeText(tag.text);
-                        setCustomGoalTypeColor(tag.color);
+                        setGoalType(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Goal type')));
+                        }
                       }}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        goalType === 'custom' && customGoalTypeText === tag.text && styles.selectedText
+                        goalType === option && { color: pastelColor }
                       ]}>
-                        {tag.text}
+                        {option.charAt(0).toUpperCase() + option.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
-                {subtasks.map((subtask, index) => (
-                  <View key={index} style={styles.subtaskRow}>
+                {goalType === 'custom' && (
+                  <>
+                    <Text style={[styles.label, { color: darkColor }]}>Custom Goal Type *</Text>
                     <TextInput
-                      style={[styles.subtaskInput, { 
+                      style={[styles.input, { 
+                        borderColor: errors.some(e => e.includes('Custom goal type')) ? '#FC8181' : pastelColor, 
                         backgroundColor: bgColor,
-                        borderColor: pastelColor,
-                        color: darkColor,
-                        shadowColor: shadowColor
+                        color: darkColor
                       }]}
-                      placeholder={`Subtask ${index + 1}`}
+                      value={customGoalTypeText}
+                      onChangeText={(text) => {
+                        setCustomGoalTypeText(text);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Custom goal type')));
+                        }
+                      }}
+                      placeholder="Enter custom goal type"
                       placeholderTextColor={mediumColor}
-                      value={subtask}
-                      onChangeText={(value) => updateSubtask(index, value)}
                     />
-                    {subtasks.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
-                        <X size={16} color="#FC8181" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
-                <TouchableOpacity 
-                  onPress={addSubtask} 
-                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
-                >
-                  <Plus size={16} color={pastelColor} />
-                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-
-          {/* Weekly Calendar Tab */}
-          {category === 'weekly' && (
-            <>
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Type</Text>
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      !isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
-                    ]}
-                    onPress={() => setIsHabit(false)}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      !isHabit && [styles.selectedText, { color: pastelColor }]
-                    ]}>Task</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      isHabit && [styles.selectedOption, { backgroundColor: accentColor }]
-                    ]}
-                    onPress={() => setIsHabit(true)}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      isHabit && [styles.selectedText, { color: pastelColor }]
-                    ]}>Habit</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                {isHabit && (
-                  <View style={styles.habitFrequency}>
-                    <Text style={[styles.habitFrequencyLabel, { color: mediumColor }]}>
-                      Daily goal:
-                    </Text>
-                    <View style={[styles.habitGoalInput, { 
-                      backgroundColor: bgColor,
-                      shadowColor: shadowColor
-                    }]}>
-                      <TouchableOpacity 
-                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
-                        onPress={() => setHabitGoal(Math.max(1, habitGoal - 1))}
-                      >
-                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>-</Text>
-                      </TouchableOpacity>
-                      <Text style={[styles.habitGoalValue, { color: darkColor }]}>{habitGoal}</Text>
-                      <TouchableOpacity 
-                        style={[styles.habitGoalButton, { backgroundColor: pastelColor }]}
-                        onPress={() => setHabitGoal(habitGoal + 1)}
-                      >
-                        <Text style={[styles.habitGoalButtonText, { color: mediumColor }]}>+</Text>
-                      </TouchableOpacity>
-                    </View>
-                  </View>
+                  </>
                 )}
-              </View>
+              </>
+            )}
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
-                {subtasks.map((subtask, index) => (
-                  <View key={index} style={styles.subtaskRow}>
-                    <TextInput
-                      style={[styles.subtaskInput, { 
-                        backgroundColor: bgColor,
-                        borderColor: pastelColor,
-                        color: darkColor,
-                        shadowColor: shadowColor
-                      }]}
-                      placeholder={`Subtask ${index + 1}`}
-                      placeholderTextColor={mediumColor}
-                      value={subtask}
-                      onChangeText={(value) => updateSubtask(index, value)}
-                    />
-                    {subtasks.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
-                        <X size={16} color="#FC8181" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
-                <TouchableOpacity 
-                  onPress={addSubtask} 
-                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
-                >
-                  <Plus size={16} color={pastelColor} />
-                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
-                </TouchableOpacity>
-              </View>
-
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Date Options</Text>
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      !isRecurring && [styles.selectedOption, { backgroundColor: accentColor }]
-                    ]}
-                    onPress={() => setIsRecurring(false)}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      !isRecurring && [styles.selectedText, { color: pastelColor }]
-                    ]}>One-time</Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      isRecurring && [styles.selectedOption, { backgroundColor: accentColor }]
-                    ]}
-                    onPress={() => setIsRecurring(true)}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      isRecurring && [styles.selectedText, { color: pastelColor }]
-                    ]}>Recurring</Text>
-                  </TouchableOpacity>
-                </View>
-                
-                {isRecurring && (
-                  <View style={styles.recurringOptions}>
-                    <Text style={[styles.recurringTitle, { color: mediumColor }]}>Repeat on:</Text>
-                    <View style={styles.daysRow}>
-                      {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                        <TouchableOpacity
-                          key={day}
-                          style={[
-                            styles.dayButton,
-                            { backgroundColor: pastelColor, shadowColor: shadowColor },
-                            recurringDays.includes(day) && { backgroundColor: accentColor }
-                          ]}
-                          onPress={() => toggleRecurringDay(day)}
-                        >
-                          <Text style={[
-                            styles.dayText,
-                            { color: mediumColor },
-                            recurringDays.includes(day) && { color: pastelColor }
-                          ]}>
-                            {day.charAt(0)}
-                          </Text>
-                        </TouchableOpacity>
-                      ))}
-                    </View>
-                  </View>
-                )}
-              </View>
-            </>
-          )}
-
-          {/* Meal Prep Tab - Updated for day of week tags */}
-          {category === 'meal-prep' && (
-            <>
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Meal Type</Text>
-                <View style={styles.buttonRow}>
-                  {['breakfast', 'lunch', 'dinner', 'snack'].map((type) => (
+            {/* Meal Prep */}
+            {category === 'meal-prep' && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Meal Type *</Text>
+                <View style={styles.optionGrid}>
+                  {['breakfast', 'lunch', 'dinner', 'snack'].map((option) => (
                     <TouchableOpacity
-                      key={type}
+                      key={option}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        mealType === type && [
-                          styles.selectedOption,
-                          { backgroundColor: accentColor }
-                        ]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        mealType === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Meal type')) && { borderColor: '#FC8181', borderWidth: 1 }
                       ]}
-                      onPress={() => setMealType(type)}
+                      onPress={() => {
+                        setMealType(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Meal type')));
+                        }
+                      }}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        mealType === type && [styles.selectedText, { color: pastelColor }]
+                        mealType === option && { color: pastelColor }
                       ]}>
-                        {type.charAt(0).toUpperCase() + type.slice(1)}
+                        {option.charAt(0).toUpperCase() + option.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Day</Text>
-                <View style={styles.buttonRow}>
-                  {[
-                    { day: 'Mon', color: '#FC8181' }, // Red
-                    { day: 'Tue', color: '#F6AD55' }, // Orange
-                    { day: 'Wed', color: '#F6E05E' }, // Yellow
-                    { day: 'Thu', color: '#68D391' }, // Green
-                    { day: 'Fri', color: '#4FD1C5' }, // Teal
-                    { day: 'Sat', color: '#63B3ED' }, // Blue
-                    { day: 'Sun', color: '#B794F4' }  // Purple
-                  ].map(({ day, color }) => (
+                <Text style={[styles.label, { color: darkColor }]}>Day of Week</Text>
+                <View style={styles.optionGrid}>
+                  {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => (
                     <TouchableOpacity
                       key={day}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        dayOfWeek === day && [styles.selectedOption, { backgroundColor: color }]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        dayOfWeek === day && { backgroundColor: accentColor }
                       ]}
                       onPress={() => setDayOfWeek(day)}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        dayOfWeek === day && styles.selectedText
+                        dayOfWeek === day && { color: pastelColor }
                       ]}>
                         {day}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Recipe Notes</Text>
+                <Text style={[styles.label, { color: darkColor }]}>Notes</Text>
                 <TextInput
-                  style={[styles.input, styles.notesInput, { 
+                  style={[styles.input, styles.textArea, { 
+                    borderColor: pastelColor, 
                     backgroundColor: bgColor,
-                    borderColor: pastelColor,
-                    color: darkColor,
-                    shadowColor: shadowColor
+                    color: darkColor
                   }]}
-                  placeholder="Add recipe notes, ingredients, etc."
-                  placeholderTextColor={mediumColor}
                   value={notes}
                   onChangeText={setNotes}
+                  placeholder="Add any notes or details"
+                  placeholderTextColor={mediumColor}
                   multiline
-                  numberOfLines={4}
+                  numberOfLines={3}
                 />
-              </View>
-            </>
-          )}
+              </>
+            )}
 
-          {/* Cleaning Tab - Updated for custom location with color wheel */}
-          {category === 'cleaning' && (
-            <>
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Frequency</Text>
-                <View style={styles.buttonRow}>
-                  {['daily', 'weekly', 'monthly', 'seasonal'].map((freq) => (
+            {/* Cleaning */}
+            {category === 'cleaning' && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Frequency *</Text>
+                <View style={styles.optionGrid}>
+                  {['daily', 'weekly', 'monthly', 'seasonal'].map((option) => (
                     <TouchableOpacity
-                      key={freq}
+                      key={option}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        frequency === freq && [styles.selectedOption, { backgroundColor: accentColor }]
-                      ]}
-                      onPress={() => setFrequency(freq)}
-                    >
-                      <Text style={[
-                        styles.optionText, 
-                        { color: mediumColor },
-                        frequency === freq && [styles.selectedText, { color: pastelColor }]
-                      ]}>
-                        {freq.charAt(0).toUpperCase() + freq.slice(1)}
-                      </Text>
-                    </TouchableOpacity>
-                  ))}
-                </View>
-              </View>
-
-              <View style={styles.section}>
-                <View style={styles.sectionHeader}>
-                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Location</Text>
-                  <TouchableOpacity 
-                    style={[styles.addCustomButton, { backgroundColor: pastelColor }]}
-                    onPress={() => openCustomTagModal('cleaningLocation')}
-                  >
-                    <Plus size={14} color={mediumColor} />
-                    <Text style={[styles.addCustomText, { color: mediumColor }]}>Add Custom</Text>
-                  </TouchableOpacity>
-                </View>
-                <View style={styles.buttonRow}>
-                  <TouchableOpacity
-                    key="kitchen"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      cleaningLocation === 'kitchen' && [styles.selectedOption, {backgroundColor: '#F6E05E'}]
-                    ]}
-                    onPress={() => setCleaningLocation('kitchen')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      cleaningLocation === 'kitchen' && styles.selectedText
-                    ]}>
-                      Kitchen
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="bathroom"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      cleaningLocation === 'bathroom' && [styles.selectedOption, {backgroundColor: '#4FD1C5'}]
-                    ]}
-                    onPress={() => setCleaningLocation('bathroom')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      cleaningLocation === 'bathroom' && styles.selectedText
-                    ]}>
-                      Bathroom
-                    </Text>
-                  </TouchableOpacity>
-                  <TouchableOpacity
-                    key="bedroom"
-                    style={[
-                      styles.optionButton, 
-                      { backgroundColor: pastelColor, shadowColor: shadowColor },
-                      cleaningLocation === 'bedroom' && [styles.selectedOption, {backgroundColor: '#9F7AEA'}]
-                    ]}
-                    onPress={() => setCleaningLocation('bedroom')}
-                  >
-                    <Text style={[
-                      styles.optionText, 
-                      { color: mediumColor },
-                      cleaningLocation === 'bedroom' && styles.selectedText
-                    ]}>
-                      Bedroom
-                    </Text>
-                  </TouchableOpacity>
-                  
-                  {/* Display saved custom cleaning location tags */}
-                  {savedCleaningLocationTags.map((tag, index) => (
-                    <TouchableOpacity
-                      key={`saved-cleaning-${index}`}
-                      style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        cleaningLocation === 'custom' && customCleaningLocation === tag.text && [
-                          styles.selectedOption, 
-                          { backgroundColor: tag.color }
-                        ]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        frequency === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Frequency')) && { borderColor: '#FC8181', borderWidth: 1 }
                       ]}
                       onPress={() => {
-                        setCleaningLocation('custom');
-                        setCustomCleaningLocation(tag.text);
-                        setCustomCleaningLocationColor(tag.color);
+                        setFrequency(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Frequency')));
+                        }
                       }}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        cleaningLocation === 'custom' && customCleaningLocation === tag.text && styles.selectedText
+                        frequency === option && { color: pastelColor }
                       ]}>
-                        {tag.text}
+                        {option.charAt(0).toUpperCase() + option.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
-                {subtasks.map((subtask, index) => (
-                  <View key={index} style={styles.subtaskRow}>
-                    <TextInput
-                      style={[styles.subtaskInput, { 
-                        backgroundColor: bgColor,
-                        borderColor: pastelColor,
-                        color: darkColor,
-                        shadowColor: shadowColor
-                      }]}
-                      placeholder={`Subtask ${index + 1}`}
-                      placeholderTextColor={mediumColor}
-                      value={subtask}
-                      onChangeText={(value) => updateSubtask(index, value)}
-                    />
-                    {subtasks.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
-                        <X size={16} color="#FC8181" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
-                <TouchableOpacity 
-                  onPress={addSubtask} 
-                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
-                >
-                  <Plus size={16} color={pastelColor} />
-                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
-
-          {/* Self-care Tab - Removed Frequency section */}
-          {category === 'self-care' && (
-            <>
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Self-Care Type</Text>
-                <View style={styles.buttonRow}>
-                  {[
-                    { type: 'physical', label: 'Physical Health', color: '#68D391' },
-                    { type: 'mental', label: 'Mental Health', color: '#9F7AEA' },
-                    { type: 'rest', label: 'Rest & Recovery', color: '#4FD1C5' },
-                    { type: 'joy', label: 'Joy & Connection', color: '#F6AD55' }
-                  ].map(({ type, label, color }) => (
+                <Text style={[styles.label, { color: darkColor }]}>Location *</Text>
+                <View style={styles.optionGrid}>
+                  {['kitchen', 'bathroom', 'bedroom', 'custom'].map((option) => (
                     <TouchableOpacity
-                      key={type}
+                      key={option}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        selfCareType === type && [styles.selectedOption, {backgroundColor: color}]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        cleaningLocation === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Location')) && { borderColor: '#FC8181', borderWidth: 1 }
                       ]}
-                      onPress={() => setSelfCareType(type)}
+                      onPress={() => {
+                        setCleaningLocation(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Location')));
+                        }
+                      }}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        selfCareType === type && styles.selectedText
+                        cleaningLocation === option && { color: pastelColor }
                       ]}>
-                        {label}
+                        {option.charAt(0).toUpperCase() + option.slice(1)}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
-                {subtasks.map((subtask, index) => (
-                  <View key={index} style={styles.subtaskRow}>
+                {cleaningLocation === 'custom' && (
+                  <>
+                    <Text style={[styles.label, { color: darkColor }]}>Custom Location *</Text>
                     <TextInput
-                      style={[styles.subtaskInput, { 
+                      style={[styles.input, { 
+                        borderColor: errors.some(e => e.includes('Custom location')) ? '#FC8181' : pastelColor, 
                         backgroundColor: bgColor,
-                        borderColor: pastelColor,
-                        color: darkColor,
-                        shadowColor: shadowColor
+                        color: darkColor
                       }]}
-                      placeholder={`Subtask ${index + 1}`}
+                      value={customCleaningLocation}
+                      onChangeText={(text) => {
+                        setCustomCleaningLocation(text);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Custom location')));
+                        }
+                      }}
+                      placeholder="Enter custom location"
                       placeholderTextColor={mediumColor}
-                      value={subtask}
-                      onChangeText={(value) => updateSubtask(index, value)}
                     />
-                    {subtasks.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
-                        <X size={16} color="#FC8181" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
-                <TouchableOpacity 
-                  onPress={addSubtask} 
-                  style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
-                >
-                  <Plus size={16} color={pastelColor} />
-                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
-                </TouchableOpacity>
-              </View>
-            </>
-          )}
+                  </>
+                )}
+              </>
+            )}
 
-          {/* Delegation Tab - Removed Frequency, renamed field, added tag selection */}
-          {category === 'delegation' && (
-            <>
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Delegate To</Text>
-                <View style={styles.buttonRow}>
-                  {[
-                    { type: 'partner', label: 'Partner Tasks', color: '#63B3ED' },
-                    { type: 'family', label: 'Family Tasks', color: '#F6AD55' },
-                    { type: 'friends', label: 'Friends Tasks', color: '#9F7AEA' },
-                    { type: 'kids', label: 'Kids Tasks', color: '#68D391' }
-                  ].map(({ type, label, color }) => (
+            {/* Self-Care */}
+            {category === 'self-care' && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Self-Care Type *</Text>
+                <View style={styles.optionGrid}>
+                  {['physical', 'mental', 'rest', 'joy'].map((option) => (
                     <TouchableOpacity
-                      key={type}
+                      key={option}
                       style={[
-                        styles.optionButton, 
-                        { backgroundColor: pastelColor, shadowColor: shadowColor },
-                        delegateType === type && [styles.selectedOption, {backgroundColor: color}]
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        selfCareType === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Self-care type')) && { borderColor: '#FC8181', borderWidth: 1 }
                       ]}
-                      onPress={() => setDelegateType(type)}
+                      onPress={() => {
+                        setSelfCareType(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Self-care type')));
+                        }
+                      }}
                     >
                       <Text style={[
-                        styles.optionText, 
+                        styles.optionText,
                         { color: mediumColor },
-                        delegateType === type && styles.selectedText
+                        selfCareType === option && { color: pastelColor }
                       ]}>
-                        {label}
+                        {option === 'physical' ? 'Physical Health' :
+                         option === 'mental' ? 'Mental Health' :
+                         option === 'rest' ? 'Rest & Recovery' :
+                         'Joy & Connection'}
                       </Text>
                     </TouchableOpacity>
                   ))}
                 </View>
-              </View>
+              </>
+            )}
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Delegate Name</Text>
+            {/* Delegation */}
+            {category === 'delegation' && (
+              <>
+                <Text style={[styles.label, { color: darkColor }]}>Delegate To *</Text>
                 <TextInput
                   style={[styles.input, { 
+                    borderColor: errors.some(e => e.includes('Person to delegate')) ? '#FC8181' : pastelColor, 
                     backgroundColor: bgColor,
-                    borderColor: pastelColor,
-                    color: darkColor,
-                    shadowColor: shadowColor
+                    color: darkColor
                   }]}
-                  placeholder="Person's name"
-                  placeholderTextColor={mediumColor}
                   value={delegatedTo}
-                  onChangeText={setDelegatedTo}
+                  onChangeText={(text) => {
+                    setDelegatedTo(text);
+                    if (errors.length > 0) {
+                      setErrors(errors.filter(e => !e.includes('Person to delegate')));
+                    }
+                  }}
+                  placeholder="Who will handle this task?"
+                  placeholderTextColor={mediumColor}
                 />
-              </View>
 
-              <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: darkColor }]}>Subtasks</Text>
-                {subtasks.map((subtask, index) => (
-                  <View key={index} style={styles.subtaskRow}>
-                    <TextInput
-                      style={[styles.subtaskInput, { 
-                        backgroundColor: bgColor,
-                        borderColor: pastelColor,
-                        color: darkColor,
-                        shadowColor: shadowColor
-                      }]}
-                      placeholder={`Subtask ${index + 1}`}
-                      placeholderTextColor={mediumColor}
-                      value={subtask}
-                      onChangeText={(value) => updateSubtask(index, value)}
-                    />
-                    {subtasks.length > 1 && (
-                      <TouchableOpacity onPress={() => removeSubtask(index)} style={styles.removeButton}>
-                        <X size={16} color="#FC8181" />
-                      </TouchableOpacity>
-                    )}
-                  </View>
-                ))}
+                <Text style={[styles.label, { color: darkColor }]}>Delegate Type *</Text>
+                <View style={styles.optionGrid}>
+                  {['partner', 'family', 'friends', 'kids'].map((option) => (
+                    <TouchableOpacity
+                      key={option}
+                      style={[
+                        styles.optionButton,
+                        { backgroundColor: pastelColor },
+                        delegateType === option && { backgroundColor: accentColor },
+                        errors.some(e => e.includes('Delegate type')) && { borderColor: '#FC8181', borderWidth: 1 }
+                      ]}
+                      onPress={() => {
+                        setDelegateType(option);
+                        if (errors.length > 0) {
+                          setErrors(errors.filter(e => !e.includes('Delegate type')));
+                        }
+                      }}
+                    >
+                      <Text style={[
+                        styles.optionText,
+                        { color: mediumColor },
+                        delegateType === option && { color: pastelColor }
+                      ]}>
+                        {option.charAt(0).toUpperCase() + option.slice(1)}
+                      </Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+
+                <View style={styles.switchRow}>
+                  <Text style={[styles.label, { color: darkColor }]}>Enable Reminders</Text>
+                  <Switch
+                    value={reminderEnabled}
+                    onValueChange={setReminderEnabled}
+                    trackColor={{ false: pastelColor, true: accentColor }}
+                    thumbColor="#ffffff"
+                  />
+                </View>
+              </>
+            )}
+
+            {/* Calendar Tasks */}
+            {category === 'weekly' && selectedDate && (
+              <View style={[styles.dateInfo, { 
+                backgroundColor: accentColor,
+                borderColor: darkColor
+              }]}>
+                <Text style={[styles.dateInfoText, { color: pastelColor }]}>
+                  Scheduled for: {selectedDate.toLocaleDateString('en-US', { 
+                    weekday: 'long', 
+                    year: 'numeric', 
+                    month: 'long', 
+                    day: 'numeric' 
+                  })}
+                </Text>
+              </View>
+            )}
+
+            {/* Subtasks */}
+            <View style={styles.subtasksSection}>
+              <View style={styles.subtasksHeader}>
+                <Text style={[styles.label, { color: darkColor }]}>Subtasks</Text>
                 <TouchableOpacity 
                   onPress={addSubtask} 
                   style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
                 >
                   <Plus size={16} color={pastelColor} />
-                  <Text style={[styles.addSubtaskText, { color: pastelColor }]}>Add Subtask</Text>
                 </TouchableOpacity>
               </View>
 
-              <View style={styles.section}>
-                <View style={styles.reminderRow}>
-                  <Text style={[styles.sectionTitle, { color: darkColor }]}>Add task reminder</Text>
+              {subtasks.map((subtask, index) => (
+                <View key={subtask.id} style={styles.subtaskRow}>
+                  <TextInput
+                    style={[styles.input, styles.subtaskInput, { 
+                      borderColor: pastelColor, 
+                      backgroundColor: bgColor,
+                      color: darkColor
+                    }]}
+                    value={subtask.title}
+                    onChangeText={(text) => updateSubtask(subtask.id, text)}
+                    placeholder={`Subtask ${index + 1}`}
+                    placeholderTextColor={mediumColor}
+                  />
                   <TouchableOpacity
-                    style={[
-                      styles.toggleButton,
-                      { backgroundColor: pastelColor },
-                      reminderEnabled && { backgroundColor: accentColor }
-                    ]}
-                    onPress={() => setReminderEnabled(!reminderEnabled)}
+                    onPress={() => removeSubtask(subtask.id)}
+                    style={[styles.removeSubtaskButton, { backgroundColor: '#FED7D7' }]}
                   >
-                    <View style={[
-                      styles.toggleKnob,
-                      { backgroundColor: bgColor },
-                      reminderEnabled && { transform: [{ translateX: 18 }] }
-                    ]} />
+                    <Minus size={16} color="#FC8181" />
                   </TouchableOpacity>
                 </View>
-                {reminderEnabled && (
-                  <Text style={[styles.reminderText, { color: mediumColor }]}>
-                    Will add reminder to goals: "Remind {delegatedTo || 'person'} to {title}"
-                  </Text>
-                )}
-              </View>
-            </>
-          )}
-
-          <TouchableOpacity 
-            style={[styles.submitButton, { 
-              backgroundColor: darkColor,
-              shadowColor: shadowColor
-            }]} 
-            onPress={handleSubmit}
-          >
-            <Plus size={20} color={pastelColor} />
-            <Text style={[styles.submitText, { color: pastelColor }]}>Add Task</Text>
-          </TouchableOpacity>
-        </ScrollView>
-      </NeumorphicCard>
-
-      {/* Custom Tag Modal - Modified for filtered color options */}
-      <Modal
-        transparent
-        visible={showCustomTagModal}
-        animationType="fade"
-        onRequestClose={() => setShowCustomTagModal(false)}
-      >
-        <View style={[styles.modalOverlay, { backgroundColor: 'rgba(0, 0, 0, 0.5)' }]}>
-          <NeumorphicCard style={[styles.modalContent, { 
-            backgroundColor: bgColor,
-            shadowColor: shadowColor
-          }]}>
-            <View style={styles.modalHeader}>
-              <Text style={[styles.modalTitle, { color: darkColor }]}>
-                {customTagType === 'priority' ? 'Custom Priority' : 
-                 customTagType === 'goalType' ? 'Custom Goal Type' : 
-                 'Custom Location'}
-              </Text>
-              <TouchableOpacity onPress={() => setShowCustomTagModal(false)}>
-                <X size={24} color={mediumColor} />
-              </TouchableOpacity>
-            </View>
-
-            <Text style={[styles.modalLabel, { color: darkColor }]}>
-              {customTagType === 'cleaningLocation' ? 'Location Name' : 'Tag Text'}
-            </Text>
-            <TextInput
-              style={[styles.modalInput, { 
-                backgroundColor: bgColor,
-                borderColor: pastelColor,
-                color: darkColor
-              }]}
-              placeholder={
-                customTagType === 'priority' ? "Enter custom priority" : 
-                customTagType === 'goalType' ? "Enter custom goal type" : 
-                "Enter custom location"
-              }
-              placeholderTextColor={mediumColor}
-              value={
-                customTagType === 'priority' ? customPriorityText : 
-                customTagType === 'goalType' ? customGoalTypeText : 
-                customCleaningLocation
-              }
-              onChangeText={(text) => {
-                if (customTagType === 'priority') {
-                  setCustomPriorityText(text);
-                } else if (customTagType === 'goalType') {
-                  setCustomGoalTypeText(text);
-                } else {
-                  setCustomCleaningLocation(text);
-                }
-              }}
-            />
-
-            <Text style={[styles.modalLabel, { color: darkColor }]}>Tag Color</Text>
-            <View style={styles.colorOptionsRow}>
-              {getAvailableColorOptions(customTagType).map(color => (
-                <TouchableOpacity
-                  key={color}
-                  style={[
-                    styles.colorOption,
-                    { backgroundColor: color, borderColor: pastelColor },
-                    ((customTagType === 'priority' ? customPriorityColor : 
-                     customTagType === 'goalType' ? customGoalTypeColor :
-                     customCleaningLocationColor) === color) && 
-                    [styles.selectedColorOption, { borderColor: darkColor }]
-                  ]}
-                  onPress={() => {
-                    if (customTagType === 'priority') {
-                      setCustomPriorityColor(color);
-                    } else if (customTagType === 'goalType') {
-                      setCustomGoalTypeColor(color);
-                    } else {
-                      setCustomCleaningLocationColor(color);
-                    }
-                  }}
-                />
               ))}
             </View>
-
-            <View style={styles.modalButtons}>
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.cancelButton, { backgroundColor: pastelColor }]} 
-                onPress={() => setShowCustomTagModal(false)}
-              >
-                <Text style={[styles.cancelButtonText, { color: mediumColor }]}>Cancel</Text>
-              </TouchableOpacity>
-              <TouchableOpacity 
-                style={[styles.modalButton, styles.saveButton, { backgroundColor: darkColor }]} 
-                onPress={saveCustomTag}
-              >
-                <Text style={[styles.saveButtonText, { color: pastelColor }]}>Save</Text>
-              </TouchableOpacity>
-            </View>
           </NeumorphicCard>
+        </ScrollView>
+
+        <View style={[styles.footer, { borderTopColor: pastelColor }]}>
+          <TouchableOpacity 
+            style={[styles.cancelButton, { backgroundColor: pastelColor }]} 
+            onPress={handleClose}
+          >
+            <Text style={[styles.cancelText, { color: mediumColor }]}>Cancel</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={[styles.submitButton, { backgroundColor: darkColor }]}
+            onPress={handleSubmit}
+          >
+            <Text style={[styles.submitText, { color: pastelColor }]}>Add Task</Text>
+          </TouchableOpacity>
         </View>
-      </Modal>
-    </View>
+      </SafeAreaView>
+    </Modal>
   );
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    position: 'absolute',
-    top: 0,
-    left: 0,
-    right: 0,
-    bottom: 0,
-    justifyContent: 'center',
-    alignItems: 'center',
-    zIndex: 1000,
-  },
-  form: {
-    width: '90%',
-    maxWidth: 400,
-    padding: 20,
-    margin: 0,
-    maxHeight: '90%',
-  },
-  scrollView: {
-    flexGrow: 0,
+  container: {
+    flex: 1,
   },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    borderBottomWidth: 1,
   },
   title: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 20,
+    fontFamily: 'Quicksand-Bold',
   },
   closeButton: {
     padding: 4,
   },
+  content: {
+    flex: 1,
+    paddingHorizontal: 12,
+  },
+  errorCard: {
+    margin: 12,
+    borderLeftWidth: 4,
+  },
+  errorTitle: {
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+    marginBottom: 8,
+  },
+  errorText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Regular',
+    marginBottom: 4,
+  },
+  formCard: {
+    margin: 12,
+  },
+  label: {
+    fontSize: 16,
+    fontFamily: 'Quicksand-SemiBold',
+    marginBottom: 8,
+    marginTop: 16,
+  },
   input: {
-    borderRadius: 12,
-    padding: 16,
+    borderWidth: 1,
+    borderRadius: 8,
+    padding: 12,
     fontSize: 16,
     fontFamily: 'Quicksand-Regular',
-    marginBottom: 20,
-    borderWidth: 1,
-    shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
   },
-  notesInput: {
-    height: 100,
+  textArea: {
+    height: 80,
     textAlignVertical: 'top',
   },
-  section: {
-    marginBottom: 20,
-  },
-  sectionHeader: {
+  switchRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 8,
+    marginTop: 16,
   },
-  sectionTitle: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  addCustomButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    padding: 4,
-    borderRadius: 12,
-  },
-  addCustomText: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Medium',
-    marginLeft: 2,
-  },
-  buttonRow: {
+  optionGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     gap: 8,
@@ -1513,55 +817,35 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
     paddingVertical: 8,
     borderRadius: 20,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    marginBottom: 4,
-  },
-  selectedOption: {
-    shadowOpacity: 0.3,
+    marginBottom: 8,
   },
   optionText: {
     fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  selectedText: {
-    color: '#ffffff',
-  },
-  habitFrequency: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    marginTop: 12,
-  },
-  habitFrequencyLabel: {
-    fontSize: 14,
     fontFamily: 'Quicksand-Medium',
   },
-  habitGoalInput: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  dateInfo: {
+    padding: 12,
     borderRadius: 8,
-    padding: 4,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
+    marginTop: 16,
+    borderWidth: 1,
   },
-  habitGoalButton: {
-    width: 30,
-    height: 30,
-    justifyContent: 'center',
+  dateInfoText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-SemiBold',
+    textAlign: 'center',
+  },
+  subtasksSection: {
+    marginTop: 16,
+  },
+  subtasksHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
     alignItems: 'center',
-    borderRadius: 15,
+    marginBottom: 8,
   },
-  habitGoalButtonText: {
-    fontSize: 18,
-    fontWeight: 'bold',
-  },
-  habitGoalValue: {
-    paddingHorizontal: 16,
-    fontSize: 16,
-    fontFamily: 'Quicksand-Bold',
+  addSubtaskButton: {
+    padding: 8,
+    borderRadius: 20,
   },
   subtaskRow: {
     flexDirection: 'row',
@@ -1570,168 +854,37 @@ const styles = StyleSheet.create({
   },
   subtaskInput: {
     flex: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
     marginRight: 8,
-    borderWidth: 1,
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.1,
-    shadowRadius: 2,
   },
-  removeButton: {
-    padding: 4,
-  },
-  addSubtaskButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
+  removeSubtaskButton: {
     padding: 8,
-    borderRadius: 8,
+    borderRadius: 20,
   },
-  addSubtaskText: {
-    fontSize: 14,
+  footer: {
+    flexDirection: 'row',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    gap: 12,
+    borderTopWidth: 1,
+  },
+  cancelButton: {
+    flex: 1,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  cancelText: {
+    fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    marginLeft: 4,
   },
   submitButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    borderRadius: 12,
+    flex: 1,
     padding: 16,
-    shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 0.3,
-    shadowRadius: 6,
+    borderRadius: 12,
+    alignItems: 'center',
   },
   submitText: {
     fontSize: 16,
     fontFamily: 'Quicksand-SemiBold',
-    marginLeft: 8,
-  },
-  recurringOptions: {
-    marginTop: 10,
-  },
-  recurringTitle: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Medium',
-    marginBottom: 8,
-  },
-  daysRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginBottom: 10,
-  },
-  dayButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowOffset: { width: 1, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-  },
-  dayText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  reminderRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  toggleButton: {
-    width: 44,
-    height: 24,
-    borderRadius: 12,
-    padding: 2,
-  },
-  toggleKnob: {
-    width: 20,
-    height: 20,
-    borderRadius: 10,
-  },
-  reminderText: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Regular',
-    fontStyle: 'italic',
-    marginBottom: 10,
-  },
-  // Modal styles
-  modalOverlay: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalContent: {
-    width: '80%',
-    padding: 20,
-    borderRadius: 16,
-  },
-  modalHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 20,
-  },
-  modalTitle: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  modalLabel: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 8,
-  },
-  modalInput: {
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    fontFamily: 'Quicksand-Regular',
-    marginBottom: 16,
-    borderWidth: 1,
-  },
-  // Updated to show colors in a single row
-  colorOptionsRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'flex-start',
-    marginBottom: 20,
-    gap: 8,
-  },
-  colorOption: {
-    width: 30,
-    height: 30,
-    borderRadius: 15,
-    marginHorizontal: 2,
-    borderWidth: 1,
-  },
-  selectedColorOption: {
-    borderWidth: 2,
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-  },
-  modalButton: {
-    flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    marginHorizontal: 4,
-  },
-  cancelButton: {
-  },
-  saveButton: {
-  },
-  cancelButtonText: {
-    fontFamily: 'Quicksand-SemiBold',
-    fontSize: 16,
-  },
-  saveButtonText: {
-    fontFamily: 'Quicksand-SemiBold',
-    fontSize: 16,
   },
 });

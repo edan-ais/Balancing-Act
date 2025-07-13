@@ -41,25 +41,25 @@ export default function Delegation() {
       name: 'Partner', 
       subtitle: 'Shared responsibilities',
       icon: Heart,
-      tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('partner')),
+      tasks: delegationTasks.filter(t => t.delegateType === 'partner'),
     },
     { 
       name: 'Family', 
       subtitle: 'Extended support network',
       icon: HomeIcon,
-      tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('family')),
+      tasks: delegationTasks.filter(t => t.delegateType === 'family'),
     },
     { 
       name: 'Friends', 
       subtitle: 'Social connections',
       icon: Star,
-      tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('friend')),
+      tasks: delegationTasks.filter(t => t.delegateType === 'friends'),
     },
     { 
       name: 'Kids', 
       subtitle: 'Learning opportunities',
       icon: BookOpen,
-      tasks: delegationTasks.filter(t => t.delegatedTo?.toLowerCase().includes('kid')),
+      tasks: delegationTasks.filter(t => t.delegateType === 'kids'),
     },
   ];
 
