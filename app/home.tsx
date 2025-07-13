@@ -29,7 +29,7 @@ const tabOptions = [
   {
     id: 'goals',
     title: 'Future Tasks',
-    subtitle: 'Plan your long-term goals and projects',
+    subtitle: 'Plan your long-term goals',
     icon: Target,
     themeKey: 'future'  // This corresponds to 'future' in the theme
   },
