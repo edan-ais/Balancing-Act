@@ -43,7 +43,7 @@ const tabOptions = [
   {
     id: 'meal-prep',
     title: 'Meal Prep',
-    subtitle: 'Plan your meals',
+    subtitle: 'Plan your meals and snacks',
     icon: ChefHat,
     themeKey: 'meals'
   },
