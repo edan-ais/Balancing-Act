@@ -16,54 +16,47 @@ const routeToColorMap = {
   'delegation': 'delegate'
 };
 
-// Tab configuration mapping with shortened display names
+// Tab configuration mapping
 const tabConfig = {
   'index': {
     name: 'index',
     title: 'Daily',
-    shortTitle: 'Day', // Shortened version
     icon: CalendarDays,
     colorKey: 'daily'
   },
   'goals': {
     name: 'goals',
     title: 'Future',
-    shortTitle: 'Goal', // Shortened version
     icon: Target,
     colorKey: 'future'
   },
   'weekly': {
     name: 'weekly',
     title: 'Calendar',
-    shortTitle: 'Cal', // Shortened version
     icon: Calendar,
     colorKey: 'calendar'
   },
   'meal-prep': {
     name: 'meal-prep',
     title: 'Meals',
-    shortTitle: 'Food', // Shortened version
     icon: ChefHat,
     colorKey: 'meals'
   },
   'cleaning': {
     name: 'cleaning',
     title: 'Cleaning',
-    shortTitle: 'Clean', // Shortened version
     icon: Sparkles,
     colorKey: 'cleaning'
   },
   'self-care': {
     name: 'self-care',
     title: 'Self-Care',
-    shortTitle: 'Self', // Shortened version
     icon: Heart,
     colorKey: 'selfCare'
   },
   'delegation': {
     name: 'delegation',
     title: 'Delegate',
-    shortTitle: 'Del', // Shortened version
     icon: Users,
     colorKey: 'delegate'
   }
@@ -203,7 +196,7 @@ export default function TabLayout() {
               <Text 
                 style={{
                   color: labelColor,
-                  fontFamily: 'Quicksand-Bold', // Changed to Bold from SemiBold
+                  fontFamily: 'Quicksand-SemiBold',
                   fontSize: 10,
                   marginTop: 4,
                   textAlign: 'center',
@@ -211,7 +204,7 @@ export default function TabLayout() {
                 numberOfLines={1}
                 ellipsizeMode="tail"
               >
-                {config.shortTitle || config.title} {/* Use shorter title if available */}
+                {config.title}
               </Text>
             );
           }
