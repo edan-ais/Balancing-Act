@@ -57,7 +57,7 @@ const tabOptions = [
   {
     id: 'self-care',
     title: 'Self-Care',
-    subtitle: 'Nurture yourself',
+    subtitle: 'Nurture yourself to feel refreshed',
     icon: Heart,
     themeKey: 'selfCare'
   },
