@@ -111,8 +111,8 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: primaryColors.medium }]}>Balancing Act</Text>
-        <Text style={[styles.subtitle, { color: primaryColors.medium }]}>
+        <Text style={[styles.title, { color: primaryColors.dark }]}>Balancing Act</Text>
+        <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
           Choose which areas of life you want to focus on
         </Text>
       </View>
@@ -120,7 +120,7 @@ export default function HomeScreen() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Theme Selector */}
         <View style={styles.themeSelector}>
-          <Text style={[styles.themeSelectorTitle, { color: primaryColors.medium }]}>App Theme</Text>
+          <Text style={[styles.themeSelectorTitle, { color: primaryColors.dark }]}>App Theme</Text>
           {availableThemes.map((theme) => {
             const isSelected = currentTheme.id === theme.id;
             const themeColors = theme.tabColors.daily;
@@ -134,21 +134,21 @@ export default function HomeScreen() {
                 <NeumorphicCard style={[
                   styles.themeOption,
                   {
-                    backgroundColor: isSelected ? themeColors.accent : primaryColors.bg,
+                    backgroundColor: isSelected ? themeColors.medium : primaryColors.bgAlt,
                     borderColor: isSelected ? themeColors.dark : 'transparent',
-                    borderWidth: isSelected ? 2 : 0,
-                    shadowColor: themeColors.shadow || themeColors.dark
+                    borderWidth: isSelected ? 3 : 0,
+                    shadowColor: themeColors.shadow
                   }
                 ]}>
                   <View style={[
                     styles.themeIconContainer,
-                    { backgroundColor: isSelected ? themeColors.dark : primaryColors.pastel }
+                    { backgroundColor: isSelected ? themeColors.dark : primaryColors.medium }
                   ]}>
-                    <Palette size={20} color={isSelected ? themeColors.pastel : primaryColors.medium} />
+                    <Palette size={20} color={isSelected ? themeColors.pastel : primaryColors.pastel} />
                   </View>
                   <Text style={[
                     styles.themeTitle,
-                    { color: isSelected ? themeColors.medium : primaryColors.medium }
+                    { color: isSelected ? themeColors.veryDark : primaryColors.dark }
                   ]}>
                     {theme.name}
                   </Text>
@@ -166,7 +166,7 @@ export default function HomeScreen() {
           })}
         </View>
         
-        <Text style={[styles.sectionTitle, { color: primaryColors.medium }]}>Life Areas</Text>
+        <Text style={[styles.sectionTitle, { color: primaryColors.dark }]}>Life Areas</Text>
         <View style={styles.grid}>
           {tabOptions.map((tab) => {
             const isSelected = localSelectedTabs.includes(tab.id);
@@ -184,32 +184,32 @@ export default function HomeScreen() {
                 <NeumorphicCard style={[
                   styles.tabOption,
                   {
-                    backgroundColor: isSelected ? tabColors.accent : primaryColors.bg,
+                    backgroundColor: isSelected ? tabColors.medium : primaryColors.bgAlt,
                     borderColor: isSelected ? tabColors.dark : 'transparent',
-                    borderWidth: isSelected ? 2 : 0,
-                    shadowColor: tabColors.shadow || tabColors.dark
+                    borderWidth: isSelected ? 3 : 0,
+                    shadowColor: tabColors.shadow
                   }
                 ]}>
                   <View style={[
                     styles.iconContainer,
-                    { backgroundColor: isSelected ? tabColors.dark : primaryColors.pastel }
+                    { backgroundColor: isSelected ? tabColors.dark : primaryColors.medium }
                   ]}>
                     <IconComponent 
-                      size={24} 
-                      color={isSelected ? tabColors.pastel : primaryColors.medium} 
+                      size={26} 
+                      color={isSelected ? tabColors.pastel : primaryColors.pastel} 
                     />
                   </View>
                   
                   <Text style={[
                     styles.tabTitle,
-                    { color: isSelected ? tabColors.medium : primaryColors.medium }
+                    { color: isSelected ? tabColors.veryDark : primaryColors.dark }
                   ]}>
                     {tab.title}
                   </Text>
                   
                   <Text style={[
                     styles.tabSubtitle,
-                    { color: isSelected ? tabColors.medium : primaryColors.medium }
+                    { color: isSelected ? tabColors.dark : primaryColors.medium }
                   ]}>
                     {tab.subtitle}
                   </Text>
@@ -233,8 +233,8 @@ export default function HomeScreen() {
         style={[
           styles.continueButton,
           { 
-            backgroundColor: localSelectedTabs.length > 0 ? primaryColors.dark : primaryColors.pastel,
-            shadowColor: primaryColors.shadow || primaryColors.dark
+            backgroundColor: localSelectedTabs.length > 0 ? primaryColors.dark : primaryColors.medium,
+            shadowColor: primaryColors.shadow
           }
         ]}
         onPress={handleContinue}
@@ -242,13 +242,13 @@ export default function HomeScreen() {
       >
         <Text style={[
           styles.continueText, 
-          { color: localSelectedTabs.length > 0 ? primaryColors.pastel : primaryColors.medium }
+          { color: primaryColors.pastel }
         ]}>
           Continue
         </Text>
         <ArrowRight 
-          size={20} 
-          color={localSelectedTabs.length > 0 ? primaryColors.pastel : primaryColors.medium} 
+          size={22} 
+          color={primaryColors.pastel} 
         />
       </TouchableOpacity>
     </SafeAreaView>
@@ -266,15 +266,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   title: {
-    fontSize: 32,
+    fontSize: 36,
     fontFamily: 'Quicksand-Bold',
     marginBottom: 8,
   },
   subtitle: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-Medium',
+    fontSize: 18,
+    fontFamily: 'Quicksand-SemiBold',
     textAlign: 'center',
-    lineHeight: 22,
+    lineHeight: 24,
   },
   content: {
     flex: 1,
@@ -285,11 +285,11 @@ const styles = StyleSheet.create({
     paddingHorizontal: 8,
   },
   themeOptionContainer: {
-    marginBottom: 8,
+    marginBottom: 10,
   },
   themeSelectorTitle: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 22,
+    fontFamily: 'Quicksand-Bold',
     marginBottom: 12,
     paddingLeft: 8,
   },
@@ -298,38 +298,39 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     position: 'relative',
+    borderRadius: 12,
   },
   themeIconContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 16,
   },
   themeTitle: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 18,
+    fontFamily: 'Quicksand-Bold',
   },
   themeSelectedIndicator: {
     position: 'absolute',
     top: '50%',
     right: 16,
     marginTop: -12,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
   },
   themeSelectedText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'Quicksand-Bold',
   },
   sectionTitle: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
-    marginTop: 8,
+    fontSize: 22,
+    fontFamily: 'Quicksand-Bold',
+    marginTop: 10,
     marginBottom: 12,
     paddingLeft: 16,
   },
@@ -346,41 +347,42 @@ const styles = StyleSheet.create({
   tabOption: {
     padding: 16,
     alignItems: 'center',
-    minHeight: 140,
+    minHeight: 150,
     position: 'relative',
+    borderRadius: 12,
   },
   iconContainer: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 54,
+    height: 54,
+    borderRadius: 27,
     justifyContent: 'center',
     alignItems: 'center',
     marginBottom: 12,
   },
   tabTitle: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 18,
+    fontFamily: 'Quicksand-Bold',
     textAlign: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   tabSubtitle: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 13,
+    fontFamily: 'Quicksand-SemiBold',
     textAlign: 'center',
-    lineHeight: 16,
+    lineHeight: 18,
   },
   selectedIndicator: {
     position: 'absolute',
     top: 8,
     right: 8,
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
     justifyContent: 'center',
     alignItems: 'center',
   },
   selectedText: {
-    fontSize: 12,
+    fontSize: 14,
     fontFamily: 'Quicksand-Bold',
   },
   continueButton: {
@@ -388,16 +390,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     margin: 20,
-    padding: 16,
-    borderRadius: 12,
+    padding: 18,
+    borderRadius: 14,
     shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 8,
   },
   continueText: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
-    marginRight: 8,
+    fontSize: 20,
+    fontFamily: 'Quicksand-Bold',
+    marginRight: 10,
   },
 });
