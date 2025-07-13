@@ -137,7 +137,7 @@ export default function HomeScreen() {
                     backgroundColor: isSelected ? themeColors.medium : primaryColors.bgAlt,
                     borderColor: isSelected ? themeColors.dark : 'transparent',
                     borderWidth: isSelected ? 3 : 0,
-                    shadowColor: themeColors.shadow
+                    shadowColor: isSelected ? themeColors.shadow : primaryColors.shadow
                   }
                 ]}>
                   <View style={[
@@ -187,7 +187,7 @@ export default function HomeScreen() {
                     backgroundColor: isSelected ? tabColors.medium : primaryColors.bgAlt,
                     borderColor: isSelected ? tabColors.dark : 'transparent',
                     borderWidth: isSelected ? 3 : 0,
-                    shadowColor: tabColors.shadow
+                    shadowColor: isSelected ? tabColors.shadow : primaryColors.shadow
                   }
                 ]}>
                   <View style={[
