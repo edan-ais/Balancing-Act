@@ -22,7 +22,7 @@ const tabOptions = [
   {
     id: 'index',
     title: 'Daily Tasks',
-    subtitle: 'Manage your daily routines and habits',
+    subtitle: 'Manage your daily routines',
     icon: CalendarDays,
     themeKey: 'daily'
   },
