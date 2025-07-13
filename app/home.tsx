@@ -64,7 +64,7 @@ const tabOptions = [
   {
     id: 'delegation',
     title: 'Delegation',
-    subtitle: 'Share the load',
+    subtitle: 'Share the load with loved ones',
     icon: Users,
     themeKey: 'delegate'
   }
