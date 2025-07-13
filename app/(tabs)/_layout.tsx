@@ -1,236 +1,405 @@
-import React, { useEffect } from 'react';
-import { Tabs } from 'expo-router';
-import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
-import { View, Text, ImageBackground } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { useRouter } from 'expo-router';
+import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette } from 'lucide-react-native';
+import NeumorphicCard from '@/components/NeumorphicCard';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
-// Map route names to color keys
-const routeToColorMap = {
+// Mapping between tab IDs and theme color keys
+const tabToThemeKeyMap = {
   'index': 'daily',
-  'goals': 'future',
-  'weekly': 'calendar',
+  'goals': 'future',    // "goals" tab uses "future" theme colors
+  'weekly': 'calendar', // "weekly" tab uses "calendar" theme colors
   'meal-prep': 'meals',
   'cleaning': 'cleaning',
   'self-care': 'selfCare',
   'delegation': 'delegate'
 };
 
-// Tab configuration mapping
-const tabConfig = {
-  'index': {
-    name: 'index',
-    title: 'Daily',
+const tabOptions = [
+  {
+    id: 'index',
+    title: 'Daily Tasks',
+    subtitle: 'Manage your daily routines and habits',
     icon: CalendarDays,
-    colorKey: 'daily'
+    themeKey: 'daily'
   },
-  'goals': {
-    name: 'goals',
-    title: 'Future',
+  {
+    id: 'goals',
+    title: 'Future Tasks',
+    subtitle: 'Plan your long-term goals and projects',
     icon: Target,
-    colorKey: 'future'
+    themeKey: 'future'  // This corresponds to 'future' in the theme
   },
-  'weekly': {
-    name: 'weekly',
+  {
+    id: 'weekly',
     title: 'Calendar',
+    subtitle: 'Schedule and organize your time',
     icon: Calendar,
-    colorKey: 'calendar'
+    themeKey: 'calendar'  // This corresponds to 'calendar' in the theme
   },
-  'meal-prep': {
-    name: 'meal-prep',
-    title: 'Meals',
+  {
+    id: 'meal-prep',
+    title: 'Meal Prep',
+    subtitle: 'Plan and prepare your meals',
     icon: ChefHat,
-    colorKey: 'meals'
+    themeKey: 'meals'
   },
-  'cleaning': {
-    name: 'cleaning',
+  {
+    id: 'cleaning',
     title: 'Cleaning',
+    subtitle: 'Maintain your space regularly',
     icon: Sparkles,
-    colorKey: 'cleaning'
+    themeKey: 'cleaning'
   },
-  'self-care': {
-    name: 'self-care',
+  {
+    id: 'self-care',
     title: 'Self-Care',
+    subtitle: 'Nurture yourself daily',
     icon: Heart,
-    colorKey: 'selfCare'
+    themeKey: 'selfCare'
   },
-  'delegation': {
-    name: 'delegation',
-    title: 'Delegate',
+  {
+    id: 'delegation',
+    title: 'Delegation',
+    subtitle: 'Share the load with others',
     icon: Users,
-    colorKey: 'delegate'
+    themeKey: 'delegate'
   }
-};
+];
 
-// Get all tab IDs for rendering all possible tabs
-const allTabIds = Object.keys(tabConfig);
+export default function HomeScreen() {
+  const { selectedTabs, setSelectedTabs } = useTabContext();
+  const { currentTheme, setTheme, availableThemes } = useTheme();
+  const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
+  const router = useRouter();
 
-export default function TabLayout() {
-  const { selectedTabs } = useTabContext();
-  const { currentTheme, setCurrentTab } = useTheme();
-  const tabColors = currentTheme.tabColors;
-
-  // Custom tab icon component to ensure proper re-rendering
-  const TabIcon = ({ name, size, iconComponent: Icon, focused }) => {
-    const colorKey = routeToColorMap[name];
-
-    // Calculate offset to keep icon visually centered when scaled
-    const offsetY = focused ? 8 : 0; // Adjust this value as needed
-
-    return (
-      <View style={{ 
-        transform: [{ scale: focused ? 1.8 : 1 }],
-        shadowColor: focused ? tabColors[colorKey].shadow : 'transparent',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: focused ? 0.8 : 0,
-        shadowRadius: focused ? 10 : 0,
-        // Add alignment adjustments
-        alignItems: 'center',
-        justifyContent: 'center',
-        marginTop: offsetY, // Move down when focused
-      }}>
-        <Icon size={size} color={tabColors[colorKey].pastel} />
-      </View>
-    );
+  // Helper function to get tab colors from the theme
+  const getTabThemeColors = (tab) => {
+    // Get the appropriate theme key for this tab
+    const themeKey = tab.themeKey;
+    
+    // Get colors from the theme
+    return currentTheme.tabColors[themeKey];
   };
 
-  // Get the currently focused tab for background color
-  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
-  const activeColorKey = routeToColorMap[focusedTab];
+  // Use primary colors from the current theme
+  const primaryColors = currentTheme.tabColors.daily;
 
-  // Update the current tab in the ThemeContext when focused tab changes
-  useEffect(() => {
-    if (setCurrentTab) {
-      setCurrentTab(activeColorKey);
+  const toggleTab = (tabId: string) => {
+    if (localSelectedTabs.includes(tabId)) {
+      // Don't allow removing all tabs
+      if (localSelectedTabs.length > 1) {
+        setLocalSelectedTabs(localSelectedTabs.filter(id => id !== tabId));
+      }
+    } else {
+      setLocalSelectedTabs([...localSelectedTabs, tabId]);
     }
-  }, [focusedTab, setCurrentTab, activeColorKey]);
+  };
 
-  // Update the current tab in the ThemeContext when focused tab changes
-  useEffect(() => {
-    if (setCurrentTab) {
-      setCurrentTab(activeColorKey);
-    }
-  }, [focusedTab, setCurrentTab, activeColorKey]);
-
-  // Filter out any selectedTabs that don't have valid configurations
-  const validSelectedTabs = selectedTabs.filter(tabId => tabConfig[tabId]);
-
-  // Create a Set for quick lookups
-  const selectedTabsSet = new Set(validSelectedTabs);
-
-  // Function to check if a tab is selected
-  const isTabSelected = (tabId) => selectedTabsSet.has(tabId);
-
-  // Calculate the flex value based on the number of visible tabs
-  const visibleTabCount = validSelectedTabs.length;
+  const handleContinue = () => {
+    // Update the global selected tabs
+    setSelectedTabs(localSelectedTabs);
+    
+    // Navigate to the first selected tab
+    const firstTab = localSelectedTabs[0] || 'index';
+    router.replace(`/(tabs)/${firstTab === 'index' ? '' : firstTab}`);
+  };
 
   return (
-    <Tabs
-      screenOptions={({ route }) => {
-        const routeName = route.name;
-        const isSelected = isTabSelected(routeName);
-        const colorKey = routeToColorMap[routeName] || activeColorKey;
+    <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
+      <View style={styles.header}>
+        <Text style={[styles.title, { color: primaryColors.dark }]}>Balancing Act</Text>
+        <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
+          Choose which areas of life you want to focus on
+        </Text>
+      </View>
 
-        return {
-          headerShown: false,
-          tabBarStyle: {
-            backgroundColor: tabColors[activeColorKey].dark,
-            borderTopWidth: 0,
-            elevation: 8,
-            height: 120, // Taller footer
-            // Remove all padding
-            padding: 0,
-            // Add padding to center content vertically
-            paddingTop: 30, // This centers the icons vertically
-            paddingBottom: 60, // This centers the icons vertically
-            // Add shadow with color matching active tab
-            shadowColor: tabColors[activeColorKey].shadow,
-            shadowOffset: { width: 0, height: -3 },
-            shadowOpacity: 0.3,
-            shadowRadius: 6,
-            // Add flexbox properties to ensure proper alignment
-            display: 'flex',
-            flexDirection: 'row',
-          },
-          tabBarItemStyle: {
-            borderRadius: 12,
-            marginHorizontal: 2,
-            paddingHorizontal: 2,
-            height: 80, // Fixed height for items
-            // Center content vertically
-            alignItems: 'center',
-            justifyContent: 'center',
-            // Important: only visible tabs should take up space
-            display: isSelected ? 'flex' : 'none',
-            // Make each visible tab take equal space
-            flex: isSelected ? 1 : 0,
-            width: isSelected ? `${100 / visibleTabCount}%` : 0,
-          },
-          tabBarIconStyle: {
-            // Ensure icon is centered
-            marginTop: 0,
-            marginBottom: 0,
-          },
-          tabBarLabelStyle: {
-            // Position label below icon
-            marginTop: 4,
-            color: tabColors[colorKey].pastel, // Use pastel color for label text
-          },
-          tabBarLabelPosition: 'below-icon',
-          tabBarActiveTintColor: tabColors[colorKey].pastel,
-          tabBarInactiveTintColor: tabColors[colorKey].pastel,
-          // Explicitly handle the label component to override default behavior
-          tabBarLabel: ({ focused, color }) => {
-            if (focused) return null;
-            
-            const config = tabConfig[routeName];
-            if (!config) return null;
+      <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
+        {/* Theme Selector */}
+        <View style={styles.themeSelector}>
+          <Text style={[styles.themeSelectorTitle, { color: primaryColors.dark }]}>App Theme</Text>
+          {availableThemes.map((theme) => {
+            const isSelected = currentTheme.id === theme.id;
+            const themeColors = theme.tabColors.daily;
             
             return (
-              <Text 
-                style={{
-                  color: tabColors[colorKey].pastel, // Use pastel color for text
-                  fontFamily: 'Quicksand-SemiBold',
-                  fontSize: 10,
-                  marginTop: 4,
-                  textAlign: 'center',
-                }}
-                numberOfLines={1}
-                ellipsizeMode="tail"
+              <TouchableOpacity
+                key={theme.id}
+                onPress={() => setTheme(theme.id)}
+                style={styles.themeOptionContainer}
               >
-                {config.title}
-              </Text>
+                <NeumorphicCard style={[
+                  styles.themeOption,
+                  {
+                    backgroundColor: isSelected ? themeColors.medium : primaryColors.bgAlt,
+                    borderColor: isSelected ? themeColors.dark : 'transparent',
+                    borderWidth: isSelected ? 3 : 0,
+                    shadowColor: themeColors.shadow
+                  }
+                ]}>
+                  <View style={[
+                    styles.themeIconContainer,
+                    { backgroundColor: isSelected ? themeColors.dark : primaryColors.medium }
+                  ]}>
+                    <Palette size={20} color={isSelected ? themeColors.pastel : primaryColors.pastel} />
+                  </View>
+                  <Text style={[
+                    styles.themeTitle,
+                    { color: isSelected ? themeColors.veryDark : primaryColors.dark }
+                  ]}>
+                    {theme.name}
+                  </Text>
+                  {isSelected && (
+                    <View style={[
+                      styles.themeSelectedIndicator,
+                      { backgroundColor: themeColors.dark }
+                    ]}>
+                      <Text style={[styles.themeSelectedText, { color: themeColors.pastel }]}>✓</Text>
+                    </View>
+                  )}
+                </NeumorphicCard>
+              </TouchableOpacity>
             );
+          })}
+        </View>
+        
+        <Text style={[styles.sectionTitle, { color: primaryColors.dark }]}>Life Areas</Text>
+        <View style={styles.grid}>
+          {tabOptions.map((tab) => {
+            const isSelected = localSelectedTabs.includes(tab.id);
+            const IconComponent = tab.icon;
+            
+            // Get the appropriate colors for this tab from the current theme
+            const tabColors = getTabThemeColors(tab);
+            
+            return (
+              <TouchableOpacity
+                key={tab.id}
+                onPress={() => toggleTab(tab.id)}
+                style={styles.tabOptionContainer}
+              >
+                <NeumorphicCard style={[
+                  styles.tabOption,
+                  {
+                    backgroundColor: isSelected ? tabColors.medium : primaryColors.bgAlt,
+                    borderColor: isSelected ? tabColors.dark : 'transparent',
+                    borderWidth: isSelected ? 3 : 0,
+                    shadowColor: tabColors.shadow
+                  }
+                ]}>
+                  <View style={[
+                    styles.iconContainer,
+                    { backgroundColor: isSelected ? tabColors.dark : primaryColors.medium }
+                  ]}>
+                    <IconComponent 
+                      size={26} 
+                      color={isSelected ? tabColors.pastel : primaryColors.pastel} 
+                    />
+                  </View>
+                  
+                  <Text style={[
+                    styles.tabTitle,
+                    { color: isSelected ? tabColors.veryDark : primaryColors.dark }
+                  ]}>
+                    {tab.title}
+                  </Text>
+                  
+                  <Text style={[
+                    styles.tabSubtitle,
+                    { color: isSelected ? tabColors.dark : primaryColors.medium }
+                  ]}>
+                    {tab.subtitle}
+                  </Text>
+                  
+                  {isSelected && (
+                    <View style={[
+                      styles.selectedIndicator,
+                      { backgroundColor: tabColors.dark }
+                    ]}>
+                      <Text style={[styles.selectedText, { color: tabColors.pastel }]}>✓</Text>
+                    </View>
+                  )}
+                </NeumorphicCard>
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+      </ScrollView>
+
+      <TouchableOpacity
+        style={[
+          styles.continueButton,
+          { 
+            backgroundColor: localSelectedTabs.length > 0 ? primaryColors.dark : primaryColors.medium,
+            shadowColor: primaryColors.shadow
           }
-        };
-      }}>
-      
-      {/* Render all tabs, but with visibility controlled by tabBarItemStyle */}
-      {allTabIds.map((tabId) => {
-        const config = tabConfig[tabId];
-        if (!config) return null;
-        
-        const colorKey = config.colorKey;
-        const selected = isTabSelected(tabId);
-        
-        return (
-          <Tabs.Screen
-            key={tabId}
-            name={config.name}
-            options={{
-              title: config.title,
-              tabBarIcon: ({ size, focused }) => {
-                return <TabIcon name={config.name} size={size} iconComponent={config.icon} focused={focused} />;
-              },
-            }}
-            listeners={{
-              focus: () => {
-                setFocusedTab(config.name);
-              },
-            }}
-          />
-        );
-      })}
-    </Tabs>
+        ]}
+        onPress={handleContinue}
+        disabled={localSelectedTabs.length === 0}
+      >
+        <Text style={[
+          styles.continueText, 
+          { color: primaryColors.pastel }
+        ]}>
+          Continue
+        </Text>
+        <ArrowRight 
+          size={22} 
+          color={primaryColors.pastel} 
+        />
+      </TouchableOpacity>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 10,
+    alignItems: 'center',
+  },
+  title: {
+    fontSize: 36,
+    fontFamily: 'Quicksand-Bold',
+    marginBottom: 8,
+  },
+  subtitle: {
+    fontSize: 18,
+    fontFamily: 'Quicksand-SemiBold',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 12,
+  },
+  themeSelector: {
+    marginVertical: 16,
+    paddingHorizontal: 8,
+  },
+  themeOptionContainer: {
+    marginBottom: 10,
+  },
+  themeSelectorTitle: {
+    fontSize: 22,
+    fontFamily: 'Quicksand-Bold',
+    marginBottom: 12,
+    paddingLeft: 8,
+  },
+  themeOption: {
+    padding: 16,
+    flexDirection: 'row',
+    alignItems: 'center',
+    position: 'relative',
+    borderRadius: 12,
+  },
+  themeIconContainer: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 16,
+  },
+  themeTitle: {
+    fontSize: 18,
+    fontFamily: 'Quicksand-Bold',
+  },
+  themeSelectedIndicator: {
+    position: 'absolute',
+    top: '50%',
+    right: 16,
+    marginTop: -12,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  themeSelectedText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Bold',
+  },
+  sectionTitle: {
+    fontSize: 22,
+    fontFamily: 'Quicksand-Bold',
+    marginTop: 10,
+    marginBottom: 12,
+    paddingLeft: 16,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    paddingHorizontal: 8,
+  },
+  tabOptionContainer: {
+    width: '48%',
+    marginBottom: 16,
+  },
+  tabOption: {
+    padding: 16,
+    alignItems: 'center',
+    minHeight: 150,
+    position: 'relative',
+    borderRadius: 12,
+  },
+  iconContainer: {
+    width: 54,
+    height: 54,
+    borderRadius: 27,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  tabTitle: {
+    fontSize: 18,
+    fontFamily: 'Quicksand-Bold',
+    textAlign: 'center',
+    marginBottom: 6,
+  },
+  tabSubtitle: {
+    fontSize: 13,
+    fontFamily: 'Quicksand-SemiBold',
+    textAlign: 'center',
+    lineHeight: 18,
+  },
+  selectedIndicator: {
+    position: 'absolute',
+    top: 8,
+    right: 8,
+    width: 26,
+    height: 26,
+    borderRadius: 13,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  selectedText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Bold',
+  },
+  continueButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    margin: 20,
+    padding: 18,
+    borderRadius: 14,
+    shadowOffset: { width: 4, height: 4 },
+    shadowOpacity: 0.4,
+    shadowRadius: 8,
+    elevation: 8,
+  },
+  continueText: {
+    fontSize: 20,
+    fontFamily: 'Quicksand-Bold',
+    marginRight: 10,
+  },
+});
