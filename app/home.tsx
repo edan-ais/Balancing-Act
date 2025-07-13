@@ -125,7 +125,7 @@ export default function HomeScreen() {
       <View style={styles.header}>
         <Text style={[styles.title, { color: primaryColors.dark }]}>Balancing Act</Text>
         <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
-          Choose which areas of life you want to focus on
+          Choose which areas of life you want to focus on at the moment
         </Text>
       </View>
 
