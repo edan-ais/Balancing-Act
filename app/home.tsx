@@ -36,35 +36,35 @@ const tabOptions = [
   {
     id: 'weekly',
     title: 'Calendar',
-    subtitle: 'Organize your time',
+    subtitle: 'Organize your tasks over time',
     icon: Calendar,
     themeKey: 'calendar'
   },
   {
     id: 'meal-prep',
     title: 'Meal Prep',
-    subtitle: 'Plan your meals',
+    subtitle: 'Plan your meals and snacks',
     icon: ChefHat,
     themeKey: 'meals'
   },
   {
     id: 'cleaning',
     title: 'Cleaning',
-    subtitle: 'Keep space tidy',
+    subtitle: 'Keep all your spaces tidy',
     icon: Sparkles,
     themeKey: 'cleaning'
   },
   {
     id: 'self-care',
     title: 'Self-Care',
-    subtitle: 'Nurture yourself',
+    subtitle: 'Nurture yourself to feel refreshed',
     icon: Heart,
     themeKey: 'selfCare'
   },
   {
     id: 'delegation',
     title: 'Delegation',
-    subtitle: 'Share the load',
+    subtitle: 'Share the load with loved ones',
     icon: Users,
     themeKey: 'delegate'
   }
