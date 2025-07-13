@@ -50,7 +50,7 @@ const tabOptions = [
   {
     id: 'cleaning',
     title: 'Cleaning',
-    subtitle: 'Keep space tidy',
+    subtitle: 'Keep all your spaces tidy',
     icon: Sparkles,
     themeKey: 'cleaning'
   },
