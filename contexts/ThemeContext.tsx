@@ -24,6 +24,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
 
   // Apply the background image when the theme changes
   useEffect(() => {
+    // Only run DOM manipulation in web environment
+    if (typeof document === 'undefined') return;
+    
     // Check if there's a tab-specific background for the current tab
     const tabBackground = currentTheme.tabBackgrounds?.[currentTab];
     
@@ -49,7 +52,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     
     // Clean up function to reset background when component unmounts
     return () => {
-      document.body.style.backgroundImage = 'none';
+      if (typeof document !== 'undefined') {
+        document.body.style.backgroundImage = 'none';
+      }
     };
   }, [currentTheme, currentTab]);
 
