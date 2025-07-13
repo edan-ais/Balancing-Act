@@ -36,7 +36,7 @@ const tabOptions = [
   {
     id: 'weekly',
     title: 'Calendar',
-    subtitle: 'Organize your time',
+    subtitle: 'Organize your tasks over time',
     icon: Calendar,
     themeKey: 'calendar'
   },
