@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRef, useEffect, useMemo } from 'react';
+import { useRef, useEffect, useMemo, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
 import { View, Text, ScrollView, TouchableOpacity, Animated } from 'react-native';
@@ -72,18 +72,28 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
   const label = options.tabBarLabel || options.title || route.name;
   const isVisible = selectedTabsSet.has(route.name);
   
-  // Create animated value for this specific tab
+  // Track if this is the first render to avoid initial animation
+  const [isFirstRender, setIsFirstRender] = useState(true);
+  
+  // Create animated value with initial value based on focus
   const animatedScale = useRef(new Animated.Value(isFocused ? 1.8 : 1)).current;
 
-  // Update animation when focus changes
+  // Update animation when focus changes, but not on first render
   useEffect(() => {
+    if (isFirstRender) {
+      setIsFirstRender(false);
+      return;
+    }
+    
     Animated.spring(animatedScale, {
       toValue: isFocused ? 1.8 : 1,
       useNativeDriver: true,
-      tension: 100,
-      friction: 8,
+      tension: 80,     // Reduced tension for smoother animation
+      friction: 10,    // Increased friction to reduce bounciness
+      velocity: 0.1,   // Lower initial velocity
+      delay: 0,        // No delay
     }).start();
-  }, [isFocused, animatedScale]);
+  }, [isFocused, animatedScale, isFirstRender]);
   
   // Create interpolated values for smooth animations
   const animatedTranslateY = animatedScale.interpolate({
@@ -132,15 +142,23 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
     });
     
     if (!isFocused && !event.defaultPrevented) {
+      // Immediately start animation for better perceived performance
+      Animated.spring(animatedScale, {
+        toValue: 1.8,
+        useNativeDriver: true,
+        tension: 80,
+        friction: 10,
+        velocity: 0.1,
+      }).start();
+      
       navigation.navigate(route.name);
     }
   };
   
   // Calculate width based on number of visible tabs
-  // When few tabs, expand to fill space; otherwise use fixed width
   const tabWidth = visibleRoutes.length <= 4 
     ? `${100 / visibleRoutes.length}%` 
-    : 80; // Keep tabs closer together
+    : 80;
   
   // Icon component
   const Icon = tabConfig[route.name]?.icon;
@@ -159,7 +177,7 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 2, // Reduced padding to keep icons closer
+        paddingHorizontal: 2,
       }}
     >
       <View style={{
@@ -179,11 +197,12 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
           shadowRadius: animatedShadowRadius,
           alignItems: 'center',
           justifyContent: 'center',
+          // Add a subtle transition for more stability
+          padding: 5,
         }}>
           {Icon && <Icon size={30} color={tabColor} />}
         </Animated.View>
         
-        {/* Animated label that fades out when focused */}
         <Animated.Text
           style={{
             opacity: animatedLabelOpacity,
@@ -210,6 +229,13 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   const { currentTheme } = useTheme();
   const tabColors = currentTheme.tabColors;
   
+  // Cache visible routes to prevent recalculation on each render
+  const selectedTabsSet = useMemo(() => new Set(selectedTabs), [selectedTabs]);
+  const visibleRoutes = useMemo(() => 
+    state.routes.filter(route => selectedTabsSet.has(route.name)),
+    [state.routes, selectedTabsSet]
+  );
+  
   // Get active route name for background color
   const activeRouteName = state.routes[state.index].name;
   const activeColorKey = routeToColorMap[activeRouteName];
@@ -218,14 +244,34 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   const backgroundColor = tabColors[activeColorKey]?.dark || '#000000';
   const shadowColor = tabColors[activeColorKey]?.shadow || 'rgba(0,0,0,0.5)';
   
-  // Filter to show only selected tabs
-  const selectedTabsSet = new Set(selectedTabs);
-  const visibleRoutes = state.routes.filter(route => selectedTabsSet.has(route.name));
+  // Use layoutEffect to scroll to the active tab
+  const scrollViewRef = useRef();
+  useEffect(() => {
+    if (scrollViewRef.current && state.index !== undefined) {
+      // Find the position of the active tab within visible routes
+      const activeRouteIndex = visibleRoutes.findIndex(
+        route => route.name === state.routes[state.index].name
+      );
+      
+      if (activeRouteIndex !== -1) {
+        // Calculate approximate scroll position based on tab width and position
+        const scrollX = activeRouteIndex * (visibleRoutes.length <= 4 ? 
+          scrollViewRef.current?.getScrollResponder?.()?.getInnerViewNode?.()?.offsetWidth / visibleRoutes.length : 
+          80);
+          
+        // Scroll with animation to reduce jumpiness
+        scrollViewRef.current?.scrollTo({
+          x: scrollX,
+          animated: true
+        });
+      }
+    }
+  }, [state.index, visibleRoutes]);
   
   return (
     <View style={{
       backgroundColor: backgroundColor,
-      height: 120, // Keep the original height
+      height: 120,
       shadowColor: shadowColor,
       shadowOffset: { width: 0, height: -3 },
       shadowOpacity: 0.3,
@@ -233,6 +279,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
       elevation: 8,
     }}>
       <ScrollView
+        ref={scrollViewRef}
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
@@ -240,9 +287,11 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           alignItems: 'center',
           justifyContent: 'center',
           height: '100%',
-          // When there are few tabs, they should expand to fill the space
           minWidth: '100%',
         }}
+        // Improve scroll behavior
+        scrollEventThrottle={16}
+        decelerationRate="normal"
       >
         {state.routes.map((route, index) => (
           <TabItem
