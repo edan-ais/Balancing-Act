@@ -101,7 +101,7 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
   // Create interpolated values for smooth animations
   const animatedTranslateY = animatedScale.interpolate({
     inputRange: [1, 1.8],
-    outputRange: [0, -5],
+    outputRange: [0, 10], // Move down to center in the full space
     extrapolate: 'clamp',
   });
   
@@ -182,53 +182,61 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
         justifyContent: 'center',
       }}
     >
+      {/* Content container with fixed height to ensure consistent layout */}
       <View style={{
         alignItems: 'center',
         justifyContent: 'center',
-        height: '100%',
+        height: 70, // Combined height for icon + text with some spacing
         width: '100%',
-        // Center content vertically in the tab bar
         paddingBottom: 10, // Add some bottom padding to account for safe area
       }}>
-        {/* Fixed height container for icon to maintain alignment */}
+        {/* Container for both icon and label, allows for better positioning */}
         <Animated.View style={{
-          height: 40, // Fixed height for icon container
-          width: 40, // Fixed width for icon container
+          height: 70,
+          alignItems: 'center',
+          justifyContent: 'flex-start', // Start from top to allow proper positioning
           transform: [
-            { scale: animatedScale },
             { translateY: animatedTranslateY }
           ],
-          shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
-          shadowOffset: { width: 0, height: 0 },
-          shadowOpacity: animatedShadowOpacity,
-          shadowRadius: animatedShadowRadius,
-          alignItems: 'center',
-          justifyContent: 'center',
         }}>
-          {Icon && <Icon size={30} color={tabColor} />}
-        </Animated.View>
-        
-        {/* Fixed height container for label to maintain alignment */}
-        <Animated.View style={{
-          height: 20, // Fixed height for text container
-          alignItems: 'center',
-          justifyContent: 'center',
-          opacity: animatedLabelOpacity,
-          transform: [{ translateY: animatedLabelTranslateY }],
-          marginTop: 4,
-        }}>
-          <Text
-            style={{
-              color: tabColor,
-              fontFamily: 'Quicksand-SemiBold',
-              fontSize: 12,
-              textAlign: 'center',
-            }}
-            numberOfLines={1}
-            ellipsizeMode="tail"
-          >
-            {tabConfig[route.name]?.title || label}
-          </Text>
+          {/* Icon container */}
+          <Animated.View style={{
+            height: 40,
+            width: 40,
+            transform: [
+              { scale: animatedScale },
+            ],
+            shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: animatedShadowOpacity,
+            shadowRadius: animatedShadowRadius,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            {Icon && <Icon size={30} color={tabColor} />}
+          </Animated.View>
+          
+          {/* Label container */}
+          <Animated.View style={{
+            height: 20,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: animatedLabelOpacity,
+            marginTop: 4,
+          }}>
+            <Text
+              style={{
+                color: tabColor,
+                fontFamily: 'Quicksand-SemiBold',
+                fontSize: 12,
+                textAlign: 'center',
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {tabConfig[route.name]?.title || label}
+            </Text>
+          </Animated.View>
         </Animated.View>
       </View>
     </TouchableOpacity>
