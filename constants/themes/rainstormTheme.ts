@@ -93,64 +93,184 @@ export const rainstormTheme = {
   tagColors: {
     // Priority colors - rich, saturated colors that pop against the cool backgrounds
     priority: {
-      high: '#B83B3B',         // Rainy Day Red (distinct from all blues)
-      medium: '#906B3E',       // Muddy Puddle Brown (distinct from all blues)
-      low: '#50883C',          // Rainy Forest Green (distinct from all blues)
-      quickWin: '#C3773B',     // Thunder Orange (distinct from all blues)
-      custom: '#855C87',       // Lightning Purple (distinct from storm lavender)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      high: {
+        selected: '#B83B3B',     // Rainy Day Red (distinct from all blues)
+        unselected: '#F8E9E9'    // Very light rainy day red
+      },
+      medium: {
+        selected: '#906B3E',     // Muddy Puddle Brown (distinct from all blues)
+        unselected: '#F4F0E9'    // Very light muddy puddle
+      },
+      low: {
+        selected: '#50883C',     // Rainy Forest Green (distinct from all blues)
+        unselected: '#ECF3E9'    // Very light rainy forest
+      },
+      quickWin: {
+        selected: '#C3773B',     // Thunder Orange (distinct from all blues)
+        unselected: '#F9F1E9'    // Very light thunder
+      },
+      custom: {
+        selected: '#855C87',     // Lightning Purple (distinct from storm lavender)
+        unselected: '#F3ECF3'    // Very light lightning
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     },
     // Goal type colors - muted but distinct
     goalType: {
-      tbd: '#75558D',          // Deep Iris Purple (distinct from storm lavender)
-      notPriority: '#9C4B4B',  // Rust Red (distinct from all blues)
-      wish: '#36745E',         // Evergreen (distinct from all blues)
-      custom: '#8A683F',       // Wet Soil Brown (distinct from all blues)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      tbd: {
+        selected: '#75558D',     // Deep Iris Purple (distinct from storm lavender)
+        unselected: '#F1ECF4'    // Very light iris
+      },
+      notPriority: {
+        selected: '#9C4B4B',     // Rust Red (distinct from all blues)
+        unselected: '#F5EBEB'    // Very light rust
+      },
+      wish: {
+        selected: '#36745E',     // Evergreen (distinct from all blues)
+        unselected: '#E9F1ED'    // Very light evergreen
+      },
+      custom: {
+        selected: '#8A683F',     // Wet Soil Brown (distinct from all blues)
+        unselected: '#F3EFEA'    // Very light wet soil
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     },
     // Day of week - colors inspired by changing weather conditions
     dayOfWeek: {
-      mon: '#A15555',          // Wet Brick Red (distinct from all blues)
-      tue: '#7B6B43',          // Wet Sand (distinct from all blues)
-      wed: '#4F7347',          // Damp Moss (distinct from all blues)
-      thu: '#3F7380',          // Shallow Puddle Teal (distinct from ocean/rain blues)
-      fri: '#73426B',          // Twilight Purple (distinct from storm lavender)
-      sat: '#486A8D',          // Faded Denim (distinct shade from other blues)
-      sun: '#7D5E40',          // Wet Tree Bark (distinct from all blues)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      mon: {
+        selected: '#A15555',     // Wet Brick Red (distinct from all blues)
+        unselected: '#F6ECEC'    // Very light wet brick
+      },
+      tue: {
+        selected: '#7B6B43',     // Wet Sand (distinct from all blues)
+        unselected: '#F2EFEA'    // Very light wet sand
+      },
+      wed: {
+        selected: '#4F7347',     // Damp Moss (distinct from all blues)
+        unselected: '#ECF1EA'    // Very light damp moss
+      },
+      thu: {
+        selected: '#3F7380',     // Shallow Puddle Teal (distinct from ocean/rain blues)
+        unselected: '#EAF1F3'    // Very light puddle teal
+      },
+      fri: {
+        selected: '#73426B',     // Twilight Purple (distinct from storm lavender)
+        unselected: '#F1EAEF'    // Very light twilight
+      },
+      sat: {
+        selected: '#486A8D',     // Faded Denim (distinct shade from other blues)
+        unselected: '#EBF0F4'    // Very light faded denim
+      },
+      sun: {
+        selected: '#7D5E40',     // Wet Tree Bark (distinct from all blues)
+        unselected: '#F2EDEA'    // Very light tree bark
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     },
     // Cleaning location - colors inspired by indoor spaces during rain
     cleaningLocation: {
-      kitchen: '#5F8064',      // Indoor Plant Green (distinct from all blues)
-      bathroom: '#7C96A8',     // Foggy Mirror (distinct shade from misty sky)
-      bedroom: '#8A7969',      // Cozy Blanket Taupe (distinct from all blues)
-      custom: '#9D7277',       // Dusty Rose (distinct from all blues/purples)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      kitchen: {
+        selected: '#5F8064',     // Indoor Plant Green (distinct from all blues)
+        unselected: '#EEF2EF'    // Very light plant green
+      },
+      bathroom: {
+        selected: '#7C96A8',     // Foggy Mirror (distinct shade from misty sky)
+        unselected: '#F1F4F6'    // Very light foggy mirror
+      },
+      bedroom: {
+        selected: '#8A7969',     // Cozy Blanket Taupe (distinct from all blues)
+        unselected: '#F3F1EF'    // Very light cozy blanket
+      },
+      custom: {
+        selected: '#9D7277',     // Dusty Rose (distinct from all blues/purples)
+        unselected: '#F5F0F1'    // Very light dusty rose
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     },
     // Self-care type - soothing, nurturing colors for rainy day self-care
     selfCareType: {
-      physical: '#6B7F55',     // Eucalyptus Leaf (distinct from all blues)
-      mental: '#6B5B7E',       // Calming Lavender (distinct from storm lavender)
-      rest: '#7D7462',         // Warm Wool Gray (distinct from all blues)
-      joy: '#A0746A',          // Terracotta (distinct from all blues)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      physical: {
+        selected: '#6B7F55',     // Eucalyptus Leaf (distinct from all blues)
+        unselected: '#F0F2EC'    // Very light eucalyptus
+      },
+      mental: {
+        selected: '#6B5B7E',     // Calming Lavender (distinct from storm lavender)
+        unselected: '#F0EDF2'    // Very light calming lavender
+      },
+      rest: {
+        selected: '#7D7462',     // Warm Wool Gray (distinct from all blues)
+        unselected: '#F2F1EE'    // Very light warm wool
+      },
+      joy: {
+        selected: '#A0746A',     // Terracotta (distinct from all blues)
+        unselected: '#F5F0EF'    // Very light terracotta
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     },
     // Delegate type - warm, human tones to contrast with cool rain theme
     delegateType: {
-      partner: '#665B83',      // Twilight Purple (distinct from storm lavender)
-      family: '#8D6F58',       // Warm Wood (distinct from all blues)
-      friends: '#5A8377',      // Sage Green (distinct from all blues)
-      kids: '#8B6A6E',         // Muted Berry (distinct from all blues)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      partner: {
+        selected: '#665B83',     // Twilight Purple (distinct from storm lavender)
+        unselected: '#EFEDF3'    // Very light twilight purple
+      },
+      family: {
+        selected: '#8D6F58',     // Warm Wood (distinct from all blues)
+        unselected: '#F4F0EC'    // Very light warm wood
+      },
+      friends: {
+        selected: '#5A8377',     // Sage Green (distinct from all blues)
+        unselected: '#EDF3F1'    // Very light sage
+      },
+      kids: {
+        selected: '#8B6A6E',     // Muted Berry (distinct from all blues)
+        unselected: '#F3EFF0'    // Very light muted berry
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     },
     // Meal type colors - warm food-inspired tones to contrast with cool rain theme
     mealType: {
-      breakfast: '#9D7E52',    // Toasted Oatmeal (distinct from all blues)
-      lunch: '#5C7C5E',        // Fresh Herb (distinct from all blues)
-      dinner: '#8E5F5F',       // Mulled Wine Red (distinct from all blues)
-      snack: '#8A7960',        // Warm Cinnamon (distinct from all blues)
-      custom: '#6A6B8D',       // Muted Plum (distinct from storm lavender)
-      default: '#657280'       // Neutral Rain Cloud Gray
+      breakfast: {
+        selected: '#9D7E52',     // Toasted Oatmeal (distinct from all blues)
+        unselected: '#F5F2EC'    // Very light toasted oatmeal
+      },
+      lunch: {
+        selected: '#5C7C5E',     // Fresh Herb (distinct from all blues)
+        unselected: '#EDF2ED'    // Very light fresh herb
+      },
+      dinner: {
+        selected: '#8E5F5F',     // Mulled Wine Red (distinct from all blues)
+        unselected: '#F4EDED'    // Very light mulled wine
+      },
+      snack: {
+        selected: '#8A7960',     // Warm Cinnamon (distinct from all blues)
+        unselected: '#F3F1ED'    // Very light cinnamon
+      },
+      custom: {
+        selected: '#6A6B8D',     // Muted Plum (distinct from storm lavender)
+        unselected: '#F0F0F4'    // Very light muted plum
+      },
+      default: {
+        selected: '#657280',     // Neutral Rain Cloud Gray
+        unselected: '#EFF1F3'    // Very light rain cloud
+      }
     }
   }
 };
