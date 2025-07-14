@@ -66,19 +66,149 @@ const tabConfig = {
 // Get all tab IDs for rendering all possible tabs
 const allTabIds = Object.keys(tabConfig);
 
+// Individual Tab Item component to properly use hooks
+const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, selectedTabsSet, visibleRoutes }) => {
+  const { options } = descriptor;
+  const label = options.tabBarLabel || options.title || route.name;
+  const isVisible = selectedTabsSet.has(route.name);
+  
+  // Create animated value for this specific tab
+  const animatedScale = useRef(new Animated.Value(isFocused ? 1.8 : 1)).current;
+
+  // Update animation when focus changes
+  useEffect(() => {
+    Animated.spring(animatedScale, {
+      toValue: isFocused ? 1.8 : 1,
+      useNativeDriver: true,
+      tension: 100,
+      friction: 8,
+    }).start();
+  }, [isFocused, animatedScale]);
+  
+  // Create interpolated values for smooth animations
+  const animatedTranslateY = animatedScale.interpolate({
+    inputRange: [1, 1.8],
+    outputRange: [0, -5],
+    extrapolate: 'clamp',
+  });
+  
+  const animatedShadowOpacity = animatedScale.interpolate({
+    inputRange: [1, 1.8],
+    outputRange: [0, 0.8],
+    extrapolate: 'clamp',
+  });
+  
+  const animatedShadowRadius = animatedScale.interpolate({
+    inputRange: [1, 1.8],
+    outputRange: [0, 10],
+    extrapolate: 'clamp',
+  });
+  
+  const animatedLabelOpacity = animatedScale.interpolate({
+    inputRange: [1, 1.8],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+  
+  const animatedLabelTranslateY = animatedScale.interpolate({
+    inputRange: [1, 1.8],
+    outputRange: [0, 5],
+    extrapolate: 'clamp',
+  });
+  
+  // If tab isn't visible, don't render it
+  if (!isVisible) return null;
+  
+  // Get tab color key
+  const colorKey = routeToColorMap[route.name];
+  const tabColor = tabColors[colorKey]?.pastel || '#FFFFFF';
+  
+  // Handle tab press
+  const onPress = () => {
+    const event = navigation.emit({
+      type: 'tabPress',
+      target: route.key,
+      canPreventDefault: true,
+    });
+    
+    if (!isFocused && !event.defaultPrevented) {
+      navigation.navigate(route.name);
+    }
+  };
+  
+  // Calculate width based on number of visible tabs
+  // When few tabs, expand to fill space; otherwise use fixed width
+  const tabWidth = visibleRoutes.length <= 4 
+    ? `${100 / visibleRoutes.length}%` 
+    : 80; // Keep tabs closer together
+  
+  // Icon component
+  const Icon = tabConfig[route.name]?.icon;
+  
+  return (
+    <TouchableOpacity
+      key={route.key}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityState={isFocused ? { selected: true } : {}}
+      accessibilityLabel={options.tabBarAccessibilityLabel}
+      testID={options.tabBarTestID}
+      onPress={onPress}
+      style={{
+        width: tabWidth,
+        height: '100%',
+        alignItems: 'center',
+        justifyContent: 'center',
+        paddingHorizontal: 2, // Reduced padding to keep icons closer
+      }}
+    >
+      <View style={{
+        alignItems: 'center',
+        justifyContent: 'center',
+        height: '100%',
+        width: '100%',
+      }}>
+        <Animated.View style={{
+          transform: [
+            { scale: animatedScale },
+            { translateY: animatedTranslateY }
+          ],
+          shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
+          shadowOffset: { width: 0, height: 0 },
+          shadowOpacity: animatedShadowOpacity,
+          shadowRadius: animatedShadowRadius,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}>
+          {Icon && <Icon size={30} color={tabColor} />}
+        </Animated.View>
+        
+        {/* Animated label that fades out when focused */}
+        <Animated.Text
+          style={{
+            opacity: animatedLabelOpacity,
+            transform: [{ translateY: animatedLabelTranslateY }],
+            color: tabColor,
+            fontFamily: 'Quicksand-SemiBold',
+            fontSize: 12,
+            marginTop: 4,
+            textAlign: 'center',
+          }}
+          numberOfLines={1}
+          ellipsizeMode="tail"
+        >
+          {tabConfig[route.name]?.title || label}
+        </Animated.Text>
+      </View>
+    </TouchableOpacity>
+  );
+};
+
 // Custom TabBar component to enable horizontal scrolling
 const CustomTabBar = ({ state, descriptors, navigation }) => {
   const { selectedTabs } = useTabContext();
   const { currentTheme } = useTheme();
   const tabColors = currentTheme.tabColors;
-  
-  // Create animated values for each tab
-  const animatedValues = useRef(
-    state.routes.reduce((acc, route) => {
-      acc[route.key] = new Animated.Value(1);
-      return acc;
-    }, {})
-  ).current;
   
   // Get active route name for background color
   const activeRouteName = state.routes[state.index].name;
@@ -114,152 +244,19 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           minWidth: '100%',
         }}
       >
-        {state.routes.map((route, index) => {
-          const { options } = descriptors[route.key];
-          const label = options.tabBarLabel || options.title || route.name;
-          const isFocused = state.index === index;
-          const isVisible = selectedTabsSet.has(route.name);
-          
-          // Animate when focus changes
-          useEffect(() => {
-            Animated.spring(animatedValues[route.key], {
-              toValue: isFocused ? 1.8 : 1,
-              useNativeDriver: true,
-              tension: 100,
-              friction: 8,
-            }).start();
-          }, [isFocused, route.key]);
-          
-          // Create interpolated values for smooth animations
-          const animatedScale = animatedValues[route.key];
-          
-          const animatedTranslateY = useMemo(() => 
-            animatedScale.interpolate({
-              inputRange: [1, 1.8],
-              outputRange: [0, -5],
-              extrapolate: 'clamp',
-            }), [animatedScale]
-          );
-          
-          const animatedShadowOpacity = useMemo(() => 
-            animatedScale.interpolate({
-              inputRange: [1, 1.8],
-              outputRange: [0, 0.8],
-              extrapolate: 'clamp',
-            }), [animatedScale]
-          );
-          
-          const animatedShadowRadius = useMemo(() => 
-            animatedScale.interpolate({
-              inputRange: [1, 1.8],
-              outputRange: [0, 10],
-              extrapolate: 'clamp',
-            }), [animatedScale]
-          );
-          
-          const animatedLabelOpacity = useMemo(() => 
-            animatedScale.interpolate({
-              inputRange: [1, 1.8],
-              outputRange: [1, 0],
-              extrapolate: 'clamp',
-            }), [animatedScale]
-          );
-          
-          const animatedLabelTranslateY = useMemo(() => 
-            animatedScale.interpolate({
-              inputRange: [1, 1.8],
-              outputRange: [0, 5],
-              extrapolate: 'clamp',
-            }), [animatedScale]
-          );
-          
-          // If tab isn't visible, don't render it
-          if (!isVisible) return null;
-          
-          // Get tab color key
-          const colorKey = routeToColorMap[route.name];
-          const tabColor = tabColors[colorKey]?.pastel || '#FFFFFF';
-          
-          // Handle tab press
-          const onPress = () => {
-            const event = navigation.emit({
-              type: 'tabPress',
-              target: route.key,
-              canPreventDefault: true,
-            });
-            
-            if (!isFocused && !event.defaultPrevented) {
-              navigation.navigate(route.name);
-            }
-          };
-          
-          // Calculate width based on number of visible tabs
-          // When few tabs, expand to fill space; otherwise use fixed width
-          const tabWidth = visibleRoutes.length <= 4 
-            ? `${100 / visibleRoutes.length}%` 
-            : 80; // Keep tabs closer together
-          
-          // Icon component
-          const Icon = tabConfig[route.name]?.icon;
-          
-          return (
-            <TouchableOpacity
-              key={route.key}
-              activeOpacity={0.7}
-              accessibilityRole="button"
-              accessibilityState={isFocused ? { selected: true } : {}}
-              accessibilityLabel={options.tabBarAccessibilityLabel}
-              testID={options.tabBarTestID}
-              onPress={onPress}
-              style={{
-                width: tabWidth,
-                height: '100%',
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingHorizontal: 2, // Reduced padding to keep icons closer
-              }}
-            >
-              <View style={{
-                alignItems: 'center',
-                justifyContent: 'center',
-                height: '100%',
-                width: '100%',
-              }}>
-                <Animated.View style={{
-                  transform: [
-                    { scale: animatedScale },
-                    { translateY: animatedTranslateY }
-                  ],
-                  shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
-                  shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: animatedShadowOpacity,
-                  shadowRadius: animatedShadowRadius,
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                }}>
-                  {Icon && <Icon size={30} color={tabColor} />}
-                </Animated.View>
-                
-                {/* Animated label that fades out when focused */}
-                <Animated.Text
-                  style={{
-                    opacity: animatedLabelOpacity,
-                    transform: [{ translateY: animatedLabelTranslateY }],
-                    color: tabColor,
-                    fontFamily: 'Quicksand-SemiBold',
-                    fontSize: 12,
-                    marginTop: 4,
-                    textAlign: 'center',
-                  }}
-                  numberOfLines={1}
-                  ellipsizeMode="tail"
-                >
-                  {tabConfig[route.name]?.title || label}
-                </Animated.Text>
-              </View>
-            </TouchableOpacity>
-          );
-        })}
+        {state.routes.map((route, index) => (
+          <TabItem
+            key={route.key}
+            route={route}
+            index={index}
+            isFocused={state.index === index}
+            descriptor={descriptors[route.key]}
+            navigation={navigation}
+            tabColors={tabColors}
+            selectedTabsSet={selectedTabsSet}
+            visibleRoutes={visibleRoutes}
+          />
+        ))}
       </ScrollView>
     </View>
   );
