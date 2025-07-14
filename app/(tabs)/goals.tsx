@@ -65,7 +65,7 @@ export default function LongTermGoals() {
           <NeumorphicCard style={[styles.emptyState, { borderColor: colors.medium, backgroundColor: colors.bgAlt }]}>
             <Text style={[styles.emptyTitle, { color: colors.veryDark }]}>No long-term tasks</Text>
             <Text style={[styles.emptySubtitle, { color: colors.dark }]}>
-              Add tasks you need to do, just not any time soon
+              Add tasks to do, just not any time soon
             </Text>
           </NeumorphicCard>
         ) : (
