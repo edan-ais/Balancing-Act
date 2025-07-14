@@ -176,21 +176,40 @@ export default function AddTaskForm({
   const getColorOptions = (tagType: string) => {
     const tabColorKey = getCategoryColorKey();
     const tabColors = colors?.tabColors?.[tabColorKey] || {};
+    
+    // Map tag type to the appropriate prefix for theme color keys
+    const getPrefix = () => {
+      switch (tagType) {
+        case 'priority': return 'priority';
+        case 'goalType': return 'goal';
+        case 'cleaningLocation': return 'cleaning';
+        case 'delegateType': return 'delegate';
+        case 'dayOfWeek': return 'day';
+        default: return '';
+      }
+    };
+    
+    const prefix = getPrefix();
+    if (!prefix) return [veryDarkColor, highlightColor, tabColors.medium || effectiveMediumColor];
+    
+    // Collect all theme colors for this tag type that end with "Selected"
     const colorOptions = [];
     
-    // Collect all the Selected colors for this tag type
-    const prefix = tagType === 'priority' ? 'priority' : 
-                  tagType === 'goalType' ? 'goal' :
-                  tagType === 'cleaningLocation' ? 'cleaning' :
-                  tagType === 'delegateType' ? 'delegate' : '';
-    
-    if (prefix) {
-      // Go through all tabColors keys and find the ones that match our prefix and end with "Selected"
+    // First search in the current tab colors
+    if (tabColors) {
       Object.entries(tabColors).forEach(([key, value]) => {
-        if (key.startsWith(prefix) && key.endsWith('Selected') && key !== `${prefix}CustomSelected` && key !== `${prefix}DefaultSelected`) {
-          if (typeof value === 'string') {
-            colorOptions.push(value);
-          }
+        // Only include colors that:
+        // 1. Start with our prefix
+        // 2. End with "Selected" (these are the vibrant colors)
+        // 3. Don't include "Default" or "Custom" (special cases)
+        if (
+          typeof value === 'string' && 
+          key.startsWith(prefix) && 
+          key.endsWith('Selected') && 
+          !key.includes('Default') && 
+          !key.includes('Custom')
+        ) {
+          colorOptions.push(value);
         }
       });
     }
@@ -200,23 +219,41 @@ export default function AddTaskForm({
       return colorOptions;
     }
     
-    // Otherwise collect colors from all tabs as a fallback
-    const allColors = [];
+    // If this tag type's colors might be in another tab, look across all tabs
+    const allTabsColorOptions = [];
+    
     if (colors?.tabColors) {
       Object.values(colors.tabColors).forEach(tabColorSet => {
-        Object.entries(tabColorSet).forEach(([key, value]) => {
-          if (typeof value === 'string' && key.endsWith('Selected') && !key.includes('Default') && !key.includes('Custom')) {
-            if (!allColors.includes(value)) {
-              allColors.push(value);
+        if (tabColorSet) {
+          Object.entries(tabColorSet).forEach(([key, value]) => {
+            if (
+              typeof value === 'string' && 
+              key.startsWith(prefix) && 
+              key.endsWith('Selected') && 
+              !key.includes('Default') && 
+              !key.includes('Custom')
+            ) {
+              if (!allTabsColorOptions.includes(value)) {
+                allTabsColorOptions.push(value);
+              }
             }
-          }
-        });
+          });
+        }
       });
     }
     
-    // Return all collected colors or fallback to tab colors
-    return allColors.length > 0 ? allColors : [
-      veryDarkColor, highlightColor, tabColors.medium || effectiveMediumColor
+    // If we found colors across all tabs, return them
+    if (allTabsColorOptions.length > 0) {
+      return allTabsColorOptions;
+    }
+    
+    // Fallback to basic theme colors if no specific tag colors found
+    return [
+      veryDarkColor, 
+      highlightColor, 
+      tabColors.medium || effectiveMediumColor,
+      tabColors.dark || effectiveDarkColor,
+      tabColors.pastel || effectivePastelColor
     ];
   };
 
