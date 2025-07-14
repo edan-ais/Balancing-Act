@@ -51,13 +51,24 @@ export default function AddTaskForm({
   const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
   
+  // Map category to appropriate tab color key
+  const getCategoryColorKey = () => {
+    switch (category) {
+      case 'daily': return 'daily';
+      case 'future': return 'future';
+      case 'weekly': return 'calendar';
+      case 'meal-prep': return 'meals';
+      case 'cleaning': return 'cleaning';
+      case 'self-care': return 'selfCare';
+      case 'delegation': return 'delegate';
+      case 'goals': return 'future'; // Goals can use future colors
+      default: return 'daily'; // Fallback to daily colors
+    }
+  };
+  
   // Get the appropriate theme colors based on category
-  const tabColors = colors?.tabColors?.[category === 'future' ? 'future' : 
-                                       category === 'weekly' ? 'calendar' :
-                                       category === 'meal-prep' ? 'meals' :
-                                       category === 'self-care' ? 'selfCare' :
-                                       category === 'delegation' ? 'delegate' :
-                                       category] || {};
+  const tabColorKey = getCategoryColorKey();
+  const tabColors = colors?.tabColors?.[tabColorKey] || {};
   
   // Use the tab colors from the theme
   const veryDarkColor = tabColors.veryDark || '#333333';
@@ -267,7 +278,10 @@ export default function AddTaskForm({
     <Modal visible={visible} animationType="fade" transparent={true}>
       <View style={styles.overlay}>
         <View style={[styles.modalContainer, { backgroundColor: bgColor }]}>
-          <View style={[styles.header, { borderBottomColor: pastelColor }]}>
+          <View style={[styles.header, { 
+            borderBottomColor: pastelColor,
+            backgroundColor: bgAltColor 
+          }]}>
             <Text style={[styles.title, { color: darkColor }]}>Add New Task</Text>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
               <X size={24} color={mediumColor} />
@@ -318,7 +332,7 @@ export default function AddTaskForm({
                     <TouchableOpacity
                       style={[
                         styles.toggleButton, 
-                        { backgroundColor: !isHabit ? accentColor : bgColor }
+                        { backgroundColor: !isHabit ? highlightColor : bgColor }
                       ]}
                       onPress={() => setIsHabit(false)}
                     >
@@ -332,7 +346,7 @@ export default function AddTaskForm({
                     <TouchableOpacity
                       style={[
                         styles.toggleButton, 
-                        { backgroundColor: isHabit ? accentColor : bgColor }
+                        { backgroundColor: isHabit ? highlightColor : bgColor }
                       ]}
                       onPress={() => setIsHabit(true)}
                     >
@@ -590,7 +604,7 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { backgroundColor: pastelColor },
-                          frequency === option && { backgroundColor: accentColor },
+                          frequency === option && { backgroundColor: highlightColor },
                           errors.some(e => e.includes('Frequency')) && { borderColor: '#FC8181', borderWidth: 1 }
                         ]}
                         onPress={() => {
@@ -747,7 +761,7 @@ export default function AddTaskForm({
                     <Switch
                       value={reminderEnabled}
                       onValueChange={setReminderEnabled}
-                      trackColor={{ false: pastelColor, true: accentColor }}
+                      trackColor={{ false: pastelColor, true: highlightColor }}
                       thumbColor="#ffffff"
                     />
                   </View>
@@ -757,7 +771,7 @@ export default function AddTaskForm({
               {/* Calendar Tasks */}
               {category === 'weekly' && selectedDate && (
                 <View style={[styles.dateInfo, { 
-                  backgroundColor: accentColor,
+                  backgroundColor: highlightColor,
                   borderColor: darkColor
                 }]}>
                   <Text style={[styles.dateInfoText, { color: bgColor }]}>
@@ -777,7 +791,7 @@ export default function AddTaskForm({
                   <Text style={[styles.label, { color: darkColor }]}>Subtasks</Text>
                   <TouchableOpacity 
                     onPress={addSubtask} 
-                    style={[styles.addSubtaskButton, { backgroundColor: accentColor }]}
+                    style={[styles.addSubtaskButton, { backgroundColor: highlightColor }]}
                   >
                     <Plus size={16} color="#FFFFFF" />
                   </TouchableOpacity>
@@ -808,7 +822,10 @@ export default function AddTaskForm({
             </View>
           </ScrollView>
 
-          <View style={[styles.footer, { borderTopColor: pastelColor }]}>
+          <View style={[styles.footer, { 
+            borderTopColor: pastelColor,
+            backgroundColor: bgAltColor
+          }]}>
             <TouchableOpacity 
               style={[styles.cancelButton, { backgroundColor: pastelColor }]} 
               onPress={handleClose}
