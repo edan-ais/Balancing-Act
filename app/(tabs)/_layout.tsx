@@ -1,5 +1,5 @@
 import React from 'react';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
 import { View, Text, ScrollView, TouchableOpacity, Animated } from 'react-native';
@@ -120,7 +120,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           const isFocused = state.index === index;
           const isVisible = selectedTabsSet.has(route.name);
           
-          // Animate scale when focus changes
+          // Animate when focus changes
           useEffect(() => {
             Animated.spring(animatedValues[route.key], {
               toValue: isFocused ? 1.8 : 1,
@@ -129,6 +129,49 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
               friction: 8,
             }).start();
           }, [isFocused, route.key]);
+          
+          // Create interpolated values for smooth animations
+          const animatedScale = animatedValues[route.key];
+          
+          const animatedTranslateY = useMemo(() => 
+            animatedScale.interpolate({
+              inputRange: [1, 1.8],
+              outputRange: [0, -5],
+              extrapolate: 'clamp',
+            }), [animatedScale]
+          );
+          
+          const animatedShadowOpacity = useMemo(() => 
+            animatedScale.interpolate({
+              inputRange: [1, 1.8],
+              outputRange: [0, 0.8],
+              extrapolate: 'clamp',
+            }), [animatedScale]
+          );
+          
+          const animatedShadowRadius = useMemo(() => 
+            animatedScale.interpolate({
+              inputRange: [1, 1.8],
+              outputRange: [0, 10],
+              extrapolate: 'clamp',
+            }), [animatedScale]
+          );
+          
+          const animatedLabelOpacity = useMemo(() => 
+            animatedScale.interpolate({
+              inputRange: [1, 1.8],
+              outputRange: [1, 0],
+              extrapolate: 'clamp',
+            }), [animatedScale]
+          );
+          
+          const animatedLabelTranslateY = useMemo(() => 
+            animatedScale.interpolate({
+              inputRange: [1, 1.8],
+              outputRange: [0, 5],
+              extrapolate: 'clamp',
+            }), [animatedScale]
+          );
           
           // If tab isn't visible, don't render it
           if (!isVisible) return null;
@@ -183,22 +226,80 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                 width: '100%',
               }}>
                 <Animated.View style={{
-                  transform: [{ scale: animatedValues[route.key] }],
-                  shadowColor: isFocused ? tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)' : 'transparent',
+                  transform: [
+                    { scale: animatedScale },
+                    { translateY: animatedTranslateY }
+                  ],
+                  shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
                   shadowOffset: { width: 0, height: 0 },
-                  shadowOpacity: isFocused ? 0.8 : 0,
-                  shadowRadius: isFocused ? 10 : 0,
+                  shadowOpacity: animatedShadowOpacity,
+                  shadowRadius: animatedShadowRadius,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  // Center the icon vertically regardless of focus state
-                  marginTop: isFocused ? -5 : 0, // Adjust to center when enlarged
                 }}>
                   {Icon && <Icon size={30} color={tabColor} />}
                 </Animated.View>
                 
-                {/* Only show label when not focused */}
-                {!isFocused && (
-                  <Text
+                {/* Animated label that fades out when focused */}
+                <Animated.Text
+                  style={{
+                    opacity: animatedLabelOpacity,
+                    transform: [{ translateY: animatedLabelTranslateY }],
+                    color: tabColor,
+                    fontFamily: 'Quicksand-SemiBold',
+                    fontSize: 12,
+                    marginTop: 4,
+                    textAlign: 'center',
+                  }}
+                  numberOfLines={1}
+                  ellipsizeMode="tail"
+                >
+                  {tabConfig[route.name]?.title || label}
+                </Animated.Text>
+              </View>
+            </TouchableOpacity>
+          );
+        })}
+      </ScrollView>
+    </View>
+  );
+};
+
+export default function TabLayout() {
+  const { selectedTabs } = useTabContext();
+  const { currentTheme } = useTheme();
+  
+  // Get the currently focused tab for background color
+  const [focusedTab, setFocusedTab] = React.useState(selectedTabs[0] || 'index');
+  
+  return (
+    <Tabs
+      tabBar={(props) => <CustomTabBar {...props} />}
+      screenOptions={{
+        headerShown: false,
+      }}
+    >
+      {/* Render all tabs, but with visibility controlled by the CustomTabBar */}
+      {allTabIds.map((tabId) => {
+        const config = tabConfig[tabId];
+        if (!config) return null;
+        
+        return (
+          <Tabs.Screen
+            key={tabId}
+            name={config.name}
+            options={{
+              title: config.title,
+            }}
+            listeners={{
+              focus: () => setFocusedTab(config.name),
+            }}
+          />
+        );
+      })}
+    </Tabs>
+  );
+}
                     style={{
                       color: tabColor,
                       fontFamily: 'Quicksand-SemiBold',
