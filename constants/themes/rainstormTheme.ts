@@ -3,6 +3,7 @@ export const rainstormTheme = {
   name: 'Rainstorm Theme',
   id: 'rainstorm',
   backgroundImage: 'https://images.pexels.com/photos/1529360/pexels-photo-1529360.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+  addTaskIcon: 'cloud-rain', // Added rain cloud icon for the Rainstorm theme
   tabColors: {
     // Deep Ocean Blue - deep navy with cool undertones
     daily: {
