@@ -66,21 +66,21 @@ export default function MealPrep() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: colors.dark }]}>Meal Prep</Text>
-          <Text style={[styles.subtitle, { color: colors.medium }]}>
+        <View style={styles.headerTitleContainer}>
+          <Text style={[styles.title, { color: colors.veryDark }]}>Meal Prep</Text>
+          <Text style={[styles.subtitle, { color: colors.dark }]}>
             Plan and prepare your meals
           </Text>
         </View>
         <View style={styles.headerIcons}>
           <TouchableOpacity 
             style={[styles.actionButton, { 
-              backgroundColor: colors.accent,
+              backgroundColor: colors.dark,
               shadowColor: colors.shadow
             }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.pastel} />
+            <Home size={22} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -89,24 +89,25 @@ export default function MealPrep() {
         {mealCategories.map((category, index) => (
           <NeumorphicCard key={index} style={[styles.categoryCard, { 
             shadowColor: colors.shadow,
-            borderColor: colors.accent,
-            borderWidth: 1 
+            borderColor: colors.medium,
+            borderWidth: 1,
+            backgroundColor: colors.bgAlt
           }]}>
             <View style={styles.categoryHeader}>
               <View style={styles.categoryInfo}>
                 <View style={styles.categoryTitleRow}>
-                  <category.icon size={20} color={colors.accent} />
+                  <category.icon size={22} color={colors.dark} />
                   <View style={styles.categoryTextContainer}>
-                    <Text style={[styles.categoryTitle, { color: colors.dark }]}>
+                    <Text style={[styles.categoryTitle, { color: colors.veryDark }]}>
                       {category.title}
                     </Text>
-                    <Text style={[styles.categorySubtitle, { color: colors.medium }]}>
+                    <Text style={[styles.categorySubtitle, { color: colors.dark }]}>
                       {category.subtitle}
                     </Text>
                   </View>
                 </View>
               </View>
-              <View style={[styles.categoryCountContainer, { backgroundColor: colors.accent }]}>
+              <View style={[styles.categoryCountContainer, { backgroundColor: colors.dark }]}>
                 <Text style={[styles.categoryCount, { color: colors.pastel }]}>
                   {category.tasks.length} items
                 </Text>
@@ -115,7 +116,7 @@ export default function MealPrep() {
             
             {category.tasks.length === 0 ? (
               <View style={styles.emptyCategory}>
-                <Text style={[styles.emptyCategoryText, { color: colors.medium }]}>
+                <Text style={[styles.emptyCategoryText, { color: colors.dark }]}>
                   No {category.title.toLowerCase()} tasks yet
                 </Text>
               </View>
@@ -162,6 +163,9 @@ export default function MealPrep() {
         mediumColor={colors.medium}
         pastelColor={colors.pastel}
         shadowColor={colors.shadow}
+        veryDarkColor={colors.veryDark}
+        highlightColor={colors.highlight}
+        bgAltColor={colors.bgAlt}
       />
 
       <EditTaskForm
@@ -175,6 +179,9 @@ export default function MealPrep() {
         mediumColor={colors.medium}
         pastelColor={colors.pastel}
         shadowColor={colors.shadow}
+        veryDarkColor={colors.veryDark}
+        highlightColor={colors.highlight}
+        bgAltColor={colors.bgAlt}
       />
     </SafeAreaView>
   );
@@ -188,46 +195,55 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    paddingRight: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: 'Quicksand-Bold',
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Quicksand-Medium',
     marginTop: 2,
   },
   headerIcons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 8,
   },
   actionButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
     justifyContent: 'center',
     alignItems: 'center',
     shadowOffset: { width: 2, height: 2 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.25,
     shadowRadius: 4,
+    elevation: 4,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
+    marginTop: 6,
   },
   categoryCard: {
-    margin: 12,
-    marginBottom: 8,
+    margin: 10,
+    marginBottom: 10,
+    padding: 12,
+    borderRadius: 16,
   },
   categoryHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   categoryInfo: {
     flex: 1,
@@ -237,47 +253,47 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   categoryTextContainer: {
-    marginLeft: 8,
+    marginLeft: 10,
   },
   categoryTitle: {
     fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
+    fontFamily: 'Quicksand-Bold',
   },
   categorySubtitle: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 14,
+    fontFamily: 'Quicksand-Medium',
     marginTop: 2,
   },
   categoryCountContainer: {
     borderRadius: 12,
-    paddingHorizontal: 8,
+    paddingHorizontal: 10,
     paddingVertical: 4,
   },
   categoryCount: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Medium',
+    fontSize: 13,
+    fontFamily: 'Quicksand-SemiBold',
   },
   emptyCategory: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   emptyCategoryText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 16,
+    fontFamily: 'Quicksand-Medium',
     fontStyle: 'italic',
   },
   addButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: 16,
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowOffset: { width: 4, height: 4 },
+    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 6,
+    elevation: 6,
   },
 });
