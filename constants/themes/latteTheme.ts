@@ -88,5 +88,69 @@ export const latteTheme = {
       pastel: '#F8F5EF',       // Light vanilla cream
       bg: '#FEFCF9'            // Ultra light vanilla cream
     }
+  },
+  // Tag colors that complement the coffee theme but avoid using the same colors as the tabs
+  tagColors: {
+    // Priority colors - warm, rich tones that stand out
+    priority: {
+      high: '#9D2933',         // Cranberry red (avoiding espresso brown)
+      medium: '#4A6741',       // Forest green (avoiding hazelnut)
+      low: '#4B6584',          // Steel blue (avoiding caramel)
+      quickWin: '#E67E22',     // Pumpkin orange (distinct from all tabs)
+      custom: '#8B6B8C',       // Muted purple (distinct from lavender)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    },
+    // Goal type colors - muted but distinct
+    goalType: {
+      tbd: '#6F4E7C',          // Muted grape (distinct from lavender)
+      notPriority: '#BA4A4A',  // Brick red (distinct from rose pink)
+      wish: '#5B6F4C',         // Olive green (distinct from pistachio)
+      custom: '#996B21',       // Bronze (distinct from hazelnut/caramel)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    },
+    // Day of week - warm spectrum that flows through the week
+    dayOfWeek: {
+      mon: '#96514D',          // Terracotta (distinct from rose pink)
+      tue: '#AD7D4C',          // Amber (distinct from caramel)
+      wed: '#7D9148',          // Avocado (distinct from pistachio)
+      thu: '#5A8A72',          // Sage (distinct from pistachio)
+      fri: '#577E9F',          // Denim blue (distinct from all tabs)
+      sat: '#7A6C93',          // Dusty purple (distinct from lavender)
+      sun: '#B25D85',          // Raspberry (distinct from rose pink)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    },
+    // Cleaning location - fresh and clean tones
+    cleaningLocation: {
+      kitchen: '#D4A04F',      // Golden honey (distinct from caramel)
+      bathroom: '#6487A5',     // Powder blue (distinct from all tabs)
+      bedroom: '#8D6E63',      // Coffee brown (distinct from espresso/hazelnut)
+      custom: '#AF6458',       // Terra cotta (distinct from rose pink)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    },
+    // Self-care type - gentle nurturing colors
+    selfCareType: {
+      physical: '#778F67',     // Eucalyptus (distinct from pistachio)
+      mental: '#7D6D9C',       // Periwinkle (distinct from lavender)
+      rest: '#669999',         // Seafoam (distinct from all tabs)
+      joy: '#CF745F',          // Coral (distinct from rose pink)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    },
+    // Delegate type - earthy tones that feel reassuring
+    delegateType: {
+      partner: '#7D93B2',      // Steel blue (distinct from all tabs)
+      family: '#C7874F',       // Copper (distinct from caramel)
+      friends: '#8B7D7B',      // Taupe (distinct from vanilla)
+      kids: '#8DAA7B',         // Moss green (distinct from pistachio)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    },
+    // Meal type colors - appetizing food-inspired tones
+    mealType: {
+      breakfast: '#D99E6A',    // Toast brown (distinct from hazelnut)
+      lunch: '#7D9457',        // Olive (distinct from pistachio)
+      dinner: '#A05B53',       // Tomato (distinct from rose pink)
+      snack: '#BE9E6F',        // Honey gold (distinct from caramel)
+      custom: '#8D7C9D',       // Dusky purple (distinct from lavender)
+      default: '#8A7F6F'       // Neutral dark vanilla
+    }
   }
 };
