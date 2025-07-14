@@ -41,7 +41,7 @@ export default function DailyTasks() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
-        <View>
+        <View style={styles.headerTitleContainer}>
           <Text style={[styles.title, { color: colors.veryDark }]}>Daily Tasks</Text>
           <Text style={[styles.subtitle, { color: colors.dark }]}>
             {completedTasks.length}/{dailyTasks.length} completed
@@ -55,7 +55,7 @@ export default function DailyTasks() {
             }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={24} color={colors.pastel} />
+            <Home size={22} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -124,7 +124,7 @@ export default function DailyTasks() {
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={28} color={colors.pastel} />
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -170,80 +170,84 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 24,
-    paddingTop: 20,
-    paddingBottom: 14,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    paddingRight: 8,
   },
   title: {
-    fontSize: 32,
+    fontSize: 26,
     fontFamily: 'Quicksand-Bold',
-    marginBottom: 4,
+    marginBottom: 2,
   },
   subtitle: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 16,
+    fontFamily: 'Quicksand-Medium',
     marginTop: 2,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 16,
+    gap: 8,
   },
   homeButton: {
-    width: 52,
-    height: 52,
-    borderRadius: 26,
+    width: 46,
+    height: 46,
+    borderRadius: 23,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  content: {
+    flex: 1,
+    paddingHorizontal: 10,
+    marginTop: 6,
+  },
+  section: {
+    marginBottom: 20,
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontFamily: 'Quicksand-Bold',
+    marginLeft: 12,
+    marginBottom: 10,
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingVertical: 40,
+    paddingHorizontal: 16,
+    margin: 10,
+    borderWidth: 2,
+    borderRadius: 16,
+  },
+  emptyTitle: {
+    fontSize: 22,
+    fontFamily: 'Quicksand-Bold',
+    marginBottom: 10,
+  },
+  emptySubtitle: {
+    fontSize: 16,
+    fontFamily: 'Quicksand-Medium',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  addButton: {
+    position: 'absolute',
+    bottom: 16,
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
     shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
     shadowRadius: 6,
-    elevation: 5,
-  },
-  content: {
-    flex: 1,
-    paddingHorizontal: 16,
-    marginTop: 10,
-  },
-  section: {
-    marginBottom: 24,
-  },
-  sectionTitle: {
-    fontSize: 22,
-    fontFamily: 'Quicksand-Bold',
-    marginLeft: 12,
-    marginBottom: 12,
-  },
-  emptyState: {
-    alignItems: 'center',
-    paddingVertical: 50,
-    paddingHorizontal: 20,
-    margin: 16,
-    borderWidth: 2,
-    borderRadius: 16,
-  },
-  emptyTitle: {
-    fontSize: 24,
-    fontFamily: 'Quicksand-Bold',
-    marginBottom: 12,
-  },
-  emptySubtitle: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-Medium',
-    textAlign: 'center',
-    lineHeight: 26,
-  },
-  addButton: {
-    position: 'absolute',
-    bottom: 24,
-    right: 24,
-    width: 68,
-    height: 68,
-    borderRadius: 34,
-    justifyContent: 'center',
-    alignItems: 'center',
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    elevation: 6,
   },
 });
