@@ -3,6 +3,7 @@ export const balanceTheme = {
   name: 'Balance Theme',
   id: 'balance',
   backgroundImage: 'https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+  addTaskIcon: 'leaf', // Add task icon for all tabs in this theme
   tabColors: {
     // Blue - Daily
     daily: {
@@ -136,7 +137,6 @@ export const balanceTheme = {
       highlight: '#FF5757', // Bright red
       bg: '#FFF5F5', // Ultra light red
       accent: '#FBD8D8' // Soft red
-      // Removed selfCare type tags as they are required tags
     },
 
     // Teal - Delegate
