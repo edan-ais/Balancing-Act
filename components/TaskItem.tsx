@@ -372,32 +372,39 @@ export default function TaskItem({
     return colors?.dark || '#4A5568'; // Active subtasks use dark color
   };
 
-  // Choose icon colors based on theme
+  // Choose icon colors based on theme - ensuring good contrast
   const getIconColor = (disabled: boolean) => {
-    if (disabled) return colors?.pastel || '#CBD5E0'; 
-    return colors?.medium || '#4A5568';
+    if (disabled) return colors?.medium || '#A0AEC0'; // Using medium instead of pastel for better visibility
+    return colors?.dark || '#4A5568'; // Using dark instead of medium for better contrast
   };
 
-  // Get checkbox background color - logical flow from light to dark
-  const getCheckboxBgColor = (completed: boolean, isHabit: boolean) => {
+  // Get checkbox background color - LIGHT before check, DARK after check
+  const getCheckboxBgColor = (completed: boolean) => {
     if (completed) {
-      return taskAccentColor; // Completed checkbox uses accent color (darker)
-    } else if (isHabit) {
-      return colors?.bgAlt || '#EDF2F7'; // Habit checkbox uses slightly different bg
+      return taskAccentColor; // Completed checkbox uses dark accent color
     } else {
-      return colors?.pastel || '#E2E8F0'; // Uncompleted uses pastel (lighter)
+      // Use a light but visible color for unchecked boxes
+      return colors?.medium || '#CBD5E0'; 
     }
   };
 
-  // Get checkbox text/icon color - ensure high contrast
-  const getCheckboxContentColor = (completed: boolean, isHabit: boolean) => {
+  // Get checkbox text/icon color - DARK icon on LIGHT background, LIGHT icon on DARK background
+  const getCheckboxContentColor = (completed: boolean) => {
     if (completed) {
-      return '#FFFFFF'; // Completed checkbox always uses white for best contrast
-    } else if (isHabit) {
-      return colors?.veryDark || '#1A202C'; // Habit number uses dark text for contrast
+      return colors?.pastel || '#FFFFFF'; // Light icon on dark background
     } else {
-      return colors?.veryDark || '#1A202C'; // Default to dark text for contrast
+      return colors?.veryDark || '#1A202C'; // Dark text on light background
     }
+  };
+
+  // Get habit progress bar background - LIGHT before completing
+  const getHabitProgressBgColor = () => {
+    return colors?.pastel || '#E2E8F0'; // Light background
+  };
+
+  // Get habit progress bar fill color - DARK after completing
+  const getHabitProgressFillColor = () => {
+    return taskHabitColor; // Dark fill
   };
 
   return (
@@ -411,7 +418,7 @@ export default function TaskItem({
           borderWidth: 1,
           // Add left border accent for habits
           ...(task.isHabit ? {
-            borderLeftWidth: 6, // Increased from 4
+            borderLeftWidth: 6,
             borderLeftColor: taskColor
           } : {})
         }
@@ -424,20 +431,20 @@ export default function TaskItem({
               task.completed ? styles.checkedBox : null,
               task.isHabit ? styles.habitBox : null,
               { 
-                backgroundColor: getCheckboxBgColor(task.completed, !!task.isHabit),
+                backgroundColor: getCheckboxBgColor(task.completed),
                 borderColor: task.completed ? 'transparent' : taskColor,
-                borderWidth: task.completed ? 0 : 1.5,
+                borderWidth: task.completed ? 0 : 2,
                 shadowColor: colors?.shadow || '#C8D0E0'
               },
             ]}
           >
             {task.completed ? (
-              <Check size={18} color={getCheckboxContentColor(true, !!task.isHabit)} />
+              <Check size={18} color={getCheckboxContentColor(true)} />
             ) : (
               task.isHabit && task.habitCount !== undefined && (
                 <Text style={[
                   styles.habitCount,
-                  { color: getCheckboxContentColor(false, true) }
+                  { color: getCheckboxContentColor(false) }
                 ]}>
                   {task.habitCount}
                 </Text>
@@ -469,7 +476,7 @@ export default function TaskItem({
               <View style={[styles.notesContainer, { 
                 backgroundColor: colors?.bgAlt || '#F7FAFC',
                 borderLeftColor: colors?.accent || '#ED8936',
-                borderLeftWidth: 3 // Increased from 2
+                borderLeftWidth: 3
               }]}>
                 <Text style={[styles.notesText, { color: colors?.dark || '#4A5568' }]}>
                   {task.notes}
@@ -478,15 +485,15 @@ export default function TaskItem({
             ) : null}
 
             {task.isHabit && task.habitGoal ? (
-              <View style={[styles.habitProgressContainer, { backgroundColor: colors?.pastel || '#E2E8F0' }]}>
+              <View style={[styles.habitProgressContainer, { backgroundColor: getHabitProgressBgColor() }]}>
                 <View 
                   style={[
                     styles.habitProgressBar, 
                     { 
                       width: `${habitProgress}%`,
-                      backgroundColor: taskHabitColor
+                      backgroundColor: getHabitProgressFillColor()
                     }
-                  ]} 
+                  ]] 
                 />
                 <Text style={[styles.habitGoalText, { color: colors?.dark || '#4A5568' }]}>
                   {task.habitCount || 0}/{task.habitGoal}
@@ -507,15 +514,15 @@ export default function TaskItem({
                         styles.subtaskCheckbox, 
                         { 
                           backgroundColor: subtask.completed 
-                            ? taskAccentColor 
-                            : (colors?.pastel || '#E2E8F0'),
-                          borderColor: subtask.completed ? 'transparent' : (colors?.medium || '#A0AEC0'),
-                          borderWidth: subtask.completed ? 0 : 1,
+                            ? taskAccentColor // DARK when completed 
+                            : (colors?.medium || '#CBD5E0'), // LIGHT but visible when not completed
+                          borderColor: subtask.completed ? 'transparent' : taskColor,
+                          borderWidth: subtask.completed ? 0 : 1.5,
                         },
                         subtask.completed ? styles.subtaskCompleted : null
                       ]} 
                     >
-                      {subtask.completed ? <Check size={10} color={'#FFFFFF'} /> : null}
+                      {subtask.completed ? <Check size={10} color={colors?.pastel || '#FFFFFF'} /> : null}
                     </View>
                     <Text style={[
                       styles.subtaskText, 
@@ -554,7 +561,7 @@ export default function TaskItem({
                 onPress={() => onEdit(task)}
                 style={styles.editIconButton}
               >
-                <Pencil size={20} color={colors?.medium || "#4A5568"} />
+                <Pencil size={20} color={colors?.dark || "#4A5568"} />
               </TouchableOpacity>
             )}
             
