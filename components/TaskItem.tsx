@@ -493,7 +493,7 @@ export default function TaskItem({
                       width: `${habitProgress}%`,
                       backgroundColor: getHabitProgressFillColor()
                     }
-                  ]] 
+                  ]} 
                 />
                 <Text style={[styles.habitGoalText, { color: colors?.dark || '#4A5568' }]}>
                   {task.habitCount || 0}/{task.habitGoal}
