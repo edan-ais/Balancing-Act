@@ -3,7 +3,7 @@ export const balanceTheme = {
   name: 'Balance Theme',
   id: 'balance',
   backgroundImage: 'https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
-  addTaskIcon: 'leaf', // Add task icon for all tabs in this theme
+  addTaskIcon: 'palette', // Add task icon for all tabs in this theme
   tabColors: {
     // Blue - Daily
     daily: {
