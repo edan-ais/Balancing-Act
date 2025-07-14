@@ -157,8 +157,12 @@ export default function TaskItem({
 
   // If theme colors provided, use them, otherwise fallback to props or category colors
   const taskColor = colors?.dark || borderColor || getTabColor(task.category);
-  const taskAccentColor = colors?.accent || accentColor || taskColor;
-  const taskHabitColor = colors?.accent || habitColor || taskColor;
+  
+  // Updated: Use dark first for better contrast with light backgrounds
+  const taskAccentColor = colors?.dark || colors?.accent || taskColor;
+  
+  // Updated: Use dark first for habit progress fill
+  const taskHabitColor = colors?.dark || colors?.accent || taskColor;
   
   // Get a lighter version of the color for borders
   const getLightBorderColor = (color: string) => {
@@ -470,10 +474,10 @@ export default function TaskItem({
                     styles.habitProgressBar, 
                     { 
                       width: `${habitProgress}%`,
-                      // DARK fill for completed portion
-                      backgroundColor: taskHabitColor
+                      // DARK fill for completed portion - using dark directly from theme
+                      backgroundColor: colors?.dark || '#2A1B0F'
                     }
-                  ]} 
+                  ]] 
                 />
                 <Text style={[styles.habitGoalText, { color: colors?.dark || '#4A5568' }]}>
                   {task.habitCount || 0}/{task.habitGoal}
