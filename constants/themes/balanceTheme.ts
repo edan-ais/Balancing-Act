@@ -93,64 +93,184 @@ export const balanceTheme = {
   tagColors: {
     // Priority colors - rich, balanced tones with strong contrast
     priority: {
-      high: '#B83232',         // Balanced Crimson (distinct from red tab)
-      medium: '#996633',       // Amber Gold (distinct from all tabs)
-      low: '#547133',          // Olive Green (distinct from green tab)
-      quickWin: '#B8671D',     // Deep Amber (distinct from orange tab)
-      custom: '#6E416F',       // Muted Plum (distinct from purple tab)
-      default: '#666F7A'       // Neutral Slate Gray
+      high: {
+        selected: '#B83232',     // Balanced Crimson (distinct from red tab)
+        unselected: '#F8E8E8'    // Very light crimson
+      },
+      medium: {
+        selected: '#996633',     // Amber Gold (distinct from all tabs)
+        unselected: '#F5EFE3'    // Very light amber
+      },
+      low: {
+        selected: '#547133',     // Olive Green (distinct from green tab)
+        unselected: '#EDF1E8'    // Very light olive
+      },
+      quickWin: {
+        selected: '#B8671D',     // Deep Amber (distinct from orange tab)
+        unselected: '#F8F0E7'    // Very light amber
+      },
+      custom: {
+        selected: '#6E416F',     // Muted Plum (distinct from purple tab)
+        unselected: '#F0E9F0'    // Very light plum
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     },
     // Goal type colors - thoughtful, aspirational colors
     goalType: {
-      tbd: '#695C87',          // Dusty Lavender (distinct from purple tab)
-      notPriority: '#9C4848',  // Dusty Cedar (distinct from red tab)
-      wish: '#3D7266',         // Jungle Green (distinct from teal/green tabs)
-      custom: '#79553D',       // Rustic Brown (distinct from all tabs)
-      default: '#666F7A'       // Neutral Slate Gray
+      tbd: {
+        selected: '#695C87',     // Dusty Lavender (distinct from purple tab)
+        unselected: '#EFEDF3'    // Very light lavender
+      },
+      notPriority: {
+        selected: '#9C4848',     // Dusty Cedar (distinct from red tab)
+        unselected: '#F5EAEA'    // Very light cedar
+      },
+      wish: {
+        selected: '#3D7266',     // Jungle Green (distinct from teal/green tabs)
+        unselected: '#E9F0EE'    // Very light jungle green
+      },
+      custom: {
+        selected: '#79553D',     // Rustic Brown (distinct from all tabs)
+        unselected: '#F1ECE9'    // Very light rustic brown
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     },
     // Day of week - balanced color spectrum spanning the week
     dayOfWeek: {
-      mon: '#9E4352',          // Mulberry (distinct from red tab)
-      tue: '#8D7144',          // Honey Gold (distinct from all tabs)
-      wed: '#456855',          // Forest Green (distinct from green tab)
-      thu: '#2E7391',          // Sea Blue (distinct from blue tabs)
-      fri: '#7C5876',          // Mauve (distinct from purple tab)
-      sat: '#856B4D',          // Khaki Brown (distinct from all tabs)
-      sun: '#BD5B35',          // Terra Cotta (distinct from orange tab)
-      default: '#666F7A'       // Neutral Slate Gray
+      mon: {
+        selected: '#9E4352',     // Mulberry (distinct from red tab)
+        unselected: '#F5E9EB'    // Very light mulberry
+      },
+      tue: {
+        selected: '#8D7144',     // Honey Gold (distinct from all tabs)
+        unselected: '#F3F0E9'    // Very light honey
+      },
+      wed: {
+        selected: '#456855',     // Forest Green (distinct from green tab)
+        unselected: '#EAEFED'    // Very light forest
+      },
+      thu: {
+        selected: '#2E7391',     // Sea Blue (distinct from blue tabs)
+        unselected: '#E8F0F4'    // Very light sea blue
+      },
+      fri: {
+        selected: '#7C5876',     // Mauve (distinct from purple tab)
+        unselected: '#F1ECF1'    // Very light mauve
+      },
+      sat: {
+        selected: '#856B4D',     // Khaki Brown (distinct from all tabs)
+        unselected: '#F2EFEA'    // Very light khaki
+      },
+      sun: {
+        selected: '#BD5B35',     // Terra Cotta (distinct from orange tab)
+        unselected: '#F8ECE8'    // Very light terra cotta
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     },
     // Cleaning location - fresh, clean tones that aren't the same as cleaning tab
     cleaningLocation: {
-      kitchen: '#748547',      // Avocado Green (distinct from green tab)
-      bathroom: '#4E7891',     // Steel Blue (distinct from blue tabs)
-      bedroom: '#8A6D59',      // Walnut Brown (distinct from all tabs)
-      custom: '#996B77',       // Dusty Rose (distinct from all tabs)
-      default: '#666F7A'       // Neutral Slate Gray
+      kitchen: {
+        selected: '#748547',     // Avocado Green (distinct from green tab)
+        unselected: '#F1F3EA'    // Very light avocado
+      },
+      bathroom: {
+        selected: '#4E7891',     // Steel Blue (distinct from blue tabs)
+        unselected: '#EBF1F4'    // Very light steel blue
+      },
+      bedroom: {
+        selected: '#8A6D59',     // Walnut Brown (distinct from all tabs)
+        unselected: '#F3EFEC'    // Very light walnut
+      },
+      custom: {
+        selected: '#996B77',     // Dusty Rose (distinct from all tabs)
+        unselected: '#F5EFF1'    // Very light dusty rose
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     },
     // Self-care type - nurturing, wellness-focused colors different from self-care tab
     selfCareType: {
-      physical: '#5E8353',     // Healing Green (distinct from green tab)
-      mental: '#6F6696',       // Tranquil Purple (distinct from purple tab)
-      rest: '#7B8FA2',         // Relaxing Blue-Gray (distinct from blue tabs)
-      joy: '#C17954',          // Warm Terracotta (distinct from orange tab)
-      default: '#666F7A'       // Neutral Slate Gray
+      physical: {
+        selected: '#5E8353',     // Healing Green (distinct from green tab)
+        unselected: '#EDF2EB'    // Very light healing green
+      },
+      mental: {
+        selected: '#6F6696',     // Tranquil Purple (distinct from purple tab)
+        unselected: '#F0EEF5'    // Very light tranquil purple
+      },
+      rest: {
+        selected: '#7B8FA2',     // Relaxing Blue-Gray (distinct from blue tabs)
+        unselected: '#F1F3F6'    // Very light blue-gray
+      },
+      joy: {
+        selected: '#C17954',     // Warm Terracotta (distinct from orange tab)
+        unselected: '#F8F0EC'    // Very light terracotta
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     },
     // Delegate type - collaborative, people-focused colors
     delegateType: {
-      partner: '#4B7994',      // Trustworthy Blue (distinct from blue tabs)
-      family: '#A56F4B',       // Warm Auburn (distinct from all tabs)
-      friends: '#637A54',      // Sage Green (distinct from green tab)
-      kids: '#8D5F75',         // Raspberry (distinct from all tabs)
-      default: '#666F7A'       // Neutral Slate Gray
+      partner: {
+        selected: '#4B7994',     // Trustworthy Blue (distinct from blue tabs)
+        unselected: '#EBF1F4'    // Very light trustworthy blue
+      },
+      family: {
+        selected: '#A56F4B',     // Warm Auburn (distinct from all tabs)
+        unselected: '#F6F0EA'    // Very light auburn
+      },
+      friends: {
+        selected: '#637A54',     // Sage Green (distinct from green tab)
+        unselected: '#EEF1EC'    // Very light sage
+      },
+      kids: {
+        selected: '#8D5F75',     // Raspberry (distinct from all tabs)
+        unselected: '#F4EDF1'    // Very light raspberry
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     },
     // Meal type colors - appetizing food-inspired tones distinct from meals tab
     mealType: {
-      breakfast: '#B88746',    // Golden Toast (distinct from orange tab)
-      lunch: '#557153',        // Fresh Salad Green (distinct from green tab)
-      dinner: '#93514B',       // Brick Red (distinct from red tab)
-      snack: '#877A52',        // Nutty Brown (distinct from all tabs)
-      custom: '#736A8F',       // Muted Grape (distinct from purple tab)
-      default: '#666F7A'       // Neutral Slate Gray
+      breakfast: {
+        selected: '#B88746',     // Golden Toast (distinct from orange tab)
+        unselected: '#F7F2E9'    // Very light golden toast
+      },
+      lunch: {
+        selected: '#557153',     // Fresh Salad Green (distinct from green tab)
+        unselected: '#ECF0EC'    // Very light salad green
+      },
+      dinner: {
+        selected: '#93514B',     // Brick Red (distinct from red tab)
+        unselected: '#F4EBEA'    // Very light brick red
+      },
+      snack: {
+        selected: '#877A52',     // Nutty Brown (distinct from all tabs)
+        unselected: '#F3F1EB'    // Very light nutty brown
+      },
+      custom: {
+        selected: '#736A8F',     // Muted Grape (distinct from purple tab)
+        unselected: '#F0EFF4'    // Very light grape
+      },
+      default: {
+        selected: '#666F7A',     // Neutral Slate Gray
+        unselected: '#EFF1F3'    // Very light slate
+      }
     }
   }
 };
