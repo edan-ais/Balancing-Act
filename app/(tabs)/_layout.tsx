@@ -2,7 +2,7 @@ import React from 'react';
 import { useRef, useEffect, useMemo, useState } from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
-import { View, Text, ScrollView, TouchableOpacity, Animated } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -66,6 +66,9 @@ const tabConfig = {
 // Get all tab IDs for rendering all possible tabs
 const allTabIds = Object.keys(tabConfig);
 
+// Get screen width for calculations
+const screenWidth = Dimensions.get('window').width;
+
 // Individual Tab Item component to properly use hooks
 const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, selectedTabsSet, visibleRoutes }) => {
   const { options } = descriptor;
@@ -88,10 +91,10 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
     Animated.spring(animatedScale, {
       toValue: isFocused ? 1.8 : 1,
       useNativeDriver: true,
-      tension: 80,     // Reduced tension for smoother animation
-      friction: 10,    // Increased friction to reduce bounciness
-      velocity: 0.1,   // Lower initial velocity
-      delay: 0,        // No delay
+      tension: 80,
+      friction: 10,
+      velocity: 0.1,
+      delay: 0,
     }).start();
   }, [isFocused, animatedScale, isFirstRender]);
   
@@ -157,7 +160,7 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
   
   // Calculate width based on number of visible tabs
   const tabWidth = visibleRoutes.length <= 4 
-    ? `${100 / visibleRoutes.length}%` 
+    ? screenWidth / visibleRoutes.length 
     : 80;
   
   // Icon component
@@ -177,7 +180,6 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
         height: '100%',
         alignItems: 'center',
         justifyContent: 'center',
-        paddingHorizontal: 2,
       }}
     >
       <View style={{
@@ -185,8 +187,13 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
         justifyContent: 'center',
         height: '100%',
         width: '100%',
+        // Center content vertically in the tab bar
+        paddingBottom: 10, // Add some bottom padding to account for safe area
       }}>
+        {/* Fixed height container for icon to maintain alignment */}
         <Animated.View style={{
+          height: 40, // Fixed height for icon container
+          width: 40, // Fixed width for icon container
           transform: [
             { scale: animatedScale },
             { translateY: animatedTranslateY }
@@ -197,27 +204,32 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
           shadowRadius: animatedShadowRadius,
           alignItems: 'center',
           justifyContent: 'center',
-          // Add a subtle transition for more stability
-          padding: 5,
         }}>
           {Icon && <Icon size={30} color={tabColor} />}
         </Animated.View>
         
-        <Animated.Text
-          style={{
-            opacity: animatedLabelOpacity,
-            transform: [{ translateY: animatedLabelTranslateY }],
-            color: tabColor,
-            fontFamily: 'Quicksand-SemiBold',
-            fontSize: 12,
-            marginTop: 4,
-            textAlign: 'center',
-          }}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {tabConfig[route.name]?.title || label}
-        </Animated.Text>
+        {/* Fixed height container for label to maintain alignment */}
+        <Animated.View style={{
+          height: 20, // Fixed height for text container
+          alignItems: 'center',
+          justifyContent: 'center',
+          opacity: animatedLabelOpacity,
+          transform: [{ translateY: animatedLabelTranslateY }],
+          marginTop: 4,
+        }}>
+          <Text
+            style={{
+              color: tabColor,
+              fontFamily: 'Quicksand-SemiBold',
+              fontSize: 12,
+              textAlign: 'center',
+            }}
+            numberOfLines={1}
+            ellipsizeMode="tail"
+          >
+            {tabConfig[route.name]?.title || label}
+          </Text>
+        </Animated.View>
       </View>
     </TouchableOpacity>
   );
@@ -244,7 +256,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   const backgroundColor = tabColors[activeColorKey]?.dark || '#000000';
   const shadowColor = tabColors[activeColorKey]?.shadow || 'rgba(0,0,0,0.5)';
   
-  // Use layoutEffect to scroll to the active tab
+  // Use effect to scroll to the active tab
   const scrollViewRef = useRef();
   useEffect(() => {
     if (scrollViewRef.current && state.index !== undefined) {
@@ -254,10 +266,12 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
       );
       
       if (activeRouteIndex !== -1) {
-        // Calculate approximate scroll position based on tab width and position
-        const scrollX = activeRouteIndex * (visibleRoutes.length <= 4 ? 
-          scrollViewRef.current?.getScrollResponder?.()?.getInnerViewNode?.()?.offsetWidth / visibleRoutes.length : 
-          80);
+        // Calculate scroll position based on tab width and position
+        const tabWidth = visibleRoutes.length <= 4 
+          ? screenWidth / visibleRoutes.length 
+          : 80;
+        
+        const scrollX = Math.max(0, activeRouteIndex * tabWidth - (screenWidth / 2) + (tabWidth / 2));
           
         // Scroll with animation to reduce jumpiness
         scrollViewRef.current?.scrollTo({
@@ -283,13 +297,17 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
         horizontal
         showsHorizontalScrollIndicator={false}
         contentContainerStyle={{
-          flexGrow: 1,
           alignItems: 'center',
           justifyContent: 'center',
           height: '100%',
-          minWidth: '100%',
+          // Make sure content is at least as wide as the screen
+          minWidth: screenWidth,
+          // Center tabs when there are few of them
+          ...(visibleRoutes.length <= 4 && {
+            justifyContent: 'space-evenly',
+            width: screenWidth,
+          }),
         }}
-        // Improve scroll behavior
         scrollEventThrottle={16}
         decelerationRate="normal"
       >
