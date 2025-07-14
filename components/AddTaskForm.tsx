@@ -8,6 +8,7 @@ import {
   TouchableOpacity,
   ScrollView,
   Switch,
+  Alert,
 } from 'react-native';
 import { X, Plus, Minus } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
@@ -184,6 +185,11 @@ export default function AddTaskForm({
           validationErrors.push('Person to delegate to is required');
         }
         break;
+
+      case 'weekly':
+        // For calendar tasks, we don't require additional validation beyond title
+        // The selectedDate is handled automatically
+        break;
     }
 
     // Habit-specific validation
@@ -280,9 +286,10 @@ export default function AddTaskForm({
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Error Messages */}
             {errors.length > 0 && (
-              <View style={[styles.errorCard, { 
+              <NeumorphicCard style={[styles.errorCard, { 
                 backgroundColor: '#FED7D7',
                 borderLeftColor: '#FC8181',
+                shadowColor: effectiveShadowColor
               }]}>
                 <Text style={[styles.errorTitle, { color: '#C53030' }]}>Please fix the following:</Text>
                 {errors.map((error, index) => (
@@ -290,10 +297,10 @@ export default function AddTaskForm({
                     • {error}
                   </Text>
                 ))}
-              </View>
+              </NeumorphicCard>
             )}
 
-            <View style={styles.formSection}>
+            <NeumorphicCard style={[styles.formCard, { shadowColor: effectiveShadowColor }]}>
               <Text style={[styles.label, { color: effectiveDarkColor }]}>Task Name *</Text>
               <TextInput
                 style={[styles.input, { 
@@ -350,7 +357,7 @@ export default function AddTaskForm({
 
                   {isHabit && (
                     <View style={styles.habitGoalSection}>
-                      <Text style={[styles.label, { color: effectiveDarkColor }]}>Daily Goal</Text>
+                      <Text style={[styles.label, { color: effectiveDarkColor }]}>Daily Goal *</Text>
                       <View style={styles.counterContainer}>
                         <TouchableOpacity
                           style={[styles.counterButton, { backgroundColor: effectivePastelColor }]}
@@ -802,7 +809,7 @@ export default function AddTaskForm({
                   </View>
                 ))}
               </View>
-            </View>
+            </NeumorphicCard>
           </ScrollView>
 
           <View style={[styles.footer, { borderTopColor: effectivePastelColor }]}>
@@ -861,8 +868,6 @@ const styles = StyleSheet.create({
   errorCard: {
     margin: 12,
     borderLeftWidth: 4,
-    padding: 12,
-    borderRadius: 8,
   },
   errorTitle: {
     fontSize: 16,
@@ -874,8 +879,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Regular',
     marginBottom: 4,
   },
-  formSection: {
-    padding: 12,
+  formCard: {
+    margin: 12,
   },
   label: {
     fontSize: 16,
