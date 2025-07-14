@@ -177,52 +177,87 @@ export default function AddTaskForm({
     const tabColorKey = getCategoryColorKey();
     const tabColors = colors?.tabColors?.[tabColorKey] || {};
     
-    // Map tag type to the appropriate prefix for theme color keys
-    const getPrefix = () => {
+    // Specific mapping of which colors to use for each tag type's color wheel
+    // This ensures we use the exact intended colors for each category
+    const getTagSpecificColors = () => {
       switch (tagType) {
-        case 'priority': return 'priority';
-        case 'goalType': return 'goal';
-        case 'cleaningLocation': return 'cleaning';
-        case 'delegateType': return 'delegate';
-        case 'dayOfWeek': return 'day';
-        default: return '';
+        case 'priority':
+          return [
+            tabColors.priorityHighSelected,
+            tabColors.priorityMediumSelected,
+            tabColors.priorityLowSelected,
+            tabColors.priorityQuickWinSelected,
+            tabColors.veryDark,
+            tabColors.medium,
+            tabColors.pastel
+          ].filter(Boolean); // Remove any undefined values
+          
+        case 'goalType':
+          return [
+            tabColors.goalTbdSelected,
+            tabColors.goalNotPrioritySelected,
+            tabColors.goalWishSelected,
+            tabColors.veryDark,
+            tabColors.medium,
+            tabColors.pastel
+          ].filter(Boolean);
+          
+        case 'cleaningLocation':
+          return [
+            tabColors.cleaningKitchenSelected,
+            tabColors.cleaningBathroomSelected,
+            tabColors.cleaningBedroomSelected,
+            tabColors.veryDark,
+            tabColors.medium,
+            tabColors.pastel
+          ].filter(Boolean);
+          
+        case 'delegateType':
+          return [
+            tabColors.delegatePartnerSelected,
+            tabColors.delegateFamilySelected,
+            tabColors.delegateFriendsSelected,
+            tabColors.delegateKidsSelected,
+            tabColors.veryDark,
+            tabColors.medium,
+            tabColors.pastel
+          ].filter(Boolean);
+          
+        case 'dayOfWeek':
+          return [
+            colors?.tabColors?.meals?.dayMonSelected,
+            colors?.tabColors?.meals?.dayTueSelected,
+            colors?.tabColors?.meals?.dayWedSelected,
+            colors?.tabColors?.meals?.dayThuSelected,
+            colors?.tabColors?.meals?.dayFriSelected,
+            colors?.tabColors?.meals?.daySatSelected,
+            colors?.tabColors?.meals?.daySunSelected
+          ].filter(Boolean);
+          
+        default:
+          return [];
       }
     };
     
-    const prefix = getPrefix();
-    if (!prefix) return [veryDarkColor, highlightColor, tabColors.medium || effectiveMediumColor];
+    // Get the specifically mapped colors for this tag type
+    const tagSpecificColors = getTagSpecificColors();
     
-    // Collect all theme colors for this tag type that end with "Selected"
-    const colorOptions = [];
-    
-    // First search in the current tab colors
-    if (tabColors) {
-      Object.entries(tabColors).forEach(([key, value]) => {
-        // Only include colors that:
-        // 1. Start with our prefix
-        // 2. End with "Selected" (these are the vibrant colors)
-        // 3. Don't include "Default" or "Custom" (special cases)
-        if (
-          typeof value === 'string' && 
-          key.startsWith(prefix) && 
-          key.endsWith('Selected') && 
-          !key.includes('Default') && 
-          !key.includes('Custom')
-        ) {
-          colorOptions.push(value);
-        }
-      });
+    // If we have specific colors for this tag type, return them
+    if (tagSpecificColors.length > 0) {
+      return tagSpecificColors;
     }
     
-    // If we found colors for this tag type, return them
-    if (colorOptions.length > 0) {
-      return colorOptions;
-    }
+    // Fallback: Dynamically find all colors for this tag type across all tabs
+    const prefix = tagType === 'priority' ? 'priority' : 
+                  tagType === 'goalType' ? 'goal' :
+                  tagType === 'cleaningLocation' ? 'cleaning' :
+                  tagType === 'delegateType' ? 'delegate' :
+                  tagType === 'dayOfWeek' ? 'day' : '';
     
-    // If this tag type's colors might be in another tab, look across all tabs
-    const allTabsColorOptions = [];
-    
-    if (colors?.tabColors) {
+    if (prefix && colors?.tabColors) {
+      const dynamicColors = [];
+      
+      // Look for colors across all tabs
       Object.values(colors.tabColors).forEach(tabColorSet => {
         if (tabColorSet) {
           Object.entries(tabColorSet).forEach(([key, value]) => {
@@ -233,26 +268,23 @@ export default function AddTaskForm({
               !key.includes('Default') && 
               !key.includes('Custom')
             ) {
-              if (!allTabsColorOptions.includes(value)) {
-                allTabsColorOptions.push(value);
-              }
+              dynamicColors.push(value);
             }
           });
         }
       });
+      
+      if (dynamicColors.length > 0) {
+        return dynamicColors;
+      }
     }
     
-    // If we found colors across all tabs, return them
-    if (allTabsColorOptions.length > 0) {
-      return allTabsColorOptions;
-    }
-    
-    // Fallback to basic theme colors if no specific tag colors found
+    // Ultimate fallback to base theme colors
     return [
       veryDarkColor, 
-      highlightColor, 
-      tabColors.medium || effectiveMediumColor,
+      highlightColor,
       tabColors.dark || effectiveDarkColor,
+      tabColors.medium || effectiveMediumColor,
       tabColors.pastel || effectivePastelColor
     ];
   };
