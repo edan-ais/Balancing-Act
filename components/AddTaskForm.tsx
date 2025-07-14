@@ -56,14 +56,23 @@ export default function AddTaskForm({
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
   const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tagColors?.goalType?.custom || '#4A5568');
   const [mealType, setMealType] = useState<string>('');
+  const [customMealTypeText, setCustomMealTypeText] = useState('');
+  const [customMealTypeColor, setCustomMealTypeColor] = useState(colors?.tagColors?.mealType?.custom || '#736A8F');
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [frequency, setFrequency] = useState<string>('');
+  const [customFrequencyText, setCustomFrequencyText] = useState('');
+  const [customFrequencyColor, setCustomFrequencyColor] = useState(colors?.tagColors?.frequency?.custom || '#666F7A');
   const [cleaningLocation, setCleaningLocation] = useState<string>('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
+  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tagColors?.cleaningLocation?.custom || '#996B77');
   const [selfCareType, setSelfCareType] = useState<string>('');
+  const [customSelfCareTypeText, setCustomSelfCareTypeText] = useState('');
+  const [customSelfCareTypeColor, setCustomSelfCareTypeColor] = useState(colors?.tagColors?.selfCareType?.custom || '#666F7A');
   const [delegatedTo, setDelegatedTo] = useState('');
   const [delegateType, setDelegateType] = useState<string>('');
+  const [customDelegateTypeText, setCustomDelegateTypeText] = useState('');
+  const [customDelegateTypeColor, setCustomDelegateTypeColor] = useState(colors?.tagColors?.delegateType?.custom || '#666F7A');
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
@@ -103,7 +112,21 @@ export default function AddTaskForm({
 
   // Helper to get tag color from theme
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
-    // For required tags, use the tag's specific color
+    // If it's custom, return the custom color
+    if (tagValue === 'custom') {
+      const customColorMap = {
+        'priority': customPriorityColor,
+        'goalType': customGoalTypeColor,
+        'mealType': customMealTypeColor,
+        'frequency': customFrequencyColor,
+        'cleaningLocation': customCleaningLocationColor,
+        'selfCareType': customSelfCareTypeColor,
+        'delegateType': customDelegateTypeColor
+      };
+      return isSelected ? customColorMap[tagType] || effectiveMediumColor : effectivePastelColor;
+    }
+    
+    // For other tags, use the tag's specific color
     if (colors?.tagColors && colors.tagColors[tagType] && colors.tagColors[tagType][tagValue]) {
       return isSelected ? colors.tagColors[tagType][tagValue] : effectivePastelColor;
     }
@@ -140,6 +163,36 @@ export default function AddTaskForm({
     return effectivePastelColor;
   };
 
+  // Get array of color options for custom color selection
+  const getColorOptions = (tagType: string) => {
+    // Get all colors from the tag category
+    if (colors?.tagColors?.[tagType]) {
+      return Object.values(colors.tagColors[tagType]).filter(color => typeof color === 'string');
+    }
+    
+    // If no specific colors for this tag type, use a mix of colors from all tag types
+    const allColors = [];
+    if (colors?.tagColors) {
+      Object.keys(colors.tagColors).forEach(category => {
+        Object.values(colors.tagColors[category])
+          .filter(color => typeof color === 'string')
+          .forEach(color => {
+            if (!allColors.includes(color)) {
+              allColors.push(color);
+            }
+          });
+      });
+    }
+    
+    // Add some fallback colors if needed
+    const fallbackColors = [
+      '#B83232', '#996633', '#547133', '#B8671D', '#6E416F', 
+      '#695C87', '#9C4848', '#3D7266', '#79553D', '#4B7994'
+    ];
+    
+    return allColors.length > 0 ? allColors : fallbackColors;
+  };
+
   const resetForm = () => {
     setTitle('');
     setTaskType('task');
@@ -151,14 +204,23 @@ export default function AddTaskForm({
     setCustomGoalTypeText('');
     setCustomGoalTypeColor(colors?.tagColors?.goalType?.custom || '#4A5568');
     setMealType('');
+    setCustomMealTypeText('');
+    setCustomMealTypeColor(colors?.tagColors?.mealType?.custom || '#736A8F');
     setDayOfWeek('');
     setNotes('');
     setFrequency('');
+    setCustomFrequencyText('');
+    setCustomFrequencyColor(colors?.tagColors?.frequency?.custom || '#666F7A');
     setCleaningLocation('');
     setCustomCleaningLocation('');
+    setCustomCleaningLocationColor(colors?.tagColors?.cleaningLocation?.custom || '#996B77');
     setSelfCareType('');
+    setCustomSelfCareTypeText('');
+    setCustomSelfCareTypeColor(colors?.tagColors?.selfCareType?.custom || '#666F7A');
     setDelegatedTo('');
     setDelegateType('');
+    setCustomDelegateTypeText('');
+    setCustomDelegateTypeColor(colors?.tagColors?.delegateType?.custom || '#666F7A');
     setReminderEnabled(false);
     setSubtasks([]);
     setErrors([]);
@@ -208,6 +270,35 @@ export default function AddTaskForm({
       validationErrors.push('Valid habit goal is required for habits');
     }
 
+    // Validate custom tag text is provided when custom option is selected
+    if (priority === 'custom' && !customPriorityText.trim()) {
+      validationErrors.push('Custom priority text is required');
+    }
+    
+    if (goalType === 'custom' && !customGoalTypeText.trim()) {
+      validationErrors.push('Custom goal type text is required');
+    }
+    
+    if (mealType === 'custom' && !customMealTypeText.trim()) {
+      validationErrors.push('Custom meal type text is required');
+    }
+    
+    if (frequency === 'custom' && !customFrequencyText.trim()) {
+      validationErrors.push('Custom frequency text is required');
+    }
+    
+    if (cleaningLocation === 'custom' && !customCleaningLocation.trim()) {
+      validationErrors.push('Custom location text is required');
+    }
+    
+    if (selfCareType === 'custom' && !customSelfCareTypeText.trim()) {
+      validationErrors.push('Custom self-care type text is required');
+    }
+    
+    if (delegateType === 'custom' && !customDelegateTypeText.trim()) {
+      validationErrors.push('Custom delegate type text is required');
+    }
+
     return validationErrors;
   };
 
@@ -235,14 +326,23 @@ export default function AddTaskForm({
       customGoalTypeText: goalType === 'custom' ? customGoalTypeText : undefined,
       customGoalTypeColor: goalType === 'custom' ? customGoalTypeColor : undefined,
       mealType: mealType || undefined,
+      customMealTypeText: mealType === 'custom' ? customMealTypeText : undefined,
+      customMealTypeColor: mealType === 'custom' ? customMealTypeColor : undefined,
       dayOfWeek: dayOfWeek || undefined,
       notes: notes || undefined,
       frequency: frequency || undefined,
+      customFrequencyText: frequency === 'custom' ? customFrequencyText : undefined,
+      customFrequencyColor: frequency === 'custom' ? customFrequencyColor : undefined,
       cleaningLocation: cleaningLocation || undefined,
       customCleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : undefined,
+      customCleaningLocationColor: cleaningLocation === 'custom' ? customCleaningLocationColor : undefined,
       selfCareType: selfCareType || undefined,
+      customSelfCareTypeText: selfCareType === 'custom' ? customSelfCareTypeText : undefined,
+      customSelfCareTypeColor: selfCareType === 'custom' ? customSelfCareTypeColor : undefined,
       delegatedTo: delegatedTo || undefined,
       delegateType: delegateType || undefined,
+      customDelegateTypeText: delegateType === 'custom' ? customDelegateTypeText : undefined,
+      customDelegateTypeColor: delegateType === 'custom' ? customDelegateTypeColor : undefined,
       reminderEnabled,
       subtasks: subtasks.length > 0 ? subtasks : undefined,
       scheduledDate: selectedDate, // For calendar tasks
@@ -281,6 +381,32 @@ export default function AddTaskForm({
     if (currentGoal > 1) {
       setHabitGoal((currentGoal - 1).toString());
     }
+  };
+
+  // Render custom color picker for a tag type
+  const renderColorPicker = (tagType: string, selectedColor: string, setColorFunction: (color: string) => void) => {
+    const colorOptions = getColorOptions(tagType);
+    
+    return (
+      <>
+        <Text style={[styles.label, { color: veryDarkColor }]}>Custom Color</Text>
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
+          <View style={styles.colorWheel}>
+            {colorOptions.map((color: string, index: number) => (
+              <TouchableOpacity
+                key={index}
+                style={[
+                  styles.colorOption,
+                  { backgroundColor: color },
+                  selectedColor === color && styles.selectedColor
+                ]}
+                onPress={() => setColorFunction(color)}
+              />
+            ))}
+          </View>
+        </ScrollView>
+      </>
+    );
   };
 
   return (
@@ -438,32 +564,22 @@ export default function AddTaskForm({
                       <Text style={[styles.label, { color: veryDarkColor }]}>Custom Priority Text</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: effectivePastelColor, 
+                          borderColor: errors.some(e => e.includes('Custom priority text')) ? '#E53E3E' : effectivePastelColor, 
                           backgroundColor: effectiveBgColor,
                           color: veryDarkColor
                         }]}
                         value={customPriorityText}
-                        onChangeText={setCustomPriorityText}
+                        onChangeText={(text) => {
+                          setCustomPriorityText(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom priority text')));
+                          }
+                        }}
                         placeholder="Enter custom priority"
                         placeholderTextColor={effectiveMediumColor}
                       />
                       
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Color</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
-                        <View style={styles.colorWheel}>
-                          {Object.values(colors?.tagColors?.priority || {}).map((color: string, index: number) => (
-                            <TouchableOpacity
-                              key={index}
-                              style={[
-                                styles.colorOption,
-                                { backgroundColor: color },
-                                customPriorityColor === color && styles.selectedColor
-                              ]}
-                              onPress={() => setCustomPriorityColor(color)}
-                            />
-                          ))}
-                        </View>
-                      </ScrollView>
+                      {renderColorPicker('priority', customPriorityColor, setCustomPriorityColor)}
                     </>
                   )}
                 </>
@@ -514,32 +630,22 @@ export default function AddTaskForm({
                       <Text style={[styles.label, { color: veryDarkColor }]}>Custom Goal Type</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: effectivePastelColor, 
+                          borderColor: errors.some(e => e.includes('Custom goal type text')) ? '#E53E3E' : effectivePastelColor, 
                           backgroundColor: effectiveBgColor,
                           color: veryDarkColor
                         }]}
                         value={customGoalTypeText}
-                        onChangeText={setCustomGoalTypeText}
+                        onChangeText={(text) => {
+                          setCustomGoalTypeText(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom goal type text')));
+                          }
+                        }}
                         placeholder="Enter custom goal type"
                         placeholderTextColor={effectiveMediumColor}
                       />
                       
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Color</Text>
-                      <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
-                        <View style={styles.colorWheel}>
-                          {Object.values(colors?.tagColors?.goalType || {}).map((color: string, index: number) => (
-                            <TouchableOpacity
-                              key={index}
-                              style={[
-                                styles.colorOption,
-                                { backgroundColor: color },
-                                customGoalTypeColor === color && styles.selectedColor
-                              ]}
-                              onPress={() => setCustomGoalTypeColor(color)}
-                            />
-                          ))}
-                        </View>
-                      </ScrollView>
+                      {renderColorPicker('goalType', customGoalTypeColor, setCustomGoalTypeColor)}
                     </>
                   )}
                 </>
@@ -550,7 +656,7 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Meal Type *</Text>
                   <View style={styles.optionGrid}>
-                    {['breakfast', 'lunch', 'dinner', 'snack'].map((option) => (
+                    {['breakfast', 'lunch', 'dinner', 'snack', 'custom'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
@@ -579,6 +685,30 @@ export default function AddTaskForm({
                       </TouchableOpacity>
                     ))}
                   </View>
+
+                  {mealType === 'custom' && (
+                    <>
+                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Meal Type</Text>
+                      <TextInput
+                        style={[styles.input, { 
+                          borderColor: errors.some(e => e.includes('Custom meal type text')) ? '#E53E3E' : effectivePastelColor, 
+                          backgroundColor: effectiveBgColor,
+                          color: veryDarkColor
+                        }]}
+                        value={customMealTypeText}
+                        onChangeText={(text) => {
+                          setCustomMealTypeText(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom meal type text')));
+                          }
+                        }}
+                        placeholder="Enter custom meal type"
+                        placeholderTextColor={effectiveMediumColor}
+                      />
+                      
+                      {renderColorPicker('mealType', customMealTypeColor, setCustomMealTypeColor)}
+                    </>
+                  )}
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Day of Week</Text>
                   <View style={styles.optionGrid}>
@@ -630,14 +760,14 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Frequency *</Text>
                   <View style={styles.optionGrid}>
-                    {['daily', 'weekly', 'monthly', 'seasonal'].map((option) => (
+                    {['daily', 'weekly', 'monthly', 'seasonal', 'custom'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
                           styles.optionButton,
                           { 
                             backgroundColor: frequency === option ? 
-                              (colors?.tagColors?.frequency?.[option] || highlightColor) : 
+                              (getTagColor('frequency', option, true)) : 
                               effectivePastelColor,
                             borderColor: errors.some(e => e.includes('Frequency')) ? '#E53E3E' : 'transparent',
                             borderWidth: errors.some(e => e.includes('Frequency')) ? 1 : 0
@@ -661,6 +791,30 @@ export default function AddTaskForm({
                       </TouchableOpacity>
                     ))}
                   </View>
+
+                  {frequency === 'custom' && (
+                    <>
+                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Frequency</Text>
+                      <TextInput
+                        style={[styles.input, { 
+                          borderColor: errors.some(e => e.includes('Custom frequency text')) ? '#E53E3E' : effectivePastelColor, 
+                          backgroundColor: effectiveBgColor,
+                          color: veryDarkColor
+                        }]}
+                        value={customFrequencyText}
+                        onChangeText={(text) => {
+                          setCustomFrequencyText(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom frequency text')));
+                          }
+                        }}
+                        placeholder="Enter custom frequency"
+                        placeholderTextColor={effectiveMediumColor}
+                      />
+                      
+                      {renderColorPicker('frequency', customFrequencyColor, setCustomFrequencyColor)}
+                    </>
+                  )}
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Location</Text>
                   <View style={styles.optionGrid}>
@@ -694,15 +848,22 @@ export default function AddTaskForm({
                       <Text style={[styles.label, { color: veryDarkColor }]}>Custom Location</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: effectivePastelColor, 
+                          borderColor: errors.some(e => e.includes('Custom location text')) ? '#E53E3E' : effectivePastelColor, 
                           backgroundColor: effectiveBgColor,
                           color: veryDarkColor
                         }]}
                         value={customCleaningLocation}
-                        onChangeText={setCustomCleaningLocation}
+                        onChangeText={(text) => {
+                          setCustomCleaningLocation(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom location text')));
+                          }
+                        }}
                         placeholder="Enter custom location"
                         placeholderTextColor={effectiveMediumColor}
                       />
+                      
+                      {renderColorPicker('cleaningLocation', customCleaningLocationColor, setCustomCleaningLocationColor)}
                     </>
                   )}
                 </>
@@ -713,7 +874,7 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Self-Care Type *</Text>
                   <View style={styles.optionGrid}>
-                    {['physical', 'mental', 'rest', 'joy'].map((option) => (
+                    {['physical', 'mental', 'rest', 'joy', 'custom'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
@@ -740,11 +901,36 @@ export default function AddTaskForm({
                           {option === 'physical' ? 'Physical Health' :
                            option === 'mental' ? 'Mental Health' :
                            option === 'rest' ? 'Rest & Recovery' :
-                           'Joy & Connection'}
+                           option === 'joy' ? 'Joy & Connection' :
+                           'Custom'}
                         </Text>
                       </TouchableOpacity>
                     ))}
                   </View>
+
+                  {selfCareType === 'custom' && (
+                    <>
+                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Self-Care Type</Text>
+                      <TextInput
+                        style={[styles.input, { 
+                          borderColor: errors.some(e => e.includes('Custom self-care type text')) ? '#E53E3E' : effectivePastelColor, 
+                          backgroundColor: effectiveBgColor,
+                          color: veryDarkColor
+                        }]}
+                        value={customSelfCareTypeText}
+                        onChangeText={(text) => {
+                          setCustomSelfCareTypeText(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom self-care type text')));
+                          }
+                        }}
+                        placeholder="Enter custom self-care type"
+                        placeholderTextColor={effectiveMediumColor}
+                      />
+                      
+                      {renderColorPicker('selfCareType', customSelfCareTypeColor, setCustomSelfCareTypeColor)}
+                    </>
+                  )}
                 </>
               )}
 
@@ -771,7 +957,7 @@ export default function AddTaskForm({
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Delegate Type *</Text>
                   <View style={styles.optionGrid}>
-                    {['partner', 'family', 'friends', 'kids'].map((option) => (
+                    {['partner', 'family', 'friends', 'kids', 'custom'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
@@ -800,6 +986,30 @@ export default function AddTaskForm({
                       </TouchableOpacity>
                     ))}
                   </View>
+
+                  {delegateType === 'custom' && (
+                    <>
+                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Delegate Type</Text>
+                      <TextInput
+                        style={[styles.input, { 
+                          borderColor: errors.some(e => e.includes('Custom delegate type text')) ? '#E53E3E' : effectivePastelColor, 
+                          backgroundColor: effectiveBgColor,
+                          color: veryDarkColor
+                        }]}
+                        value={customDelegateTypeText}
+                        onChangeText={(text) => {
+                          setCustomDelegateTypeText(text);
+                          if (errors.length > 0) {
+                            setErrors(errors.filter(e => !e.includes('Custom delegate type text')));
+                          }
+                        }}
+                        placeholder="Enter custom delegate type"
+                        placeholderTextColor={effectiveMediumColor}
+                      />
+                      
+                      {renderColorPicker('delegateType', customDelegateTypeColor, setCustomDelegateTypeColor)}
+                    </>
+                  )}
 
                   <View style={styles.switchRow}>
                     <Text style={[styles.label, { color: veryDarkColor }]}>Enable Reminders</Text>
