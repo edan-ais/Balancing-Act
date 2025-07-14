@@ -189,7 +189,7 @@ export default function MonthlyCalendar() {
                 disabled={!day}
               >
                 {day && (
-                  <>
+                  <View style={styles.dayCellContent}>
                     <Text style={[
                       styles.dayNumber,
                       { color: colors.dark },
@@ -211,7 +211,7 @@ export default function MonthlyCalendar() {
                           : colors.dark 
                       }]} />
                     )}
-                  </>
+                  </View>
                 )}
               </TouchableOpacity>
             ))}
@@ -361,6 +361,12 @@ const styles = StyleSheet.create({
     margin: 0,
     padding: 0,
   },
+  dayCellContent: {
+    width: '100%',
+    height: '100%',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   emptyDayCell: {
     backgroundColor: 'transparent',
   },
@@ -376,6 +382,8 @@ const styles = StyleSheet.create({
   dayNumber: {
     fontSize: 15,
     fontFamily: 'Quicksand-SemiBold',
+    textAlign: 'center',
+    textAlignVertical: 'center',
   },
   todayNumber: {
     fontFamily: 'Quicksand-Bold',
@@ -387,7 +395,9 @@ const styles = StyleSheet.create({
     width: 6,
     height: 6,
     borderRadius: 3,
-    marginTop: 2,
+    marginTop: 3,
+    position: 'absolute',
+    bottom: '20%',
   },
   addButton: {
     position: 'absolute',
