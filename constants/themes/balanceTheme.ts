@@ -88,5 +88,69 @@ export const balanceTheme = {
       bg: '#F2FFFE',           // Ultra light teal
       accent: '#C9F0EE'        // Soft teal
     }
+  },
+  // Tag colors that complement the balance theme while remaining distinct from tab colors
+  tagColors: {
+    // Priority colors - rich, balanced tones with strong contrast
+    priority: {
+      high: '#B83232',         // Balanced Crimson (distinct from red tab)
+      medium: '#996633',       // Amber Gold (distinct from all tabs)
+      low: '#547133',          // Olive Green (distinct from green tab)
+      quickWin: '#B8671D',     // Deep Amber (distinct from orange tab)
+      custom: '#6E416F',       // Muted Plum (distinct from purple tab)
+      default: '#666F7A'       // Neutral Slate Gray
+    },
+    // Goal type colors - thoughtful, aspirational colors
+    goalType: {
+      tbd: '#695C87',          // Dusty Lavender (distinct from purple tab)
+      notPriority: '#9C4848',  // Dusty Cedar (distinct from red tab)
+      wish: '#3D7266',         // Jungle Green (distinct from teal/green tabs)
+      custom: '#79553D',       // Rustic Brown (distinct from all tabs)
+      default: '#666F7A'       // Neutral Slate Gray
+    },
+    // Day of week - balanced color spectrum spanning the week
+    dayOfWeek: {
+      mon: '#9E4352',          // Mulberry (distinct from red tab)
+      tue: '#8D7144',          // Honey Gold (distinct from all tabs)
+      wed: '#456855',          // Forest Green (distinct from green tab)
+      thu: '#2E7391',          // Sea Blue (distinct from blue tabs)
+      fri: '#7C5876',          // Mauve (distinct from purple tab)
+      sat: '#856B4D',          // Khaki Brown (distinct from all tabs)
+      sun: '#BD5B35',          // Terra Cotta (distinct from orange tab)
+      default: '#666F7A'       // Neutral Slate Gray
+    },
+    // Cleaning location - fresh, clean tones that aren't the same as cleaning tab
+    cleaningLocation: {
+      kitchen: '#748547',      // Avocado Green (distinct from green tab)
+      bathroom: '#4E7891',     // Steel Blue (distinct from blue tabs)
+      bedroom: '#8A6D59',      // Walnut Brown (distinct from all tabs)
+      custom: '#996B77',       // Dusty Rose (distinct from all tabs)
+      default: '#666F7A'       // Neutral Slate Gray
+    },
+    // Self-care type - nurturing, wellness-focused colors different from self-care tab
+    selfCareType: {
+      physical: '#5E8353',     // Healing Green (distinct from green tab)
+      mental: '#6F6696',       // Tranquil Purple (distinct from purple tab)
+      rest: '#7B8FA2',         // Relaxing Blue-Gray (distinct from blue tabs)
+      joy: '#C17954',          // Warm Terracotta (distinct from orange tab)
+      default: '#666F7A'       // Neutral Slate Gray
+    },
+    // Delegate type - collaborative, people-focused colors
+    delegateType: {
+      partner: '#4B7994',      // Trustworthy Blue (distinct from blue tabs)
+      family: '#A56F4B',       // Warm Auburn (distinct from all tabs)
+      friends: '#637A54',      // Sage Green (distinct from green tab)
+      kids: '#8D5F75',         // Raspberry (distinct from all tabs)
+      default: '#666F7A'       // Neutral Slate Gray
+    },
+    // Meal type colors - appetizing food-inspired tones distinct from meals tab
+    mealType: {
+      breakfast: '#B88746',    // Golden Toast (distinct from orange tab)
+      lunch: '#557153',        // Fresh Salad Green (distinct from green tab)
+      dinner: '#93514B',       // Brick Red (distinct from red tab)
+      snack: '#877A52',        // Nutty Brown (distinct from all tabs)
+      custom: '#736A8F',       // Muted Grape (distinct from purple tab)
+      default: '#666F7A'       // Neutral Slate Gray
+    }
   }
 };
