@@ -20,15 +20,6 @@ interface AddTaskFormProps {
   category: string;
   selectedDate?: Date; // For calendar tasks
   colors?: any; // Theme colors
-  accentColor?: string;
-  darkColor?: string;
-  bgColor?: string;
-  mediumColor?: string;
-  pastelColor?: string;
-  shadowColor?: string;
-  veryDarkColor?: string;
-  highlightColor?: string;
-  bgAltColor?: string;
 }
 
 const windowHeight = Dimensions.get('window').height;
@@ -40,25 +31,16 @@ export default function AddTaskForm({
   category,
   selectedDate,
   colors,
-  accentColor = '#4055C5',
-  darkColor = '#2B6CB0',
-  bgColor = '#F5F7FA',
-  mediumColor = '#4A5568',
-  pastelColor = '#E2E8F0',
-  shadowColor = '#C8D0E0',
-  veryDarkColor = '#1A365D',
-  highlightColor = '#5A67D8',
-  bgAltColor = '#EDF2F7'
 }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [isHabit, setIsHabit] = useState(false);
   const [habitGoal, setHabitGoal] = useState('1');
   const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tagColors?.priority?.custom || '#4A5568');
+  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tagColors?.priority?.custom || '');
   const [goalType, setGoalType] = useState<string>('');
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tagColors?.goalType?.custom || '#4A5568');
+  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tagColors?.goalType?.custom || '');
   const [mealType, setMealType] = useState<string>('');
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
@@ -71,18 +53,6 @@ export default function AddTaskForm({
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
-  
-  // Use theme colors if provided, otherwise use props
-  const themeColors = colors || {};
-  const effectiveAccentColor = colors?.accent || accentColor;
-  const effectiveDarkColor = colors?.dark || darkColor;
-  const effectiveBgColor = colors?.bg || bgColor;
-  const effectiveMediumColor = colors?.medium || mediumColor;
-  const effectivePastelColor = colors?.pastel || pastelColor;
-  const effectiveShadowColor = colors?.shadow || shadowColor;
-  const effectiveVeryDarkColor = colors?.veryDark || veryDarkColor;
-  const effectiveHighlightColor = colors?.highlight || highlightColor;
-  const effectiveBgAltColor = colors?.bgAlt || bgAltColor;
   
   // Map category to appropriate tab color key
   const getCategoryColorKey = () => {
@@ -102,24 +72,19 @@ export default function AddTaskForm({
   // Get the appropriate theme colors based on category
   const tabColorKey = getCategoryColorKey();
   const tabColors = colors?.tabColors?.[tabColorKey] || {};
-  
-  // Use the tab colors from the theme or fallback to effective colors
-  const veryDarkColor = tabColors.veryDark || effectiveVeryDarkColor;
-  const highlightColor = tabColors.highlight || effectiveHighlightColor;
-  const bgAltColor = tabColors.bgAlt || effectiveBgAltColor;
 
   // Helper to get tag color from theme
   const getTagColor = (tagType: string, tagValue: string) => {
     if (colors?.tagColors && colors.tagColors[tagType] && colors.tagColors[tagType][tagValue]) {
       return colors.tagColors[tagType][tagValue];
     }
-    return null;
+    return tabColors.highlight || tabColors.accent;
   };
 
   // Get priority color based on theme
   const getPriorityColor = (priorityValue: string) => {
     if (priorityValue === 'custom') return customPriorityColor;
-    return getTagColor('priority', priorityValue) || effectiveHighlightColor;
+    return getTagColor('priority', priorityValue);
   };
 
   // Get goal type color based on theme
@@ -129,33 +94,33 @@ export default function AddTaskForm({
     const key = goalTypeValue === 'TBD' ? 'tbd' : 
                 goalTypeValue === 'Not Priority' ? 'notPriority' : 
                 goalTypeValue.toLowerCase();
-    return getTagColor('goalType', key) || effectiveHighlightColor;
+    return getTagColor('goalType', key);
   };
 
   // Get day of week color based on theme
   const getDayOfWeekColor = (day: string) => {
     const key = day.toLowerCase();
-    return getTagColor('dayOfWeek', key) || effectiveHighlightColor;
+    return getTagColor('dayOfWeek', key);
   };
   
   // Get meal type color based on theme
   const getMealTypeColor = (type: string) => {
-    return getTagColor('mealType', type) || effectiveHighlightColor;
+    return getTagColor('mealType', type);
   };
 
   // Get cleaning location color based on theme
   const getCleaningLocationColor = (location: string) => {
-    return getTagColor('cleaningLocation', location) || effectiveHighlightColor;
+    return getTagColor('cleaningLocation', location);
   };
 
   // Get self-care type color based on theme
   const getSelfCareTypeColor = (type: string) => {
-    return getTagColor('selfCareType', type) || effectiveHighlightColor;
+    return getTagColor('selfCareType', type);
   };
 
   // Get delegate type color based on theme
   const getDelegateTypeColor = (type: string) => {
-    return getTagColor('delegateType', type) || effectiveHighlightColor;
+    return getTagColor('delegateType', type);
   };
 
   const resetForm = () => {
@@ -164,10 +129,10 @@ export default function AddTaskForm({
     setHabitGoal('1');
     setPriority('');
     setCustomPriorityText('');
-    setCustomPriorityColor(colors?.tagColors?.priority?.custom || effectiveMediumColor);
+    setCustomPriorityColor(colors?.tagColors?.priority?.custom || '');
     setGoalType('');
     setCustomGoalTypeText('');
-    setCustomGoalTypeColor(colors?.tagColors?.goalType?.custom || effectiveMediumColor);
+    setCustomGoalTypeColor(colors?.tagColors?.goalType?.custom || '');
     setMealType('');
     setDayOfWeek('');
     setNotes('');
@@ -305,21 +270,21 @@ export default function AddTaskForm({
     <Modal visible={visible} animationType="fade" transparent={true}>
       <View style={styles.overlay}>
         <View style={[styles.modalContainer, { 
-          backgroundColor: effectiveBgColor,
-          shadowColor: effectiveShadowColor,
+          backgroundColor: tabColors.bg,
+          shadowColor: tabColors.shadow,
           minHeight: windowHeight * 0.6, // Ensure minimum height for consistency
           maxHeight: windowHeight * 0.85
         }]}>
           <View style={[styles.header, { 
-            borderBottomColor: effectivePastelColor,
-            backgroundColor: bgAltColor 
+            borderBottomColor: tabColors.pastel,
+            backgroundColor: tabColors.bgAlt 
           }]}>
-            <Text style={[styles.title, { color: effectiveVeryDarkColor }]}>Add New Task</Text>
+            <Text style={[styles.title, { color: tabColors.veryDark }]}>Add New Task</Text>
             <TouchableOpacity 
               onPress={handleClose} 
-              style={[styles.closeButton, { backgroundColor: effectivePastelColor }]}
+              style={[styles.closeButton, { backgroundColor: tabColors.pastel }]}
             >
-              <X size={22} color={effectiveMediumColor} />
+              <X size={22} color={tabColors.medium} />
             </TouchableOpacity>
           </View>
 
@@ -344,12 +309,12 @@ export default function AddTaskForm({
             )}
 
             <View style={styles.formSection}>
-              <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Task Name *</Text>
+              <Text style={[styles.label, { color: tabColors.veryDark }]}>Task Name *</Text>
               <TextInput
                 style={[styles.input, { 
-                  borderColor: errors.some(e => e.includes('Task name')) ? '#FC8181' : effectivePastelColor, 
-                  backgroundColor: effectiveBgColor,
-                  color: effectiveVeryDarkColor
+                  borderColor: errors.some(e => e.includes('Task name')) ? '#FC8181' : tabColors.pastel, 
+                  backgroundColor: tabColors.bg,
+                  color: tabColors.veryDark
                 }]}
                 value={title}
                 onChangeText={(text) => {
@@ -359,26 +324,26 @@ export default function AddTaskForm({
                   }
                 }}
                 placeholder="Enter task name"
-                placeholderTextColor={effectiveMediumColor}
+                placeholderTextColor={tabColors.medium}
                 multiline
               />
 
               {/* Habit Settings - Only for Daily and Calendar tabs */}
               {(category === 'daily' || category === 'weekly') && (
                 <View style={styles.taskTypeSection}>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Task Type</Text>
-                  <View style={[styles.toggleContainer, { borderColor: effectivePastelColor }]}>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Task Type</Text>
+                  <View style={[styles.toggleContainer, { borderColor: tabColors.pastel }]}>
                     <TouchableOpacity
                       style={[
                         styles.toggleButton, 
-                        { backgroundColor: !isHabit ? highlightColor : effectiveBgColor }
+                        { backgroundColor: !isHabit ? tabColors.highlight : tabColors.bg }
                       ]}
                       onPress={() => setIsHabit(false)}
                     >
                       <Text style={[
                         styles.toggleText, 
                         { 
-                          color: !isHabit ? effectivePastelColor : effectiveMediumColor,
+                          color: !isHabit ? tabColors.pastel : tabColors.medium,
                           fontFamily: !isHabit ? 'Quicksand-Bold' : 'Quicksand-Medium'
                         }
                       ]}>
@@ -388,14 +353,14 @@ export default function AddTaskForm({
                     <TouchableOpacity
                       style={[
                         styles.toggleButton, 
-                        { backgroundColor: isHabit ? highlightColor : effectiveBgColor }
+                        { backgroundColor: isHabit ? tabColors.highlight : tabColors.bg }
                       ]}
                       onPress={() => setIsHabit(true)}
                     >
                       <Text style={[
                         styles.toggleText, 
                         { 
-                          color: isHabit ? effectivePastelColor : effectiveMediumColor,
+                          color: isHabit ? tabColors.pastel : tabColors.medium,
                           fontFamily: isHabit ? 'Quicksand-Bold' : 'Quicksand-Medium'
                         }
                       ]}>
@@ -406,28 +371,28 @@ export default function AddTaskForm({
 
                   {isHabit && (
                     <View style={styles.habitGoalSection}>
-                      <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Daily Goal</Text>
+                      <Text style={[styles.label, { color: tabColors.veryDark }]}>Daily Goal</Text>
                       <View style={styles.counterContainer}>
                         <TouchableOpacity
                           style={[styles.counterButton, { 
-                            backgroundColor: effectivePastelColor,
-                            shadowColor: effectiveShadowColor
+                            backgroundColor: tabColors.pastel,
+                            shadowColor: tabColors.shadow
                           }]}
                           onPress={decrementHabitGoal}
                         >
-                          <Minus size={16} color={effectiveDarkColor} />
+                          <Minus size={16} color={tabColors.dark} />
                         </TouchableOpacity>
-                        <Text style={[styles.counterText, { color: effectiveVeryDarkColor }]}>
+                        <Text style={[styles.counterText, { color: tabColors.veryDark }]}>
                           {habitGoal}
                         </Text>
                         <TouchableOpacity
                           style={[styles.counterButton, { 
-                            backgroundColor: effectivePastelColor,
-                            shadowColor: effectiveShadowColor
+                            backgroundColor: tabColors.pastel,
+                            shadowColor: tabColors.shadow
                           }]}
                           onPress={incrementHabitGoal}
                         >
-                          <Plus size={16} color={effectiveDarkColor} />
+                          <Plus size={16} color={tabColors.dark} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -438,7 +403,7 @@ export default function AddTaskForm({
               {/* Daily Tasks - Priority (Optional) */}
               {category === 'daily' && (
                 <>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Priority (Optional)</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Priority (Optional)</Text>
                   <View style={styles.optionGrid}>
                     {['high', 'medium', 'low', 'quick-win', 'custom'].map((option) => (
                       <TouchableOpacity
@@ -446,8 +411,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: priority === option ? getPriorityColor(option) : effectivePastelColor,
-                            shadowColor: effectiveShadowColor
+                            backgroundColor: priority === option ? getPriorityColor(option) : tabColors.pastel,
+                            shadowColor: tabColors.shadow
                           }
                         ]}
                         onPress={() => {
@@ -460,7 +425,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: priority === option ? effectivePastelColor : effectiveMediumColor,
+                            color: priority === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: priority === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -472,20 +437,20 @@ export default function AddTaskForm({
 
                   {priority === 'custom' && (
                     <>
-                      <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Custom Priority Text</Text>
+                      <Text style={[styles.label, { color: tabColors.veryDark }]}>Custom Priority Text</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: effectiveVeryDarkColor
+                          borderColor: tabColors.pastel, 
+                          backgroundColor: tabColors.bg,
+                          color: tabColors.veryDark
                         }]}
                         value={customPriorityText}
                         onChangeText={setCustomPriorityText}
                         placeholder="Enter custom priority"
-                        placeholderTextColor={effectiveMediumColor}
+                        placeholderTextColor={tabColors.medium}
                       />
                       
-                      <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Custom Color</Text>
+                      <Text style={[styles.label, { color: tabColors.veryDark }]}>Custom Color</Text>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
                         <View style={styles.colorWheel}>
                           {Object.values(colors?.tagColors?.priority || {}).map((color: string, index: number) => (
@@ -509,7 +474,7 @@ export default function AddTaskForm({
               {/* Goals - Goal Type (Optional) */}
               {category === 'goals' && (
                 <>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Goal Type (Optional)</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Goal Type (Optional)</Text>
                   <View style={styles.optionGrid}>
                     {['TBD', 'Not Priority', 'Wish', 'custom'].map((option) => (
                       <TouchableOpacity
@@ -517,8 +482,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: goalType === option ? getGoalTypeColor(option) : effectivePastelColor,
-                            shadowColor: effectiveShadowColor
+                            backgroundColor: goalType === option ? getGoalTypeColor(option) : tabColors.pastel,
+                            shadowColor: tabColors.shadow
                           }
                         ]}
                         onPress={() => {
@@ -531,7 +496,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: goalType === option ? effectivePastelColor : effectiveMediumColor,
+                            color: goalType === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: goalType === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -543,20 +508,20 @@ export default function AddTaskForm({
 
                   {goalType === 'custom' && (
                     <>
-                      <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Custom Goal Type</Text>
+                      <Text style={[styles.label, { color: tabColors.veryDark }]}>Custom Goal Type</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: effectiveVeryDarkColor
+                          borderColor: tabColors.pastel, 
+                          backgroundColor: tabColors.bg,
+                          color: tabColors.veryDark
                         }]}
                         value={customGoalTypeText}
                         onChangeText={setCustomGoalTypeText}
                         placeholder="Enter custom goal type"
-                        placeholderTextColor={effectiveMediumColor}
+                        placeholderTextColor={tabColors.medium}
                       />
                       
-                      <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Custom Color</Text>
+                      <Text style={[styles.label, { color: tabColors.veryDark }]}>Custom Color</Text>
                       <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
                         <View style={styles.colorWheel}>
                           {Object.values(colors?.tagColors?.goalType || {}).map((color: string, index: number) => (
@@ -580,7 +545,7 @@ export default function AddTaskForm({
               {/* Meal Prep */}
               {category === 'meal-prep' && (
                 <>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Meal Type *</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Meal Type *</Text>
                   <View style={styles.optionGrid}>
                     {['breakfast', 'lunch', 'dinner', 'snack'].map((option) => (
                       <TouchableOpacity
@@ -588,8 +553,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: mealType === option ? getMealTypeColor(option) : effectivePastelColor,
-                            shadowColor: effectiveShadowColor,
+                            backgroundColor: mealType === option ? getMealTypeColor(option) : tabColors.pastel,
+                            shadowColor: tabColors.shadow,
                             borderColor: errors.some(e => e.includes('Meal type')) ? '#FC8181' : 'transparent',
                             borderWidth: errors.some(e => e.includes('Meal type')) ? 1 : 0
                           }
@@ -604,7 +569,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: mealType === option ? effectivePastelColor : effectiveMediumColor,
+                            color: mealType === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: mealType === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -614,7 +579,7 @@ export default function AddTaskForm({
                     ))}
                   </View>
 
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Day of Week (Optional)</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Day of Week (Optional)</Text>
                   <View style={styles.optionGrid}>
                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => {
                       const dayKey = day.toLowerCase();
@@ -624,8 +589,8 @@ export default function AddTaskForm({
                           style={[
                             styles.optionButton,
                             { 
-                              backgroundColor: dayOfWeek === day ? getDayOfWeekColor(dayKey) : effectivePastelColor,
-                              shadowColor: effectiveShadowColor
+                              backgroundColor: dayOfWeek === day ? getDayOfWeekColor(dayKey) : tabColors.pastel,
+                              shadowColor: tabColors.shadow
                             }
                           ]}
                           onPress={() => setDayOfWeek(day)}
@@ -633,7 +598,7 @@ export default function AddTaskForm({
                           <Text style={[
                             styles.optionText,
                             { 
-                              color: dayOfWeek === day ? effectivePastelColor : effectiveMediumColor,
+                              color: dayOfWeek === day ? tabColors.pastel : tabColors.medium,
                               fontFamily: dayOfWeek === day ? 'Quicksand-Bold' : 'Quicksand-Medium'
                             }
                           ]}>
@@ -644,17 +609,17 @@ export default function AddTaskForm({
                     })}
                   </View>
 
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Notes</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Notes</Text>
                   <TextInput
                     style={[styles.input, styles.textArea, { 
-                      borderColor: effectivePastelColor, 
-                      backgroundColor: effectiveBgColor,
-                      color: effectiveVeryDarkColor
+                      borderColor: tabColors.pastel, 
+                      backgroundColor: tabColors.bg,
+                      color: tabColors.veryDark
                     }]}
                     value={notes}
                     onChangeText={setNotes}
                     placeholder="Add any notes or details"
-                    placeholderTextColor={effectiveMediumColor}
+                    placeholderTextColor={tabColors.medium}
                     multiline
                     numberOfLines={3}
                   />
@@ -664,7 +629,7 @@ export default function AddTaskForm({
               {/* Cleaning */}
               {category === 'cleaning' && (
                 <>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Frequency *</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Frequency *</Text>
                   <View style={styles.optionGrid}>
                     {['daily', 'weekly', 'monthly', 'seasonal'].map((option) => (
                       <TouchableOpacity
@@ -672,8 +637,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: frequency === option ? highlightColor : effectivePastelColor,
-                            shadowColor: effectiveShadowColor,
+                            backgroundColor: frequency === option ? tabColors.highlight : tabColors.pastel,
+                            shadowColor: tabColors.shadow,
                             borderColor: errors.some(e => e.includes('Frequency')) ? '#FC8181' : 'transparent',
                             borderWidth: errors.some(e => e.includes('Frequency')) ? 1 : 0
                           }
@@ -688,7 +653,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: frequency === option ? effectivePastelColor : effectiveMediumColor,
+                            color: frequency === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: frequency === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -698,7 +663,7 @@ export default function AddTaskForm({
                     ))}
                   </View>
 
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Location (Optional)</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Location (Optional)</Text>
                   <View style={styles.optionGrid}>
                     {['kitchen', 'bathroom', 'bedroom', 'custom'].map((option) => (
                       <TouchableOpacity
@@ -706,8 +671,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: cleaningLocation === option ? getCleaningLocationColor(option) : effectivePastelColor,
-                            shadowColor: effectiveShadowColor
+                            backgroundColor: cleaningLocation === option ? getCleaningLocationColor(option) : tabColors.pastel,
+                            shadowColor: tabColors.shadow
                           }
                         ]}
                         onPress={() => {
@@ -717,7 +682,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: cleaningLocation === option ? effectivePastelColor : effectiveMediumColor,
+                            color: cleaningLocation === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: cleaningLocation === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -729,17 +694,17 @@ export default function AddTaskForm({
 
                   {cleaningLocation === 'custom' && (
                     <>
-                      <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Custom Location</Text>
+                      <Text style={[styles.label, { color: tabColors.veryDark }]}>Custom Location</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: effectiveVeryDarkColor
+                          borderColor: tabColors.pastel, 
+                          backgroundColor: tabColors.bg,
+                          color: tabColors.veryDark
                         }]}
                         value={customCleaningLocation}
                         onChangeText={setCustomCleaningLocation}
                         placeholder="Enter custom location"
-                        placeholderTextColor={effectiveMediumColor}
+                        placeholderTextColor={tabColors.medium}
                       />
                     </>
                   )}
@@ -749,7 +714,7 @@ export default function AddTaskForm({
               {/* Self-Care */}
               {category === 'self-care' && (
                 <>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Self-Care Type *</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Self-Care Type *</Text>
                   <View style={styles.optionGrid}>
                     {['physical', 'mental', 'rest', 'joy'].map((option) => (
                       <TouchableOpacity
@@ -757,8 +722,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: selfCareType === option ? getSelfCareTypeColor(option) : effectivePastelColor,
-                            shadowColor: effectiveShadowColor,
+                            backgroundColor: selfCareType === option ? getSelfCareTypeColor(option) : tabColors.pastel,
+                            shadowColor: tabColors.shadow,
                             borderColor: errors.some(e => e.includes('Self-care type')) ? '#FC8181' : 'transparent',
                             borderWidth: errors.some(e => e.includes('Self-care type')) ? 1 : 0
                           }
@@ -773,7 +738,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: selfCareType === option ? effectivePastelColor : effectiveMediumColor,
+                            color: selfCareType === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: selfCareType === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -791,12 +756,12 @@ export default function AddTaskForm({
               {/* Delegation */}
               {category === 'delegation' && (
                 <>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Delegate To *</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Delegate To *</Text>
                   <TextInput
                     style={[styles.input, { 
-                      borderColor: errors.some(e => e.includes('Person to delegate')) ? '#FC8181' : effectivePastelColor, 
-                      backgroundColor: effectiveBgColor,
-                      color: effectiveVeryDarkColor
+                      borderColor: errors.some(e => e.includes('Person to delegate')) ? '#FC8181' : tabColors.pastel, 
+                      backgroundColor: tabColors.bg,
+                      color: tabColors.veryDark
                     }]}
                     value={delegatedTo}
                     onChangeText={(text) => {
@@ -806,10 +771,10 @@ export default function AddTaskForm({
                       }
                     }}
                     placeholder="Who will handle this task?"
-                    placeholderTextColor={effectiveMediumColor}
+                    placeholderTextColor={tabColors.medium}
                   />
 
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Delegate Type *</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Delegate Type *</Text>
                   <View style={styles.optionGrid}>
                     {['partner', 'family', 'friends', 'kids'].map((option) => (
                       <TouchableOpacity
@@ -817,8 +782,8 @@ export default function AddTaskForm({
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: delegateType === option ? getDelegateTypeColor(option) : effectivePastelColor,
-                            shadowColor: effectiveShadowColor,
+                            backgroundColor: delegateType === option ? getDelegateTypeColor(option) : tabColors.pastel,
+                            shadowColor: tabColors.shadow,
                             borderColor: errors.some(e => e.includes('Delegate type')) ? '#FC8181' : 'transparent',
                             borderWidth: errors.some(e => e.includes('Delegate type')) ? 1 : 0
                           }
@@ -833,7 +798,7 @@ export default function AddTaskForm({
                         <Text style={[
                           styles.optionText,
                           { 
-                            color: delegateType === option ? effectivePastelColor : effectiveMediumColor,
+                            color: delegateType === option ? tabColors.pastel : tabColors.medium,
                             fontFamily: delegateType === option ? 'Quicksand-Bold' : 'Quicksand-Medium'
                           }
                         ]}>
@@ -844,12 +809,12 @@ export default function AddTaskForm({
                   </View>
 
                   <View style={styles.switchRow}>
-                    <Text style={[styles.label, { color: effectiveVeryDarkColor, marginTop: 0 }]}>Enable Reminders</Text>
+                    <Text style={[styles.label, { color: tabColors.veryDark, marginTop: 0 }]}>Enable Reminders</Text>
                     <Switch
                       value={reminderEnabled}
                       onValueChange={setReminderEnabled}
-                      trackColor={{ false: effectivePastelColor, true: highlightColor }}
-                      thumbColor={effectivePastelColor}
+                      trackColor={{ false: tabColors.pastel, true: tabColors.highlight }}
+                      thumbColor={tabColors.pastel}
                     />
                   </View>
                 </>
@@ -858,10 +823,10 @@ export default function AddTaskForm({
               {/* Calendar Tasks */}
               {category === 'weekly' && selectedDate && (
                 <View style={[styles.dateInfo, { 
-                  backgroundColor: highlightColor,
-                  borderColor: effectivePastelColor
+                  backgroundColor: tabColors.highlight,
+                  borderColor: tabColors.pastel
                 }]}>
-                  <Text style={[styles.dateInfoText, { color: effectivePastelColor }]}>
+                  <Text style={[styles.dateInfoText, { color: tabColors.pastel }]}>
                     Scheduled for: {selectedDate.toLocaleDateString('en-US', { 
                       weekday: 'long', 
                       year: 'numeric', 
@@ -875,15 +840,15 @@ export default function AddTaskForm({
               {/* Subtasks */}
               <View style={styles.subtasksSection}>
                 <View style={styles.subtasksHeader}>
-                  <Text style={[styles.label, { color: effectiveVeryDarkColor }]}>Subtasks (Optional)</Text>
+                  <Text style={[styles.label, { color: tabColors.veryDark }]}>Subtasks (Optional)</Text>
                   <TouchableOpacity 
                     onPress={addSubtask} 
                     style={[styles.addSubtaskButton, { 
-                      backgroundColor: highlightColor,
-                      shadowColor: effectiveShadowColor
+                      backgroundColor: tabColors.highlight,
+                      shadowColor: tabColors.shadow
                     }]}
                   >
-                    <Plus size={16} color={effectivePastelColor} />
+                    <Plus size={16} color={tabColors.pastel} />
                   </TouchableOpacity>
                 </View>
 
@@ -891,20 +856,20 @@ export default function AddTaskForm({
                   <View key={subtask.id} style={styles.subtaskRow}>
                     <TextInput
                       style={[styles.input, styles.subtaskInput, { 
-                        borderColor: effectivePastelColor, 
-                        backgroundColor: effectiveBgColor,
-                        color: effectiveVeryDarkColor
+                        borderColor: tabColors.pastel, 
+                        backgroundColor: tabColors.bg,
+                        color: tabColors.veryDark
                       }]}
                       value={subtask.title}
                       onChangeText={(text) => updateSubtask(subtask.id, text)}
                       placeholder={`Subtask ${index + 1}`}
-                      placeholderTextColor={effectiveMediumColor}
+                      placeholderTextColor={tabColors.medium}
                     />
                     <TouchableOpacity
                       onPress={() => removeSubtask(subtask.id)}
                       style={[styles.removeSubtaskButton, { 
                         backgroundColor: '#FED7D7',
-                        shadowColor: effectiveShadowColor
+                        shadowColor: tabColors.shadow
                       }]}
                     >
                       <Minus size={16} color="#FC8181" />
@@ -921,30 +886,30 @@ export default function AddTaskForm({
           </ScrollView>
 
           <View style={[styles.footer, { 
-            borderTopColor: effectivePastelColor,
-            backgroundColor: bgAltColor
+            borderTopColor: tabColors.pastel,
+            backgroundColor: tabColors.bgAlt
           }]}>
             <TouchableOpacity 
               style={[styles.cancelButton, { 
-                backgroundColor: effectivePastelColor,
-                shadowColor: effectiveShadowColor
+                backgroundColor: tabColors.pastel,
+                shadowColor: tabColors.shadow
               }]} 
               onPress={handleClose}
             >
               <Text style={[styles.cancelText, { 
-                color: effectiveDarkColor,
+                color: tabColors.dark,
                 fontFamily: 'Quicksand-Bold'
               }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
               style={[styles.submitButton, { 
-                backgroundColor: effectiveDarkColor,
-                shadowColor: effectiveShadowColor 
+                backgroundColor: tabColors.dark,
+                shadowColor: tabColors.shadow 
               }]}
               onPress={handleSubmit}
             >
               <Text style={[styles.submitText, { 
-                color: effectivePastelColor,
+                color: tabColors.pastel,
                 fontFamily: 'Quicksand-Bold'
               }]}>Add Task</Text>
             </TouchableOpacity>
