@@ -550,39 +550,71 @@ export default function TaskItem({
           </View>
 
           <View style={styles.actionIcons}>
-            <View style={styles.orderButtons}>
+            <View style={styles.iconGroup}>
               <TouchableOpacity
                 onPress={() => onMoveUp && onMoveUp(task.id)}
-                style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
+                style={[
+                  styles.iconButton, 
+                  isFirst ? styles.disabledButton : null,
+                  { backgroundColor: effectivePastelColor }
+                ]}
                 disabled={isFirst}
               >
-                <ChevronUp size={20} color={getIconColor(!!isFirst)} />
+                <ChevronUp 
+                  size={18} 
+                  color={getIconColor(!!isFirst)} 
+                  strokeWidth={2.5} 
+                />
               </TouchableOpacity>
               
               <TouchableOpacity
                 onPress={() => onMoveDown && onMoveDown(task.id)}
-                style={[styles.orderButton, isLast ? styles.disabledButton : null]}
+                style={[
+                  styles.iconButton, 
+                  isLast ? styles.disabledButton : null,
+                  { backgroundColor: effectivePastelColor }
+                ]}
                 disabled={isLast}
               >
-                <ChevronDown size={20} color={getIconColor(!!isLast)} />
+                <ChevronDown 
+                  size={18} 
+                  color={getIconColor(!!isLast)} 
+                  strokeWidth={2.5} 
+                />
               </TouchableOpacity>
             </View>
             
-            {onEdit && (
+            <View style={styles.iconGroup}>
+              {onEdit && (
+                <TouchableOpacity
+                  onPress={() => onEdit(task)}
+                  style={[
+                    styles.iconButton,
+                    { backgroundColor: effectivePastelColor }
+                  ]}
+                >
+                  <Pencil 
+                    size={18} 
+                    color={effectiveDarkColor} 
+                    strokeWidth={2.5} 
+                  />
+                </TouchableOpacity>
+              )}
+              
               <TouchableOpacity
-                onPress={() => onEdit(task)}
-                style={styles.editIconButton}
+                onPress={() => onDelete(task.id)}
+                style={[
+                  styles.iconButton,
+                  { backgroundColor: '#FFF1F0' }  // Light red background
+                ]}
               >
-                <Pencil size={20} color={effectiveDarkColor} />
+                <X 
+                  size={18} 
+                  color="#E53E3E" 
+                  strokeWidth={2.5} 
+                />
               </TouchableOpacity>
-            )}
-            
-            <TouchableOpacity
-              onPress={() => onDelete(task.id)}
-              style={styles.deleteIconButton}
-            >
-              <X size={20} color="#FC8181" />
-            </TouchableOpacity>
+            </View>
           </View>
         </View>
       </NeumorphicCard>
@@ -719,23 +751,27 @@ const styles = StyleSheet.create({
   actionIcons: {
     flexDirection: 'row',
     alignItems: 'center',
+    justifyContent: 'space-between',
+    marginLeft: 8,
   },
-  orderButtons: {
-    flexDirection: 'column',
-    marginRight: 8,
+  iconGroup: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginLeft: 4,
   },
-  orderButton: {
-    padding: 5,
-    marginVertical: 2,
+  iconButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginHorizontal: 4,
+    shadowOffset: { width: 1, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 2,
   },
   disabledButton: {
     opacity: 0.5,
-  },
-  editIconButton: {
-    padding: 6,
-    marginRight: 8,
-  },
-  deleteIconButton: {
-    padding: 6,
   },
 });
