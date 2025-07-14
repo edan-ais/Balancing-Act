@@ -109,65 +109,53 @@ export default function AddTaskForm({
   const veryDarkColor = tabColors.veryDark || effectiveDarkColor;
   const highlightColor = tabColors.highlight || effectiveAccentColor;
   const bgAltColor = tabColors.bgAlt || effectivePastelColor;
+  const lightColor = tabColors.light || effectivePastelColor;
 
   // Helper to get tag color from theme
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
+    // Non-customizable tag types should use tab colors
+    if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
+      return isSelected ? veryDarkColor : lightColor;
+    }
+    
+    // Day of Week tags - should have their own colors from theme
+    if (tagType === 'dayOfWeek') {
+      if (colors?.tagColors?.[tagType]?.[tagValue]) {
+        return isSelected ? colors.tagColors[tagType][tagValue] : lightColor;
+      }
+      return isSelected ? veryDarkColor : lightColor;
+    }
+    
     // If it's custom, return the custom color
     if (tagValue === 'custom') {
       const customColorMap = {
         'priority': customPriorityColor,
         'goalType': customGoalTypeColor,
-        'mealType': customMealTypeColor,
-        'frequency': customFrequencyColor,
         'cleaningLocation': customCleaningLocationColor,
-        'selfCareType': customSelfCareTypeColor,
-        'delegateType': customDelegateTypeColor
       };
-      return isSelected ? customColorMap[tagType] || effectiveMediumColor : effectivePastelColor;
+      return isSelected ? customColorMap[tagType] || effectiveMediumColor : lightColor;
     }
     
-    // For other tags, use the tag's specific color
+    // For customizable tags, use the tag's specific color from theme
     if (colors?.tagColors && colors.tagColors[tagType] && colors.tagColors[tagType][tagValue]) {
-      return isSelected ? colors.tagColors[tagType][tagValue] : effectivePastelColor;
+      return isSelected ? colors.tagColors[tagType][tagValue] : lightColor;
     }
     
-    // If it's a required field but no specific color found, use tab's veryDark color
-    if (isRequiredTagType(tagType)) {
-      return isSelected ? veryDarkColor : effectivePastelColor;
-    }
-    
-    // Fallback to default color for that tag type or medium color
-    return isSelected 
-      ? (colors?.tagColors?.[tagType]?.default || effectiveMediumColor)
-      : effectivePastelColor;
+    // Fallback to tab colors
+    return isSelected ? veryDarkColor : lightColor;
   };
 
-  // Check if a tag type is required
-  const isRequiredTagType = (tagType: string) => {
-    return ['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType);
-  };
-
-  // Get task type color
+  // Get task type color (special case)
   const getTaskTypeColor = (type: string, isSelected: boolean = true) => {
-    // Map task/habit to proper tag values
-    const tagValue = type === 'task' ? 'task' : 'habit';
-    // Use default colors if not in theme
-    const defaultColors = {
-      task: '#6B46C1', // Purple for task
-      habit: '#DD6B20', // Orange for habit
-    };
-    
-    if (isSelected) {
-      return colors?.tagColors?.taskType?.[tagValue] || defaultColors[type];
-    }
-    return effectivePastelColor;
+    return isSelected ? veryDarkColor : lightColor;
   };
 
   // Get array of color options for custom color selection
   const getColorOptions = (tagType: string) => {
     // Get all colors from the tag category
     if (colors?.tagColors?.[tagType]) {
-      return Object.values(colors.tagColors[tagType]).filter(color => typeof color === 'string');
+      return Object.values(colors.tagColors[tagType])
+        .filter(color => typeof color === 'string' && color !== lightColor && color !== veryDarkColor);
     }
     
     // If no specific colors for this tag type, use a mix of colors from all tag types
@@ -175,7 +163,7 @@ export default function AddTaskForm({
     if (colors?.tagColors) {
       Object.keys(colors.tagColors).forEach(category => {
         Object.values(colors.tagColors[category])
-          .filter(color => typeof color === 'string')
+          .filter(color => typeof color === 'string' && color !== lightColor && color !== veryDarkColor)
           .forEach(color => {
             if (!allColors.includes(color)) {
               allColors.push(color);
@@ -184,13 +172,22 @@ export default function AddTaskForm({
       });
     }
     
-    // Add some fallback colors if needed
-    const fallbackColors = [
-      '#B83232', '#996633', '#547133', '#B8671D', '#6E416F', 
-      '#695C87', '#9C4848', '#3D7266', '#79553D', '#4B7994'
-    ];
+    // Add tab colors from all tabs as fallback
+    const fallbackColors = [];
+    if (colors?.tabColors) {
+      Object.keys(colors.tabColors).forEach(tab => {
+        if (colors.tabColors[tab].veryDark && !fallbackColors.includes(colors.tabColors[tab].veryDark)) {
+          fallbackColors.push(colors.tabColors[tab].veryDark);
+        }
+        if (colors.tabColors[tab].highlight && !fallbackColors.includes(colors.tabColors[tab].highlight)) {
+          fallbackColors.push(colors.tabColors[tab].highlight);
+        }
+      });
+    }
     
-    return allColors.length > 0 ? allColors : fallbackColors;
+    return allColors.length > 0 ? allColors : fallbackColors.length > 0 ? fallbackColors : [
+      veryDarkColor, highlightColor
+    ];
   };
 
   const resetForm = () => {
@@ -650,7 +647,7 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Meal Type *</Text>
                   <View style={styles.optionGrid}>
-                    {['breakfast', 'lunch', 'dinner', 'snack', 'custom'].map((option) => (
+                    {['breakfast', 'lunch', 'dinner', 'snack'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
@@ -679,30 +676,6 @@ export default function AddTaskForm({
                       </TouchableOpacity>
                     ))}
                   </View>
-
-                  {mealType === 'custom' && (
-                    <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Meal Type</Text>
-                      <TextInput
-                        style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom meal type text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
-                        }]}
-                        value={customMealTypeText}
-                        onChangeText={(text) => {
-                          setCustomMealTypeText(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom meal type text')));
-                          }
-                        }}
-                        placeholder="Enter custom meal type"
-                        placeholderTextColor={effectiveMediumColor}
-                      />
-                      
-                      {renderColorPicker('mealType', customMealTypeColor, setCustomMealTypeColor)}
-                    </>
-                  )}
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Day of Week</Text>
                   <View style={styles.optionGrid}>
@@ -754,15 +727,13 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Frequency *</Text>
                   <View style={styles.optionGrid}>
-                    {['daily', 'weekly', 'monthly', 'seasonal', 'custom'].map((option) => (
+                    {['daily', 'weekly', 'monthly', 'seasonal'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
                           styles.optionButton,
                           { 
-                            backgroundColor: frequency === option ? 
-                              (getTagColor('frequency', option, true)) : 
-                              effectivePastelColor,
+                            backgroundColor: getTagColor('frequency', option, frequency === option),
                             borderColor: errors.some(e => e.includes('Frequency')) ? '#E53E3E' : 'transparent',
                             borderWidth: errors.some(e => e.includes('Frequency')) ? 1 : 0
                           }
@@ -785,30 +756,6 @@ export default function AddTaskForm({
                       </TouchableOpacity>
                     ))}
                   </View>
-
-                  {frequency === 'custom' && (
-                    <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Frequency</Text>
-                      <TextInput
-                        style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom frequency text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
-                        }]}
-                        value={customFrequencyText}
-                        onChangeText={(text) => {
-                          setCustomFrequencyText(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom frequency text')));
-                          }
-                        }}
-                        placeholder="Enter custom frequency"
-                        placeholderTextColor={effectiveMediumColor}
-                      />
-                      
-                      {renderColorPicker('frequency', customFrequencyColor, setCustomFrequencyColor)}
-                    </>
-                  )}
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Location</Text>
                   <View style={styles.optionGrid}>
@@ -868,7 +815,7 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Self-Care Type *</Text>
                   <View style={styles.optionGrid}>
-                    {['physical', 'mental', 'rest', 'joy', 'custom'].map((option) => (
+                    {['physical', 'mental', 'rest', 'joy'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
@@ -896,35 +843,11 @@ export default function AddTaskForm({
                            option === 'mental' ? 'Mental Health' :
                            option === 'rest' ? 'Rest & Recovery' :
                            option === 'joy' ? 'Joy & Connection' :
-                           'Custom'}
+                           option.charAt(0).toUpperCase() + option.slice(1)}
                         </Text>
                       </TouchableOpacity>
                     ))}
                   </View>
-
-                  {selfCareType === 'custom' && (
-                    <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Self-Care Type</Text>
-                      <TextInput
-                        style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom self-care type text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
-                        }]}
-                        value={customSelfCareTypeText}
-                        onChangeText={(text) => {
-                          setCustomSelfCareTypeText(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom self-care type text')));
-                          }
-                        }}
-                        placeholder="Enter custom self-care type"
-                        placeholderTextColor={effectiveMediumColor}
-                      />
-                      
-                      {renderColorPicker('selfCareType', customSelfCareTypeColor, setCustomSelfCareTypeColor)}
-                    </>
-                  )}
                 </>
               )}
 
@@ -951,7 +874,7 @@ export default function AddTaskForm({
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Delegate Type *</Text>
                   <View style={styles.optionGrid}>
-                    {['partner', 'family', 'friends', 'kids', 'custom'].map((option) => (
+                    {['partner', 'family', 'friends', 'kids'].map((option) => (
                       <TouchableOpacity
                         key={option}
                         style={[
@@ -980,30 +903,6 @@ export default function AddTaskForm({
                       </TouchableOpacity>
                     ))}
                   </View>
-
-                  {delegateType === 'custom' && (
-                    <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Delegate Type</Text>
-                      <TextInput
-                        style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom delegate type text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
-                        }]}
-                        value={customDelegateTypeText}
-                        onChangeText={(text) => {
-                          setCustomDelegateTypeText(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom delegate type text')));
-                          }
-                        }}
-                        placeholder="Enter custom delegate type"
-                        placeholderTextColor={effectiveMediumColor}
-                      />
-                      
-                      {renderColorPicker('delegateType', customDelegateTypeColor, setCustomDelegateTypeColor)}
-                    </>
-                  )}
 
                   <View style={styles.switchRow}>
                     <Text style={[styles.label, { color: veryDarkColor }]}>Enable Reminders</Text>
