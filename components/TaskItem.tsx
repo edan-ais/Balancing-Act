@@ -139,8 +139,6 @@ export default function TaskItem({
       lookupKey = `cleaning${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
     } else if (tagType === 'delegateType') {
       lookupKey = `delegate${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-    } else if (tagType === 'mealType') {
-      lookupKey = `meal${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
     } else if (tagType === 'selfCareType') {
       lookupKey = `selfCare${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
     }
@@ -202,13 +200,6 @@ export default function TaskItem({
     if (!type) return tabColors.delegateDefaultSelected || veryDarkColor;
     
     return getTagColor('delegateType', type);
-  };
-
-  // Function to get meal type color
-  const getMealTypeColor = (type?: string) => {
-    if (!type) return tabColors.mealDefaultSelected || veryDarkColor;
-    
-    return getTagColor('mealType', type);
   };
 
   // Get a lighter version of the color for borders
@@ -328,57 +319,18 @@ export default function TaskItem({
         </View>
       );
     }
-    // For meal-prep with day of week
-    else if (task.category === 'meal-prep') {
-      // Show both meal type and day of week if available
-      if (task.mealType && task.dayOfWeek) {
-        return (
-          <View style={styles.tagContainer}>
-            <View style={[
-              styles.priorityTag,
-              { backgroundColor: getMealTypeColor(task.mealType) }
-            ]}>
-              <Text style={styles.priorityText}>
-                {task.mealType.toUpperCase()}
-              </Text>
-            </View>
-            <View style={[
-              styles.priorityTag,
-              { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
-            ]}>
-              <Text style={styles.priorityText}>
-                {task.dayOfWeek.toUpperCase()}
-              </Text>
-            </View>
-          </View>
-        );
-      }
-      // Show just meal type if available
-      else if (task.mealType) {
-        return (
-          <View style={[
-            styles.priorityTag,
-            { backgroundColor: getMealTypeColor(task.mealType) }
-          ]}>
-            <Text style={styles.priorityText}>
-              {task.mealType.toUpperCase()}
-            </Text>
-          </View>
-        );
-      }
-      // Show just day of week if available
-      else if (task.dayOfWeek) {
-        return (
-          <View style={[
-            styles.priorityTag,
-            { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
-          ]}>
-            <Text style={styles.priorityText}>
-              {task.dayOfWeek.toUpperCase()}
-            </Text>
-          </View>
-        );
-      }
+    // For meal-prep with day of week only (not meal type)
+    else if (task.category === 'meal-prep' && task.dayOfWeek) {
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.dayOfWeek.toUpperCase()}
+          </Text>
+        </View>
+      );
     }
     // For cleaning with location
     else if (task.category === 'cleaning' && task.cleaningLocation) {
