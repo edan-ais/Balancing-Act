@@ -172,7 +172,7 @@ export default function TaskItem({
   
   // Get a lighter background color for habits based on the task category
   const getHabitBackgroundColor = (category: string) => {
-    // If we have theme colors, use the bg color
+    // If we have theme colors, use the bgAlt color
     if (colors?.bgAlt) {
       return colors.bgAlt;
     }
@@ -330,7 +330,6 @@ export default function TaskItem({
         </View>
       );
     }
-
     // For self-care with type
     else if (task.category === 'self-care' && task.selfCareType) {
       return (
@@ -344,7 +343,6 @@ export default function TaskItem({
         </View>
       );
     }
-
     // For delegation with type
     else if (task.category === 'delegation' && task.delegateType) {
       return (
@@ -365,7 +363,7 @@ export default function TaskItem({
   // Choose text color based on completed state and theme
   const getTextColor = (completed: boolean) => {
     if (completed) return colors?.medium || '#A0AEC0'; // Completed tasks use medium color
-    return colors?.veryDark || '#2D3748'; // Active tasks use veryDark color for better contrast
+    return colors?.veryDark || '#1A202C'; // Active tasks use veryDark color for better contrast
   };
 
   // Choose subtask text color based on completed state and theme
@@ -384,19 +382,21 @@ export default function TaskItem({
   const getCheckboxBgColor = (completed: boolean, isHabit: boolean) => {
     if (completed) {
       return taskAccentColor; // Completed checkbox uses accent color (darker)
+    } else if (isHabit) {
+      return colors?.bgAlt || '#EDF2F7'; // Habit checkbox uses slightly different bg
     } else {
       return colors?.pastel || '#E2E8F0'; // Uncompleted uses pastel (lighter)
     }
   };
 
-  // Get checkbox text/icon color - logical flow from dark to light
+  // Get checkbox text/icon color - ensure high contrast
   const getCheckboxContentColor = (completed: boolean, isHabit: boolean) => {
     if (completed) {
-      return colors?.pastel || '#FFFFFF'; // Completed checkbox uses light text
+      return '#FFFFFF'; // Completed checkbox always uses white for best contrast
     } else if (isHabit) {
-      return taskHabitColor; // Habit number uses accent color
+      return colors?.veryDark || '#1A202C'; // Habit number uses dark text for contrast
     } else {
-      return colors?.medium || '#A0AEC0'; // Default color
+      return colors?.veryDark || '#1A202C'; // Default to dark text for contrast
     }
   };
 
@@ -411,7 +411,7 @@ export default function TaskItem({
           borderWidth: 1,
           // Add left border accent for habits
           ...(task.isHabit ? {
-            borderLeftWidth: 4,
+            borderLeftWidth: 6, // Increased from 4
             borderLeftColor: taskColor
           } : {})
         }
@@ -425,12 +425,14 @@ export default function TaskItem({
               task.isHabit ? styles.habitBox : null,
               { 
                 backgroundColor: getCheckboxBgColor(task.completed, !!task.isHabit),
+                borderColor: task.completed ? 'transparent' : taskColor,
+                borderWidth: task.completed ? 0 : 1.5,
                 shadowColor: colors?.shadow || '#C8D0E0'
               },
             ]}
           >
             {task.completed ? (
-              <Check size={16} color={getCheckboxContentColor(true, !!task.isHabit)} />
+              <Check size={18} color={getCheckboxContentColor(true, !!task.isHabit)} />
             ) : (
               task.isHabit && task.habitCount !== undefined && (
                 <Text style={[
@@ -466,9 +468,10 @@ export default function TaskItem({
             {task.category === 'meal-prep' && task.notes ? (
               <View style={[styles.notesContainer, { 
                 backgroundColor: colors?.bgAlt || '#F7FAFC',
-                borderLeftColor: colors?.accent || '#ED8936'
+                borderLeftColor: colors?.accent || '#ED8936',
+                borderLeftWidth: 3 // Increased from 2
               }]}>
-                <Text style={[styles.notesText, { color: colors?.medium || '#4A5568' }]}>
+                <Text style={[styles.notesText, { color: colors?.dark || '#4A5568' }]}>
                   {task.notes}
                 </Text>
               </View>
@@ -483,9 +486,9 @@ export default function TaskItem({
                       width: `${habitProgress}%`,
                       backgroundColor: taskHabitColor
                     }
-                  ]} 
+                  ]] 
                 />
-                <Text style={[styles.habitGoalText, { color: colors?.medium || '#4A5568' }]}>
+                <Text style={[styles.habitGoalText, { color: colors?.dark || '#4A5568' }]}>
                   {task.habitCount || 0}/{task.habitGoal}
                 </Text>
               </View>
@@ -505,12 +508,14 @@ export default function TaskItem({
                         { 
                           backgroundColor: subtask.completed 
                             ? taskAccentColor 
-                            : (colors?.pastel || '#E2E8F0')
+                            : (colors?.pastel || '#E2E8F0'),
+                          borderColor: subtask.completed ? 'transparent' : (colors?.medium || '#A0AEC0'),
+                          borderWidth: subtask.completed ? 0 : 1,
                         },
                         subtask.completed ? styles.subtaskCompleted : null
                       ]} 
                     >
-                      {subtask.completed ? <Check size={8} color={colors?.pastel || "#ffffff"} /> : null}
+                      {subtask.completed ? <Check size={10} color={'#FFFFFF'} /> : null}
                     </View>
                     <Text style={[
                       styles.subtaskText, 
@@ -532,7 +537,7 @@ export default function TaskItem({
                 style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
                 disabled={isFirst}
               >
-                <ChevronUp size={16} color={getIconColor(!!isFirst)} />
+                <ChevronUp size={20} color={getIconColor(!!isFirst)} />
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -540,7 +545,7 @@ export default function TaskItem({
                 style={[styles.orderButton, isLast ? styles.disabledButton : null]}
                 disabled={isLast}
               >
-                <ChevronDown size={16} color={getIconColor(!!isLast)} />
+                <ChevronDown size={20} color={getIconColor(!!isLast)} />
               </TouchableOpacity>
             </View>
             
@@ -549,7 +554,7 @@ export default function TaskItem({
                 onPress={() => onEdit(task)}
                 style={styles.editIconButton}
               >
-                <Pencil size={18} color={colors?.medium || "#4A5568"} />
+                <Pencil size={20} color={colors?.medium || "#4A5568"} />
               </TouchableOpacity>
             )}
             
@@ -557,7 +562,7 @@ export default function TaskItem({
               onPress={() => onDelete(task.id)}
               style={styles.deleteIconButton}
             >
-              <X size={18} color="#FC8181" />
+              <X size={20} color="#FC8181" />
             </TouchableOpacity>
           </View>
         </View>
@@ -568,8 +573,9 @@ export default function TaskItem({
 
 const styles = StyleSheet.create({
   taskCard: {
-    margin: 4,
-    padding: 12,
+    margin: 6,
+    padding: 14,
+    borderRadius: 12,
   },
   habitCard: {
     // Base habit card - specific background colors are set dynamically
@@ -579,12 +585,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   checkbox: {
-    width: 24,
-    height: 24,
-    borderRadius: 12,
+    width: 28,
+    height: 28,
+    borderRadius: 14,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.3,
     shadowRadius: 4,
@@ -592,16 +598,17 @@ const styles = StyleSheet.create({
   checkedBox: {},
   habitBox: {},
   habitCount: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 14,
+    fontFamily: 'Quicksand-Bold',
   },
   taskContent: {
     flex: 1,
   },
   taskTitle: {
-    fontSize: 16,
+    fontSize: 18,
     fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 4,
+    marginBottom: 6,
+    lineHeight: 24,
   },
   completedTitle: {
     textDecorationLine: 'line-through',
@@ -610,78 +617,79 @@ const styles = StyleSheet.create({
     fontStyle: 'italic',
   },
   delegatedBadge: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 14,
+    fontFamily: 'Quicksand-Bold',
   },
   taskMeta: {
     flexDirection: 'row',
     alignItems: 'center',
     flexWrap: 'wrap',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   priorityTag: {
-    paddingHorizontal: 8,
-    paddingVertical: 2,
+    paddingHorizontal: 10,
+    paddingVertical: 3,
     borderRadius: 12,
     marginRight: 8,
     marginBottom: 4,
   },
   priorityText: {
     color: '#ffffff',
-    fontSize: 10,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 11,
+    fontFamily: 'Quicksand-Bold',
     textTransform: 'uppercase',
   },
   notesContainer: {
     borderRadius: 8,
-    padding: 8,
-    marginVertical: 4,
-    borderLeftWidth: 2,
+    padding: 10,
+    marginVertical: 6,
   },
   notesText: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 14,
+    fontFamily: 'Quicksand-Medium',
     fontStyle: 'italic',
+    lineHeight: 20,
   },
   habitProgressContainer: {
-    height: 8,
-    borderRadius: 4,
-    marginVertical: 4,
+    height: 10,
+    borderRadius: 5,
+    marginVertical: 6,
     overflow: 'hidden',
     position: 'relative',
   },
   habitProgressBar: {
     height: '100%',
-    borderRadius: 4,
+    borderRadius: 5,
   },
   habitGoalText: {
     position: 'absolute',
     right: 0,
-    top: -16,
-    fontSize: 10,
-    fontFamily: 'Quicksand-SemiBold',
+    top: -18,
+    fontSize: 12,
+    fontFamily: 'Quicksand-Bold',
   },
   subtasks: {
-    marginTop: 8,
+    marginTop: 10,
     paddingLeft: 4,
   },
   subtask: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: 6,
   },
   subtaskCheckbox: {
-    width: 14,
-    height: 14,
-    borderRadius: 7,
-    marginRight: 8,
+    width: 18,
+    height: 18,
+    borderRadius: 9,
+    marginRight: 10,
     justifyContent: 'center',
     alignItems: 'center',
   },
   subtaskCompleted: {},
   subtaskText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 16,
+    fontFamily: 'Quicksand-Medium',
+    lineHeight: 22,
   },
   subtaskCompletedText: {
     textDecorationLine: 'line-through',
@@ -695,17 +703,17 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   orderButton: {
-    padding: 4,
+    padding: 5,
     marginVertical: 2,
   },
   disabledButton: {
     opacity: 0.5,
   },
   editIconButton: {
-    padding: 4,
+    padding: 6,
     marginRight: 8,
   },
   deleteIconButton: {
-    padding: 4,
+    padding: 6,
   },
 });
