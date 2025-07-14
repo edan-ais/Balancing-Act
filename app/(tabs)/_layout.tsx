@@ -1,7 +1,8 @@
 import React from 'react';
+import { useRef, useEffect } from 'react';
 import { Tabs } from 'expo-router';
 import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 'lucide-react-native';
-import { View, Text, ScrollView, TouchableOpacity } from 'react-native';
+import { View, Text, ScrollView, TouchableOpacity, Animated } from 'react-native';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
 
@@ -71,6 +72,14 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
   const { currentTheme } = useTheme();
   const tabColors = currentTheme.tabColors;
   
+  // Create animated values for each tab
+  const animatedValues = useRef(
+    state.routes.reduce((acc, route) => {
+      acc[route.key] = new Animated.Value(1);
+      return acc;
+    }, {})
+  ).current;
+  
   // Get active route name for background color
   const activeRouteName = state.routes[state.index].name;
   const activeColorKey = routeToColorMap[activeRouteName];
@@ -110,6 +119,16 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
           const label = options.tabBarLabel || options.title || route.name;
           const isFocused = state.index === index;
           const isVisible = selectedTabsSet.has(route.name);
+          
+          // Animate scale when focus changes
+          useEffect(() => {
+            Animated.spring(animatedValues[route.key], {
+              toValue: isFocused ? 1.8 : 1,
+              useNativeDriver: true,
+              tension: 100,
+              friction: 8,
+            }).start();
+          }, [isFocused, route.key]);
           
           // If tab isn't visible, don't render it
           if (!isVisible) return null;
@@ -163,8 +182,8 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                 height: '100%',
                 width: '100%',
               }}>
-                <View style={{
-                  transform: [{ scale: isFocused ? 1.8 : 1 }],
+                <Animated.View style={{
+                  transform: [{ scale: animatedValues[route.key] }],
                   shadowColor: isFocused ? tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)' : 'transparent',
                   shadowOffset: { width: 0, height: 0 },
                   shadowOpacity: isFocused ? 0.8 : 0,
@@ -175,7 +194,7 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
                   marginTop: isFocused ? -5 : 0, // Adjust to center when enlarged
                 }}>
                   {Icon && <Icon size={30} color={tabColor} />}
-                </View>
+                </Animated.View>
                 
                 {/* Only show label when not focused */}
                 {!isFocused && (
