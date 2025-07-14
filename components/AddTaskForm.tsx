@@ -240,24 +240,38 @@ export default function AddTaskForm({
         if (!mealType) {
           validationErrors.push('Meal type is required for meal prep tasks');
         }
+        if (mealType === 'custom' && !customMealTypeText.trim()) {
+          validationErrors.push('Custom meal type text is required');
+        }
         break;
 
       case 'cleaning':
         if (!frequency) {
           validationErrors.push('Frequency is required for cleaning tasks');
         }
-        // Location is now optional
+        if (frequency === 'custom' && !customFrequencyText.trim()) {
+          validationErrors.push('Custom frequency text is required');
+        }
+        if (cleaningLocation === 'custom' && !customCleaningLocation.trim()) {
+          validationErrors.push('Custom location text is required');
+        }
         break;
 
       case 'self-care':
         if (!selfCareType) {
           validationErrors.push('Self-care type is required for self-care tasks');
         }
+        if (selfCareType === 'custom' && !customSelfCareTypeText.trim()) {
+          validationErrors.push('Custom self-care type text is required');
+        }
         break;
 
       case 'delegation':
         if (!delegateType) {
           validationErrors.push('Delegate type is required for delegation tasks');
+        }
+        if (delegateType === 'custom' && !customDelegateTypeText.trim()) {
+          validationErrors.push('Custom delegate type text is required');
         }
         if (!delegatedTo.trim()) {
           validationErrors.push('Person to delegate to is required');
@@ -277,26 +291,6 @@ export default function AddTaskForm({
     
     if (goalType === 'custom' && !customGoalTypeText.trim()) {
       validationErrors.push('Custom goal type text is required');
-    }
-    
-    if (mealType === 'custom' && !customMealTypeText.trim()) {
-      validationErrors.push('Custom meal type text is required');
-    }
-    
-    if (frequency === 'custom' && !customFrequencyText.trim()) {
-      validationErrors.push('Custom frequency text is required');
-    }
-    
-    if (cleaningLocation === 'custom' && !customCleaningLocation.trim()) {
-      validationErrors.push('Custom location text is required');
-    }
-    
-    if (selfCareType === 'custom' && !customSelfCareTypeText.trim()) {
-      validationErrors.push('Custom self-care type text is required');
-    }
-    
-    if (delegateType === 'custom' && !customDelegateTypeText.trim()) {
-      validationErrors.push('Custom delegate type text is required');
     }
 
     return validationErrors;
@@ -1235,19 +1229,19 @@ const styles = StyleSheet.create({
     padding: 8,
   },
   colorOption: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    marginHorizontal: 6,
+    width: 28, // Smaller color circles
+    height: 28, // Smaller color circles
+    borderRadius: 14, // Keep it circular
+    marginHorizontal: 4, // Less spacing between circles
   },
   selectedColor: {
-    borderWidth: 3,
+    borderWidth: 2, // Thinner border
     borderColor: '#FFFFFF',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
-    elevation: 5,
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
   subtasksSection: {
     marginTop: 16,
