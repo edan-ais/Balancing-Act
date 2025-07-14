@@ -42,29 +42,29 @@ export default function LongTermGoals() {
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
         <View>
-          <Text style={[styles.title, { color: colors.dark }]}>Long-term Tasks</Text>
-          <Text style={[styles.subtitle, { color: colors.medium }]}>
+          <Text style={[styles.title, { color: colors.veryDark }]}>Long-term Tasks</Text>
+          <Text style={[styles.subtitle, { color: colors.dark }]}>
             {completedTasks.length}/{goalTasks.length} completed
           </Text>
         </View>
         <View style={styles.headerActions}>
           <TouchableOpacity
             style={[styles.homeButton, { 
-              backgroundColor: colors.accent,
+              backgroundColor: colors.dark,
               shadowColor: colors.shadow
             }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.pastel} />
+            <Home size={24} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {goalTasks.length === 0 ? (
-          <NeumorphicCard style={[styles.emptyState, { borderColor: colors.pastel }]}>
-            <Text style={[styles.emptyTitle, { color: colors.dark }]}>No long-term tasks</Text>
-            <Text style={[styles.emptySubtitle, { color: colors.medium }]}>
+          <NeumorphicCard style={[styles.emptyState, { borderColor: colors.medium, backgroundColor: colors.bgAlt }]}>
+            <Text style={[styles.emptyTitle, { color: colors.veryDark }]}>No long-term tasks</Text>
+            <Text style={[styles.emptySubtitle, { color: colors.dark }]}>
               Add tasks you need to do, just not any time soon
             </Text>
           </NeumorphicCard>
@@ -72,7 +72,7 @@ export default function LongTermGoals() {
           <>
             {pendingTasks.length > 0 && (
               <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.medium }]}>Pending</Text>
+                <Text style={[styles.sectionTitle, { color: colors.dark }]}>Pending</Text>
                 {pendingTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
@@ -94,7 +94,7 @@ export default function LongTermGoals() {
 
             {completedTasks.length > 0 && (
               <View style={styles.section}>
-                <Text style={[styles.sectionTitle, { color: colors.medium }]}>Completed</Text>
+                <Text style={[styles.sectionTitle, { color: colors.dark }]}>Completed</Text>
                 {completedTasks.map((task, index) => (
                   <TaskItem
                     key={task.id}
@@ -124,7 +124,7 @@ export default function LongTermGoals() {
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        <Plus size={24} color={colors.pastel} />
+        <Plus size={28} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm
@@ -138,6 +138,9 @@ export default function LongTermGoals() {
         mediumColor={colors.medium}
         pastelColor={colors.pastel}
         shadowColor={colors.shadow}
+        veryDarkColor={colors.veryDark}
+        highlightColor={colors.highlight}
+        bgAltColor={colors.bgAlt}
       />
 
       <EditTaskForm
@@ -151,6 +154,9 @@ export default function LongTermGoals() {
         mediumColor={colors.medium}
         pastelColor={colors.pastel}
         shadowColor={colors.shadow}
+        veryDarkColor={colors.veryDark}
+        highlightColor={colors.highlight}
+        bgAltColor={colors.bgAlt}
       />
     </SafeAreaView>
   );
@@ -164,73 +170,79 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 24,
     paddingTop: 20,
-    paddingBottom: 10,
+    paddingBottom: 14,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontFamily: 'Quicksand-Bold',
+    marginBottom: 4,
   },
   subtitle: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Medium',
+    fontSize: 18,
+    fontFamily: 'Quicksand-SemiBold',
     marginTop: 2,
   },
   headerActions: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 16,
   },
   homeButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
     shadowOffset: { width: 3, height: 3 },
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.3,
     shadowRadius: 6,
+    elevation: 5,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
+    marginTop: 10,
   },
   section: {
-    marginBottom: 20,
+    marginBottom: 24,
   },
   sectionTitle: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
+    fontSize: 22,
+    fontFamily: 'Quicksand-Bold',
     marginLeft: 12,
-    marginBottom: 8,
+    marginBottom: 12,
   },
   emptyState: {
     alignItems: 'center',
-    paddingVertical: 40,
-    margin: 12,
-    borderWidth: 1,
+    paddingVertical: 50,
+    paddingHorizontal: 20,
+    margin: 16,
+    borderWidth: 2,
+    borderRadius: 16,
   },
   emptyTitle: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 8,
+    fontSize: 24,
+    fontFamily: 'Quicksand-Bold',
+    marginBottom: 12,
   },
   emptySubtitle: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 18,
+    fontFamily: 'Quicksand-Medium',
     textAlign: 'center',
+    lineHeight: 26,
   },
   addButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: 24,
+    right: 24,
+    width: 68,
+    height: 68,
+    borderRadius: 34,
     justifyContent: 'center',
     alignItems: 'center',
     shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.4,
     shadowRadius: 8,
     elevation: 8,
   },
