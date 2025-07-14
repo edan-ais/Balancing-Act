@@ -3,6 +3,7 @@ export const latteTheme = {
   name: 'Latte Theme',
   id: 'latte',
   backgroundImage: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
+  addTaskIcon: 'coffee', // Added coffee icon for the Latte theme
   tabColors: {
     // Deep Espresso - rich dark brown with reddish undertones
     daily: {
