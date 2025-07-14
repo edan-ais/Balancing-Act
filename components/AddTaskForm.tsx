@@ -15,6 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Get window dimensions for consistent modal sizing
 const windowHeight = Dimensions.get('window').height;
+const windowWidth = Dimensions.get('window').width;
 
 interface AddTaskFormProps {
   visible: boolean;
@@ -46,7 +47,7 @@ export default function AddTaskForm({
   shadowColor = '#C8D0E0'
 }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
-  const [isHabit, setIsHabit] = useState(false);
+  const [taskType, setTaskType] = useState<string>('task'); // Default to 'task'
   const [habitGoal, setHabitGoal] = useState('1');
   const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
@@ -150,9 +151,14 @@ export default function AddTaskForm({
     return getTagColor('delegateType', type) || effectiveAccentColor;
   };
 
+  // Get task type color
+  const getTaskTypeColor = (type: string) => {
+    return type === 'task' ? '#6B46C1' : '#DD6B20'; // Purple for task, orange for habit
+  };
+
   const resetForm = () => {
     setTitle('');
-    setIsHabit(false);
+    setTaskType('task');
     setHabitGoal('1');
     setPriority('');
     setCustomPriorityText('');
@@ -214,7 +220,7 @@ export default function AddTaskForm({
     }
 
     // Habit-specific validation - only if it's a habit
-    if (isHabit && (!habitGoal || parseInt(habitGoal) <= 0)) {
+    if (taskType === 'habit' && (!habitGoal || parseInt(habitGoal) <= 0)) {
       validationErrors.push('Valid habit goal is required for habits');
     }
 
@@ -236,8 +242,8 @@ export default function AddTaskForm({
 
     const newTask = {
       title: title.trim(),
-      isHabit,
-      habitGoal: isHabit && habitGoal ? parseInt(habitGoal) : undefined,
+      isHabit: taskType === 'habit',
+      habitGoal: taskType === 'habit' && habitGoal ? parseInt(habitGoal) : undefined,
       priority: priority || undefined,
       customPriorityText: priority === 'custom' ? customPriorityText : undefined,
       customPriorityColor: priority === 'custom' ? customPriorityColor : undefined,
@@ -300,7 +306,8 @@ export default function AddTaskForm({
           styles.modalContainer, 
           { 
             backgroundColor: effectiveBgColor,
-            height: windowHeight * 0.75, // Fixed height instead of min/max height
+            height: windowHeight * 0.65, // Shorter fixed height (65% instead of 75%)
+            width: Math.min(windowWidth * 0.9, 450), // Control width for better layout
           }
         ]}>
           <View style={[styles.header, { 
@@ -315,7 +322,7 @@ export default function AddTaskForm({
 
           <ScrollView 
             style={{ flex: 1 }}
-            contentContainerStyle={{ paddingBottom: 20 }}
+            contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
             showsVerticalScrollIndicator={true}
           >
             {/* Error Messages */}
@@ -353,42 +360,33 @@ export default function AddTaskForm({
                 multiline
               />
 
-              {/* Habit Settings - Only for Daily and Calendar tabs */}
+              {/* Task Type as Tags - Daily and Calendar tabs */}
               {(category === 'daily' || category === 'weekly') && (
-                <View style={styles.taskTypeSection}>
+                <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Task Type</Text>
-                  <View style={[styles.toggleContainer, { borderColor: effectivePastelColor }]}>
-                    <TouchableOpacity
-                      style={[
-                        styles.toggleButton, 
-                        { backgroundColor: !isHabit ? highlightColor : effectiveBgColor }
-                      ]}
-                      onPress={() => setIsHabit(false)}
-                    >
-                      <Text style={[
-                        styles.toggleText, 
-                        { color: !isHabit ? '#FFFFFF' : veryDarkColor }
-                      ]}>
-                        Task
-                      </Text>
-                    </TouchableOpacity>
-                    <TouchableOpacity
-                      style={[
-                        styles.toggleButton, 
-                        { backgroundColor: isHabit ? highlightColor : effectiveBgColor }
-                      ]}
-                      onPress={() => setIsHabit(true)}
-                    >
-                      <Text style={[
-                        styles.toggleText, 
-                        { color: isHabit ? '#FFFFFF' : veryDarkColor }
-                      ]}>
-                        Habit
-                      </Text>
-                    </TouchableOpacity>
+                  <View style={styles.optionGrid}>
+                    {['task', 'habit'].map((option) => (
+                      <TouchableOpacity
+                        key={option}
+                        style={[
+                          styles.optionButton,
+                          { backgroundColor: effectivePastelColor },
+                          taskType === option && { backgroundColor: getTaskTypeColor(option) }
+                        ]}
+                        onPress={() => setTaskType(option)}
+                      >
+                        <Text style={[
+                          styles.optionText,
+                          { color: veryDarkColor },
+                          taskType === option && { color: '#FFFFFF' }
+                        ]}>
+                          {option.charAt(0).toUpperCase() + option.slice(1)}
+                        </Text>
+                      </TouchableOpacity>
+                    ))}
                   </View>
 
-                  {isHabit && (
+                  {taskType === 'habit' && (
                     <View style={styles.habitGoalSection}>
                       <Text style={[styles.label, { color: veryDarkColor }]}>Daily Goal</Text>
                       <View style={styles.counterContainer}>
@@ -410,7 +408,7 @@ export default function AddTaskForm({
                       </View>
                     </View>
                   )}
-                </View>
+                </>
               )}
 
               {/* Daily Tasks - Priority (Optional) */}
@@ -883,7 +881,6 @@ const styles = StyleSheet.create({
     padding: 20,
   },
   modalContainer: {
-    width: '100%',
     borderRadius: 16,
     overflow: 'hidden',
   },
@@ -901,10 +898,6 @@ const styles = StyleSheet.create({
   },
   closeButton: {
     padding: 4,
-  },
-  content: {
-    flexGrow: 1,
-    paddingHorizontal: 16,
   },
   errorCard: {
     marginTop: 16,
@@ -983,24 +976,6 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Quicksand-SemiBold',
     textAlign: 'center',
-  },
-  taskTypeSection: {
-    marginTop: 16,
-  },
-  toggleContainer: {
-    flexDirection: 'row',
-    borderRadius: 8,
-    overflow: 'hidden',
-    borderWidth: 1,
-  },
-  toggleButton: {
-    flex: 1,
-    paddingVertical: 12,
-    alignItems: 'center',
-  },
-  toggleText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-Medium',
   },
   habitGoalSection: {
     marginTop: 16,
