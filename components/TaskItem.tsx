@@ -74,6 +74,18 @@ export default function TaskItem({
   const themeColors = colors || {};
 
   const getPriorityColor = (priority?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.priority) {
+      switch (priority) {
+        case 'high': return colors.tagColors.priority.high;
+        case 'medium': return colors.tagColors.priority.medium;
+        case 'low': return colors.tagColors.priority.low;
+        case 'quick-win': return colors.tagColors.priority.quickWin;
+        case 'custom': return task.customPriorityColor || colors.tagColors.priority.custom;
+        default: return colors.tagColors.priority.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
     switch (priority) {
       case 'high': return '#FC8181'; // Red
       case 'medium': return '#4299E1'; // Blue
@@ -86,6 +98,17 @@ export default function TaskItem({
 
   // Function to get goal type tag color
   const getGoalTypeColor = (goalType?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.goalType) {
+      switch (goalType) {
+        case 'TBD': return colors.tagColors.goalType.tbd;
+        case 'Not Priority': return colors.tagColors.goalType.notPriority;
+        case 'Wish': return colors.tagColors.goalType.wish;
+        case 'custom': return task.customGoalTypeColor || colors.tagColors.goalType.custom;
+        default: return colors.tagColors.goalType.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
     switch (goalType) {
       case 'TBD': return '#9F7AEA'; // Purple
       case 'Not Priority': return '#FC8181'; // Red
@@ -97,6 +120,20 @@ export default function TaskItem({
 
   // Function to get day of week color
   const getDayOfWeekColor = (day?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.dayOfWeek) {
+      switch (day) {
+        case 'Mon': return colors.tagColors.dayOfWeek.mon;
+        case 'Tue': return colors.tagColors.dayOfWeek.tue;
+        case 'Wed': return colors.tagColors.dayOfWeek.wed;
+        case 'Thu': return colors.tagColors.dayOfWeek.thu;
+        case 'Fri': return colors.tagColors.dayOfWeek.fri;
+        case 'Sat': return colors.tagColors.dayOfWeek.sat;
+        case 'Sun': return colors.tagColors.dayOfWeek.sun;
+        default: return colors.tagColors.dayOfWeek.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
     switch (day) {
       case 'Mon': return '#FC8181'; // Red
       case 'Tue': return '#F6AD55'; // Orange
@@ -111,6 +148,17 @@ export default function TaskItem({
 
   // Function to get cleaning location color
   const getCleaningLocationColor = (location?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.cleaningLocation) {
+      switch (location) {
+        case 'kitchen': return colors.tagColors.cleaningLocation.kitchen;
+        case 'bathroom': return colors.tagColors.cleaningLocation.bathroom;
+        case 'bedroom': return colors.tagColors.cleaningLocation.bedroom;
+        case 'custom': return colors.tagColors.cleaningLocation.custom;
+        default: return colors.tagColors.cleaningLocation.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
     switch (location) {
       case 'kitchen': return '#F6E05E'; // Yellow
       case 'bathroom': return '#4FD1C5'; // Teal
@@ -122,6 +170,17 @@ export default function TaskItem({
 
   // Function to get self-care type color
   const getSelfCareTypeColor = (type?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.selfCareType) {
+      switch (type) {
+        case 'physical': return colors.tagColors.selfCareType.physical;
+        case 'mental': return colors.tagColors.selfCareType.mental;
+        case 'rest': return colors.tagColors.selfCareType.rest;
+        case 'joy': return colors.tagColors.selfCareType.joy;
+        default: return colors.tagColors.selfCareType.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
     switch (type) {
       case 'physical': return '#68D391'; // Green
       case 'mental': return '#9F7AEA'; // Purple
@@ -133,11 +192,45 @@ export default function TaskItem({
 
   // Function to get delegate type color
   const getDelegateTypeColor = (type?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.delegateType) {
+      switch (type) {
+        case 'partner': return colors.tagColors.delegateType.partner;
+        case 'family': return colors.tagColors.delegateType.family;
+        case 'friends': return colors.tagColors.delegateType.friends;
+        case 'kids': return colors.tagColors.delegateType.kids;
+        default: return colors.tagColors.delegateType.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
     switch (type) {
       case 'partner': return '#63B3ED'; // Blue
       case 'family': return '#F6AD55'; // Orange
       case 'friends': return '#9F7AEA'; // Purple
       case 'kids': return '#68D391'; // Green
+      default: return '#A0AEC0'; // Default gray
+    }
+  };
+
+  // Function to get meal type color
+  const getMealTypeColor = (type?: string) => {
+    // If we have theme tag colors, use them
+    if (colors?.tagColors?.mealType) {
+      switch (type) {
+        case 'breakfast': return colors.tagColors.mealType.breakfast;
+        case 'lunch': return colors.tagColors.mealType.lunch;
+        case 'dinner': return colors.tagColors.mealType.dinner;
+        case 'snack': return colors.tagColors.mealType.snack;
+        case 'custom': return colors.tagColors.mealType.custom;
+        default: return colors.tagColors.mealType.default;
+      }
+    }
+    // Otherwise fallback to hardcoded colors
+    switch (type) {
+      case 'breakfast': return '#F6E05E'; // Yellow
+      case 'lunch': return '#68D391'; // Green
+      case 'dinner': return '#F56565'; // Red
+      case 'snack': return '#ED8936'; // Orange
       default: return '#A0AEC0'; // Default gray
     }
   };
@@ -247,7 +340,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customGoalTypeColor || '#4A5568' }
+            { backgroundColor: task.customGoalTypeColor || (colors?.tagColors?.goalType?.custom || '#4A5568') }
           ]}>
             <Text style={styles.priorityText}>
               {task.customGoalTypeText.toUpperCase()}
@@ -275,7 +368,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customPriorityColor || '#4A5568' }
+            { backgroundColor: task.customPriorityColor || (colors?.tagColors?.priority?.custom || '#4A5568') }
           ]}>
             <Text style={styles.priorityText}>
               {task.customPriorityText.toUpperCase()}
@@ -296,18 +389,57 @@ export default function TaskItem({
         </View>
       );
     }
-    // For meal-prep with day of week only (not meal type)
-    else if (task.category === 'meal-prep' && task.dayOfWeek) {
-      return (
-        <View style={[
-          styles.priorityTag,
-          { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
-        ]}>
-          <Text style={styles.priorityText}>
-            {task.dayOfWeek.toUpperCase()}
-          </Text>
-        </View>
-      );
+    // For meal-prep with day of week
+    else if (task.category === 'meal-prep') {
+      // Show both meal type and day of week if available
+      if (task.mealType && task.dayOfWeek) {
+        return (
+          <View style={styles.tagContainer}>
+            <View style={[
+              styles.priorityTag,
+              { backgroundColor: getMealTypeColor(task.mealType) }
+            ]}>
+              <Text style={styles.priorityText}>
+                {task.mealType.toUpperCase()}
+              </Text>
+            </View>
+            <View style={[
+              styles.priorityTag,
+              { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
+            ]}>
+              <Text style={styles.priorityText}>
+                {task.dayOfWeek.toUpperCase()}
+              </Text>
+            </View>
+          </View>
+        );
+      }
+      // Show just meal type if available
+      else if (task.mealType) {
+        return (
+          <View style={[
+            styles.priorityTag,
+            { backgroundColor: getMealTypeColor(task.mealType) }
+          ]}>
+            <Text style={styles.priorityText}>
+              {task.mealType.toUpperCase()}
+            </Text>
+          </View>
+        );
+      }
+      // Show just day of week if available
+      else if (task.dayOfWeek) {
+        return (
+          <View style={[
+            styles.priorityTag,
+            { backgroundColor: getDayOfWeekColor(task.dayOfWeek) }
+          ]}>
+            <Text style={styles.priorityText}>
+              {task.dayOfWeek.toUpperCase()}
+            </Text>
+          </View>
+        );
+      }
     }
     // For cleaning with location
     else if (task.category === 'cleaning' && task.cleaningLocation) {
@@ -620,6 +752,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     flexWrap: 'wrap',
     marginBottom: 6,
+  },
+  tagContainer: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
   },
   priorityTag: {
     paddingHorizontal: 10,
