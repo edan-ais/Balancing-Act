@@ -51,17 +51,17 @@ export default function AddTaskForm({
   const [habitGoal, setHabitGoal] = useState('1');
   const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tagColors?.priority?.custom?.selected || '#4A5568');
+  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tabColors?.daily?.priorityCustomSelected || '#4A5568');
   const [goalType, setGoalType] = useState<string>('');
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tagColors?.goalType?.custom?.selected || '#4A5568');
+  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tabColors?.future?.goalCustomSelected || '#4A5568');
   const [mealType, setMealType] = useState<string>('');
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [frequency, setFrequency] = useState<string>('');
   const [cleaningLocation, setCleaningLocation] = useState<string>('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
-  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tagColors?.cleaningLocation?.custom?.selected || '#996B77');
+  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tabColors?.cleaning?.cleaningCustomSelected || '#996B77');
   const [selfCareType, setSelfCareType] = useState<string>('');
   const [delegatedTo, setDelegatedTo] = useState('');
   const [delegateType, setDelegateType] = useState<string>('');
@@ -103,59 +103,63 @@ export default function AddTaskForm({
   const bgAltColor = tabColors.bgAlt || effectivePastelColor;
   const lightColor = tabColors.light || effectivePastelColor;
 
-  // Helper to get tag color - updated to work with nested selected/unselected structure
+  // Helper to get tag color - updated to work with the new flat structure
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
     // Required tags use tab's colors
     if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
       return isSelected ? veryDarkColor : bgAltColor;
     }
 
-    // For non-required tags, use their specific color from theme with selected/unselected options
-    if (colors?.tagColors && colors.tagColors[tagType]) {
-      // Handle custom tag option
-      if (tagValue === 'custom') {
-        const customColorMap = {
-          'priority': customPriorityColor,
-          'goalType': customGoalTypeColor,
-          'cleaningLocation': customCleaningLocationColor,
-        };
-        
-        if (isSelected) {
-          return customColorMap[tagType] || 
-                 (colors.tagColors[tagType].custom?.selected || veryDarkColor);
-        } else {
-          return colors.tagColors[tagType].custom?.unselected || bgAltColor;
-        }
-      }
+    // For non-required tags, use their specific color from the tab section in theme
+    const tabColorKey = getCategoryColorKey();
+    const tabColors = colors?.tabColors?.[tabColorKey] || {};
+    
+    // Handle custom tag option
+    if (tagValue === 'custom') {
+      const customColorMap = {
+        'priority': customPriorityColor,
+        'goalType': customGoalTypeColor,
+        'cleaningLocation': customCleaningLocationColor,
+      };
       
-      // Convert option to proper format for lookup in theme
-      let lookupValue = tagValue;
-      if (tagType === 'priority' && tagValue === 'quick-win') {
-        lookupValue = 'quickWin';
-      } else if (tagType === 'goalType' && tagValue === 'Not Priority') {
-        lookupValue = 'notPriority';
-      } else if (tagType === 'goalType' && tagValue === 'TBD') {
-        lookupValue = 'tbd';
-      } else if (tagType === 'dayOfWeek') {
-        lookupValue = tagValue.toLowerCase();
+      if (isSelected) {
+        // Try to use the user selected custom color first
+        return customColorMap[tagType] || veryDarkColor;
+      } else {
+        // For unselected state of custom tag
+        const unselectedKey = `${tagType}CustomUnselected`;
+        return tabColors[unselectedKey] || bgAltColor;
       }
-      
-      // Get the color object for this tag type and value
-      if (colors.tagColors[tagType][lookupValue]) {
-        // Use selected or unselected variant based on state
-        return isSelected 
-          ? colors.tagColors[tagType][lookupValue].selected || veryDarkColor
-          : colors.tagColors[tagType][lookupValue].unselected || bgAltColor;
-      }
-      
-      // If no specific color found, use default for that tag type
-      return isSelected
-        ? colors.tagColors[tagType].default?.selected || veryDarkColor
-        : colors.tagColors[tagType].default?.unselected || bgAltColor;
     }
     
-    // Fallback to tab colors if no specific tag colors defined
-    return isSelected ? veryDarkColor : bgAltColor;
+    // Convert option to proper format for lookup in theme
+    let lookupKey;
+    if (tagType === 'priority') {
+      lookupKey = `priority${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      if (tagValue === 'quick-win') {
+        lookupKey = 'priorityQuickWin';
+      }
+    } else if (tagType === 'goalType') {
+      if (tagValue === 'TBD') {
+        lookupKey = 'goalTbd';
+      } else if (tagValue === 'Not Priority') {
+        lookupKey = 'goalNotPriority';
+      } else {
+        lookupKey = `goal${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      }
+    } else if (tagType === 'dayOfWeek') {
+      lookupKey = `day${tagValue}`;
+    } else if (tagType === 'cleaningLocation') {
+      lookupKey = `cleaning${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+    } else if (tagType === 'delegateType') {
+      lookupKey = `delegate${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+    }
+    
+    // Add Selected/Unselected suffix based on state
+    lookupKey = `${lookupKey}${isSelected ? 'Selected' : 'Unselected'}`;
+    
+    // Return the color from the tab's colors or default to tab's main colors
+    return tabColors[lookupKey] || (isSelected ? veryDarkColor : bgAltColor);
   };
 
   // Helper to get text color based on background color
@@ -168,44 +172,41 @@ export default function AddTaskForm({
     }
   };
 
-  // Get array of color options for custom color selection
+  // Get array of color options for custom color selection from the flat structure
   const getColorOptions = (tagType: string) => {
-    // First try to collect all tag colors from this category
-    const tagColors = [];
+    const tabColorKey = getCategoryColorKey();
+    const tabColors = colors?.tabColors?.[tabColorKey] || {};
+    const colorOptions = [];
     
-    if (colors?.tagColors && colors.tagColors[tagType]) {
-      Object.entries(colors.tagColors[tagType]).forEach(([key, value]) => {
-        if (key !== 'default' && key !== 'custom') {
-          // For the new structure, extract the selected color
-          if (value && typeof value === 'object' && value.selected) {
-            tagColors.push(value.selected);
-          } else if (typeof value === 'string') {
-            // Fallback for old format
-            tagColors.push(value);
+    // Collect all the Selected colors for this tag type
+    const prefix = tagType === 'priority' ? 'priority' : 
+                  tagType === 'goalType' ? 'goal' :
+                  tagType === 'cleaningLocation' ? 'cleaning' :
+                  tagType === 'delegateType' ? 'delegate' : '';
+    
+    if (prefix) {
+      // Go through all tabColors keys and find the ones that match our prefix and end with "Selected"
+      Object.entries(tabColors).forEach(([key, value]) => {
+        if (key.startsWith(prefix) && key.endsWith('Selected') && key !== `${prefix}CustomSelected` && key !== `${prefix}DefaultSelected`) {
+          if (typeof value === 'string') {
+            colorOptions.push(value);
           }
         }
       });
     }
     
-    // If we have tag colors, return them
-    if (tagColors.length > 0) {
-      return tagColors;
+    // If we found colors for this tag type, return them
+    if (colorOptions.length > 0) {
+      return colorOptions;
     }
     
-    // If no specific colors for this tag type, collect colors from all tag types
+    // Otherwise collect colors from all tabs as a fallback
     const allColors = [];
-    if (colors?.tagColors) {
-      Object.keys(colors.tagColors).forEach(category => {
-        Object.entries(colors.tagColors[category]).forEach(([key, value]) => {
-          if (key !== 'default' && key !== 'custom') {
-            // For the new structure, extract the selected color
-            if (value && typeof value === 'object' && value.selected) {
-              const selectedColor = value.selected;
-              if (!allColors.includes(selectedColor)) {
-                allColors.push(selectedColor);
-              }
-            } else if (typeof value === 'string' && !allColors.includes(value)) {
-              // Fallback for old format
+    if (colors?.tabColors) {
+      Object.values(colors.tabColors).forEach(tabColorSet => {
+        Object.entries(tabColorSet).forEach(([key, value]) => {
+          if (typeof value === 'string' && key.endsWith('Selected') && !key.includes('Default') && !key.includes('Custom')) {
+            if (!allColors.includes(value)) {
               allColors.push(value);
             }
           }
@@ -225,17 +226,17 @@ export default function AddTaskForm({
     setHabitGoal('1');
     setPriority('');
     setCustomPriorityText('');
-    setCustomPriorityColor(colors?.tagColors?.priority?.custom?.selected || '#4A5568');
+    setCustomPriorityColor(colors?.tabColors?.daily?.priorityCustomSelected || '#4A5568');
     setGoalType('');
     setCustomGoalTypeText('');
-    setCustomGoalTypeColor(colors?.tagColors?.goalType?.custom?.selected || '#4A5568');
+    setCustomGoalTypeColor(colors?.tabColors?.future?.goalCustomSelected || '#4A5568');
     setMealType('');
     setDayOfWeek('');
     setNotes('');
     setFrequency('');
     setCleaningLocation('');
     setCustomCleaningLocation('');
-    setCustomCleaningLocationColor(colors?.tagColors?.cleaningLocation?.custom?.selected || '#996B77');
+    setCustomCleaningLocationColor(colors?.tabColors?.cleaning?.cleaningCustomSelected || '#996B77');
     setSelfCareType('');
     setDelegatedTo('');
     setDelegateType('');
