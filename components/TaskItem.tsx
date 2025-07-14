@@ -473,7 +473,7 @@ export default function TaskItem({
                       // DARK fill for completed portion
                       backgroundColor: taskHabitColor
                     }
-                  ]] 
+                  ]} 
                 />
                 <Text style={[styles.habitGoalText, { color: colors?.dark || '#4A5568' }]}>
                   {task.habitCount || 0}/{task.habitGoal}
