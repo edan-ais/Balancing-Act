@@ -93,64 +93,184 @@ export const latteTheme = {
   tagColors: {
     // Priority colors - warm, rich tones that stand out
     priority: {
-      high: '#9D2933',         // Cranberry red (avoiding espresso brown)
-      medium: '#4A6741',       // Forest green (avoiding hazelnut)
-      low: '#4B6584',          // Steel blue (avoiding caramel)
-      quickWin: '#E67E22',     // Pumpkin orange (distinct from all tabs)
-      custom: '#8B6B8C',       // Muted purple (distinct from lavender)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      high: {
+        selected: '#9D2933',     // Cranberry red (avoiding espresso brown)
+        unselected: '#F6E7E8'    // Very light cranberry
+      },
+      medium: {
+        selected: '#4A6741',     // Forest green (avoiding hazelnut)
+        unselected: '#EBEFEA'    // Very light forest green
+      },
+      low: {
+        selected: '#4B6584',     // Steel blue (avoiding caramel)
+        unselected: '#EBEFF4'    // Very light steel blue
+      },
+      quickWin: {
+        selected: '#E67E22',     // Pumpkin orange (distinct from all tabs)
+        unselected: '#FCF2E8'    // Very light pumpkin
+      },
+      custom: {
+        selected: '#8B6B8C',     // Muted purple (distinct from lavender)
+        unselected: '#F3EEF3'    // Very light muted purple
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     },
     // Goal type colors - muted but distinct
     goalType: {
-      tbd: '#6F4E7C',          // Muted grape (distinct from lavender)
-      notPriority: '#BA4A4A',  // Brick red (distinct from rose pink)
-      wish: '#5B6F4C',         // Olive green (distinct from pistachio)
-      custom: '#996B21',       // Bronze (distinct from hazelnut/caramel)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      tbd: {
+        selected: '#6F4E7C',     // Muted grape (distinct from lavender)
+        unselected: '#F0EBF2'    // Very light grape
+      },
+      notPriority: {
+        selected: '#BA4A4A',     // Brick red (distinct from rose pink)
+        unselected: '#F8EBEB'    // Very light brick red
+      },
+      wish: {
+        selected: '#5B6F4C',     // Olive green (distinct from pistachio)
+        unselected: '#EDEFE9'    // Very light olive
+      },
+      custom: {
+        selected: '#996B21',     // Bronze (distinct from hazelnut/caramel)
+        unselected: '#F5F0E8'    // Very light bronze
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     },
     // Day of week - warm spectrum that flows through the week
     dayOfWeek: {
-      mon: '#96514D',          // Terracotta (distinct from rose pink)
-      tue: '#AD7D4C',          // Amber (distinct from caramel)
-      wed: '#7D9148',          // Avocado (distinct from pistachio)
-      thu: '#5A8A72',          // Sage (distinct from pistachio)
-      fri: '#577E9F',          // Denim blue (distinct from all tabs)
-      sat: '#7A6C93',          // Dusty purple (distinct from lavender)
-      sun: '#B25D85',          // Raspberry (distinct from rose pink)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      mon: {
+        selected: '#96514D',     // Terracotta (distinct from rose pink)
+        unselected: '#F5ECEB'    // Very light terracotta
+      },
+      tue: {
+        selected: '#AD7D4C',     // Amber (distinct from caramel)
+        unselected: '#F7F2EA'    // Very light amber
+      },
+      wed: {
+        selected: '#7D9148',     // Avocado (distinct from pistachio)
+        unselected: '#F2F4EA'    // Very light avocado
+      },
+      thu: {
+        selected: '#5A8A72',     // Sage (distinct from pistachio)
+        unselected: '#EDF3F0'    // Very light sage
+      },
+      fri: {
+        selected: '#577E9F',     // Denim blue (distinct from all tabs)
+        unselected: '#ECF2F6'    // Very light denim
+      },
+      sat: {
+        selected: '#7A6C93',     // Dusty purple (distinct from lavender)
+        unselected: '#F1EFF4'    // Very light dusty purple
+      },
+      sun: {
+        selected: '#B25D85',     // Raspberry (distinct from rose pink)
+        unselected: '#F7EDF2'    // Very light raspberry
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     },
     // Cleaning location - fresh and clean tones
     cleaningLocation: {
-      kitchen: '#D4A04F',      // Golden honey (distinct from caramel)
-      bathroom: '#6487A5',     // Powder blue (distinct from all tabs)
-      bedroom: '#8D6E63',      // Coffee brown (distinct from espresso/hazelnut)
-      custom: '#AF6458',       // Terra cotta (distinct from rose pink)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      kitchen: {
+        selected: '#D4A04F',     // Golden honey (distinct from caramel)
+        unselected: '#FAF6EB'    // Very light honey
+      },
+      bathroom: {
+        selected: '#6487A5',     // Powder blue (distinct from all tabs)
+        unselected: '#EEF3F6'    // Very light powder blue
+      },
+      bedroom: {
+        selected: '#8D6E63',     // Coffee brown (distinct from espresso/hazelnut)
+        unselected: '#F3EFED'    // Very light coffee
+      },
+      custom: {
+        selected: '#AF6458',     // Terra cotta (distinct from rose pink)
+        unselected: '#F7EDEC'    // Very light terra cotta
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     },
     // Self-care type - gentle nurturing colors
     selfCareType: {
-      physical: '#778F67',     // Eucalyptus (distinct from pistachio)
-      mental: '#7D6D9C',       // Periwinkle (distinct from lavender)
-      rest: '#669999',         // Seafoam (distinct from all tabs)
-      joy: '#CF745F',          // Coral (distinct from rose pink)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      physical: {
+        selected: '#778F67',     // Eucalyptus (distinct from pistachio)
+        unselected: '#F1F4EE'    // Very light eucalyptus
+      },
+      mental: {
+        selected: '#7D6D9C',     // Periwinkle (distinct from lavender)
+        unselected: '#F1EFF6'    // Very light periwinkle
+      },
+      rest: {
+        selected: '#669999',     // Seafoam (distinct from all tabs)
+        unselected: '#EEF5F5'    // Very light seafoam
+      },
+      joy: {
+        selected: '#CF745F',     // Coral (distinct from rose pink)
+        unselected: '#F9F0ED'    // Very light coral
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     },
     // Delegate type - earthy tones that feel reassuring
     delegateType: {
-      partner: '#7D93B2',      // Steel blue (distinct from all tabs)
-      family: '#C7874F',       // Copper (distinct from caramel)
-      friends: '#8B7D7B',      // Taupe (distinct from vanilla)
-      kids: '#8DAA7B',         // Moss green (distinct from pistachio)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      partner: {
+        selected: '#7D93B2',     // Steel blue (distinct from all tabs)
+        unselected: '#F1F4F7'    // Very light steel blue
+      },
+      family: {
+        selected: '#C7874F',     // Copper (distinct from caramel)
+        unselected: '#F9F2EB'    // Very light copper
+      },
+      friends: {
+        selected: '#8B7D7B',     // Taupe (distinct from vanilla)
+        unselected: '#F3F1F1'    // Very light taupe
+      },
+      kids: {
+        selected: '#8DAA7B',     // Moss green (distinct from pistachio)
+        unselected: '#F3F6F1'    // Very light moss
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     },
     // Meal type colors - appetizing food-inspired tones
     mealType: {
-      breakfast: '#D99E6A',    // Toast brown (distinct from hazelnut)
-      lunch: '#7D9457',        // Olive (distinct from pistachio)
-      dinner: '#A05B53',       // Tomato (distinct from rose pink)
-      snack: '#BE9E6F',        // Honey gold (distinct from caramel)
-      custom: '#8D7C9D',       // Dusky purple (distinct from lavender)
-      default: '#8A7F6F'       // Neutral dark vanilla
+      breakfast: {
+        selected: '#D99E6A',     // Toast brown (distinct from hazelnut)
+        unselected: '#FAF5EE'    // Very light toast
+      },
+      lunch: {
+        selected: '#7D9457',     // Olive (distinct from pistachio)
+        unselected: '#F1F4EC'    // Very light olive
+      },
+      dinner: {
+        selected: '#A05B53',     // Tomato (distinct from rose pink)
+        unselected: '#F6ECEB'    // Very light tomato
+      },
+      snack: {
+        selected: '#BE9E6F',     // Honey gold (distinct from caramel)
+        unselected: '#F8F5EF'    // Very light honey gold
+      },
+      custom: {
+        selected: '#8D7C9D',     // Dusky purple (distinct from lavender)
+        unselected: '#F3F1F5'    // Very light dusky purple
+      },
+      default: {
+        selected: '#8A7F6F',     // Neutral dark vanilla
+        unselected: '#F3F1EF'    // Very light vanilla
+      }
     }
   }
 };
