@@ -123,16 +123,16 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: primaryColors.dark }]}>Balancing Act</Text>
+        <Text style={[styles.title, { color: primaryColors.veryDark }]}>Balancing Act</Text>
         <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
-          Choose which areas of life you want to focus on at the moment
+          Choose which areas of life you want to focus on
         </Text>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {/* Theme Selector */}
         <View style={styles.themeSelector}>
-          <Text style={[styles.themeSelectorTitle, { color: primaryColors.dark }]}>App Theme</Text>
+          <Text style={[styles.themeSelectorTitle, { color: primaryColors.veryDark }]}>App Theme</Text>
           {availableThemes.map((theme) => {
             const isSelected = currentTheme.id === theme.id;
             const themeColors = theme.tabColors.daily;
@@ -147,9 +147,9 @@ export default function HomeScreen() {
                 <NeumorphicCard style={[
                   styles.themeOption,
                   {
-                    backgroundColor: isSelected ? themeColors.medium : primaryColors.bgAlt,
+                    backgroundColor: isSelected ? themeColors.bgAlt : primaryColors.bgAlt,
                     borderColor: isSelected ? themeColors.dark : 'transparent',
-                    borderWidth: isSelected ? 3 : 0,
+                    borderWidth: isSelected ? 2 : 0,
                     shadowColor: isSelected ? themeColors.shadow : primaryColors.shadow
                   }
                 ]}>
@@ -157,7 +157,7 @@ export default function HomeScreen() {
                     styles.themeIconContainer,
                     { backgroundColor: isSelected ? themeColors.dark : primaryColors.medium }
                   ]}>
-                    <ThemeIconComponent size={20} color={isSelected ? themeColors.pastel : primaryColors.pastel} />
+                    <ThemeIconComponent size={22} color={isSelected ? themeColors.pastel : primaryColors.pastel} />
                   </View>
                   <Text style={[
                     styles.themeTitle,
@@ -179,7 +179,7 @@ export default function HomeScreen() {
           })}
         </View>
         
-        <Text style={[styles.sectionTitle, { color: primaryColors.dark }]}>Life Areas</Text>
+        <Text style={[styles.sectionTitle, { color: primaryColors.veryDark }]}>Life Areas</Text>
         <View style={styles.grid}>
           {tabOptions.map((tab) => {
             const isSelected = localSelectedTabs.includes(tab.id);
@@ -197,9 +197,9 @@ export default function HomeScreen() {
                 <NeumorphicCard style={[
                   styles.tabOption,
                   {
-                    backgroundColor: isSelected ? tabColors.medium : primaryColors.bgAlt,
+                    backgroundColor: isSelected ? tabColors.bgAlt : primaryColors.bgAlt,
                     borderColor: isSelected ? tabColors.dark : 'transparent',
-                    borderWidth: isSelected ? 3 : 0,
+                    borderWidth: isSelected ? 2 : 0,
                     shadowColor: isSelected ? tabColors.shadow : primaryColors.shadow
                   }
                 ]}>
@@ -208,7 +208,7 @@ export default function HomeScreen() {
                     { backgroundColor: isSelected ? tabColors.dark : primaryColors.medium }
                   ]}>
                     <IconComponent 
-                      size={26} 
+                      size={24} 
                       color={isSelected ? tabColors.pastel : primaryColors.pastel} 
                     />
                   </View>
@@ -273,66 +273,66 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingTop: 16,
+    paddingBottom: 8,
     alignItems: 'center',
   },
   title: {
-    fontSize: 36,
+    fontSize: 32,
     fontFamily: 'Quicksand-Bold',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   subtitle: {
     fontSize: 18,
-    fontFamily: 'Quicksand-Bold',
+    fontFamily: 'Quicksand-Medium',
     textAlign: 'center',
     lineHeight: 24,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
   },
   themeSelector: {
-    marginVertical: 16,
-    paddingHorizontal: 8,
+    marginVertical: 12,
+    paddingHorizontal: 6,
   },
   themeOptionContainer: {
     marginBottom: 10,
   },
   themeSelectorTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: 'Quicksand-Bold',
-    marginBottom: 12,
-    paddingLeft: 8,
+    marginBottom: 10,
+    paddingLeft: 6,
   },
   themeOption: {
-    padding: 16,
+    padding: 14,
     flexDirection: 'row',
     alignItems: 'center',
     position: 'relative',
     borderRadius: 12,
   },
   themeIconContainer: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
+    width: 42,
+    height: 42,
+    borderRadius: 21,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 16,
+    marginRight: 14,
   },
   themeTitle: {
     fontSize: 18,
-    fontFamily: 'Quicksand-Bold',
+    fontFamily: 'Quicksand-SemiBold',
   },
   themeSelectedIndicator: {
     position: 'absolute',
     top: '50%',
-    right: 16,
+    right: 14,
     marginTop: -12,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -341,56 +341,56 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Bold',
   },
   sectionTitle: {
-    fontSize: 22,
+    fontSize: 20,
     fontFamily: 'Quicksand-Bold',
-    marginTop: 10,
-    marginBottom: 12,
-    paddingLeft: 16,
+    marginTop: 8,
+    marginBottom: 10,
+    paddingLeft: 12,
   },
   grid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    paddingHorizontal: 8,
+    paddingHorizontal: 6,
   },
   tabOptionContainer: {
     width: '48%',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   tabOption: {
-    padding: 16,
+    padding: 14,
     alignItems: 'center',
-    minHeight: 140,
+    minHeight: 136,
     position: 'relative',
     borderRadius: 12,
   },
   iconContainer: {
-    width: 54,
-    height: 54,
-    borderRadius: 27,
+    width: 48,
+    height: 48,
+    borderRadius: 24,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 10,
   },
   tabTitle: {
-    fontSize: 18,
+    fontSize: 16,
     fontFamily: 'Quicksand-Bold',
     textAlign: 'center',
-    marginBottom: 6,
+    marginBottom: 4,
   },
   tabSubtitle: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Bold',
+    fontSize: 13,
+    fontFamily: 'Quicksand-Medium',
     textAlign: 'center',
     lineHeight: 18,
   },
   selectedIndicator: {
     position: 'absolute',
-    top: 8,
-    right: 8,
-    width: 26,
-    height: 26,
-    borderRadius: 13,
+    top: 6,
+    right: 6,
+    width: 24,
+    height: 24,
+    borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -402,17 +402,17 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    margin: 20,
-    padding: 18,
+    margin: 16,
+    padding: 16,
     borderRadius: 14,
-    shadowOffset: { width: 4, height: 4 },
-    shadowOpacity: 0.4,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 3, height: 3 },
+    shadowOpacity: 0.3,
+    shadowRadius: 6,
+    elevation: 6,
   },
   continueText: {
-    fontSize: 20,
+    fontSize: 18,
     fontFamily: 'Quicksand-Bold',
-    marginRight: 10,
+    marginRight: 8,
   },
 });
