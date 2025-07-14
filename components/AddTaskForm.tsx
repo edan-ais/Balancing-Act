@@ -51,17 +51,17 @@ export default function AddTaskForm({
   const [habitGoal, setHabitGoal] = useState('1');
   const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tagColors?.priority?.custom || '#4A5568');
+  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tagColors?.priority?.custom?.selected || '#4A5568');
   const [goalType, setGoalType] = useState<string>('');
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tagColors?.goalType?.custom || '#4A5568');
+  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tagColors?.goalType?.custom?.selected || '#4A5568');
   const [mealType, setMealType] = useState<string>('');
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [frequency, setFrequency] = useState<string>('');
   const [cleaningLocation, setCleaningLocation] = useState<string>('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
-  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tagColors?.cleaningLocation?.custom || '#996B77');
+  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tagColors?.cleaningLocation?.custom?.selected || '#996B77');
   const [selfCareType, setSelfCareType] = useState<string>('');
   const [delegatedTo, setDelegatedTo] = useState('');
   const [delegateType, setDelegateType] = useState<string>('');
@@ -103,19 +103,14 @@ export default function AddTaskForm({
   const bgAltColor = tabColors.bgAlt || effectivePastelColor;
   const lightColor = tabColors.light || effectivePastelColor;
 
-  // Helper to get tag color - updated according to requirements
+  // Helper to get tag color - updated to work with nested selected/unselected structure
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
-    // If not selected, return light color for consistent unselected state
-    if (!isSelected) {
-      return bgAltColor;
-    }
-    
     // Required tags use tab's colors
     if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
-      return veryDarkColor;
+      return isSelected ? veryDarkColor : bgAltColor;
     }
 
-    // For customizable tags, use their specific color from theme
+    // For non-required tags, use their specific color from theme with selected/unselected options
     if (colors?.tagColors && colors.tagColors[tagType]) {
       // Handle custom tag option
       if (tagValue === 'custom') {
@@ -124,7 +119,13 @@ export default function AddTaskForm({
           'goalType': customGoalTypeColor,
           'cleaningLocation': customCleaningLocationColor,
         };
-        return customColorMap[tagType] || colors.tagColors[tagType].custom || veryDarkColor;
+        
+        if (isSelected) {
+          return customColorMap[tagType] || 
+                 (colors.tagColors[tagType].custom?.selected || veryDarkColor);
+        } else {
+          return colors.tagColors[tagType].custom?.unselected || bgAltColor;
+        }
       }
       
       // Convert option to proper format for lookup in theme
@@ -139,17 +140,32 @@ export default function AddTaskForm({
         lookupValue = tagValue.toLowerCase();
       }
       
-      // Use the specific tag color from theme
+      // Get the color object for this tag type and value
       if (colors.tagColors[tagType][lookupValue]) {
-        return colors.tagColors[tagType][lookupValue];
+        // Use selected or unselected variant based on state
+        return isSelected 
+          ? colors.tagColors[tagType][lookupValue].selected || veryDarkColor
+          : colors.tagColors[tagType][lookupValue].unselected || bgAltColor;
       }
       
       // If no specific color found, use default for that tag type
-      return colors.tagColors[tagType].default || veryDarkColor;
+      return isSelected
+        ? colors.tagColors[tagType].default?.selected || veryDarkColor
+        : colors.tagColors[tagType].default?.unselected || bgAltColor;
     }
     
     // Fallback to tab colors if no specific tag colors defined
-    return veryDarkColor;
+    return isSelected ? veryDarkColor : bgAltColor;
+  };
+
+  // Helper to get text color based on background color
+  const getTextColor = (backgroundColor: string) => {
+    // For standard cases where we know the intent
+    if (backgroundColor === bgAltColor || backgroundColor.toUpperCase().startsWith('#F')) {
+      return veryDarkColor; // Dark text on light backgrounds
+    } else {
+      return '#FFFFFF'; // White text on dark backgrounds
+    }
   };
 
   // Get array of color options for custom color selection
@@ -159,8 +175,14 @@ export default function AddTaskForm({
     
     if (colors?.tagColors && colors.tagColors[tagType]) {
       Object.entries(colors.tagColors[tagType]).forEach(([key, value]) => {
-        if (typeof value === 'string' && key !== 'default' && key !== 'custom') {
-          tagColors.push(value);
+        if (key !== 'default' && key !== 'custom') {
+          // For the new structure, extract the selected color
+          if (value && typeof value === 'object' && value.selected) {
+            tagColors.push(value.selected);
+          } else if (typeof value === 'string') {
+            // Fallback for old format
+            tagColors.push(value);
+          }
         }
       });
     }
@@ -175,8 +197,17 @@ export default function AddTaskForm({
     if (colors?.tagColors) {
       Object.keys(colors.tagColors).forEach(category => {
         Object.entries(colors.tagColors[category]).forEach(([key, value]) => {
-          if (typeof value === 'string' && key !== 'default' && key !== 'custom' && !allColors.includes(value)) {
-            allColors.push(value);
+          if (key !== 'default' && key !== 'custom') {
+            // For the new structure, extract the selected color
+            if (value && typeof value === 'object' && value.selected) {
+              const selectedColor = value.selected;
+              if (!allColors.includes(selectedColor)) {
+                allColors.push(selectedColor);
+              }
+            } else if (typeof value === 'string' && !allColors.includes(value)) {
+              // Fallback for old format
+              allColors.push(value);
+            }
           }
         });
       });
@@ -194,17 +225,17 @@ export default function AddTaskForm({
     setHabitGoal('1');
     setPriority('');
     setCustomPriorityText('');
-    setCustomPriorityColor(colors?.tagColors?.priority?.custom || '#4A5568');
+    setCustomPriorityColor(colors?.tagColors?.priority?.custom?.selected || '#4A5568');
     setGoalType('');
     setCustomGoalTypeText('');
-    setCustomGoalTypeColor(colors?.tagColors?.goalType?.custom || '#4A5568');
+    setCustomGoalTypeColor(colors?.tagColors?.goalType?.custom?.selected || '#4A5568');
     setMealType('');
     setDayOfWeek('');
     setNotes('');
     setFrequency('');
     setCleaningLocation('');
     setCustomCleaningLocation('');
-    setCustomCleaningLocationColor(colors?.tagColors?.cleaningLocation?.custom || '#996B77');
+    setCustomCleaningLocationColor(colors?.tagColors?.cleaningLocation?.custom?.selected || '#996B77');
     setSelfCareType('');
     setDelegatedTo('');
     setDelegateType('');
@@ -490,15 +521,15 @@ export default function AddTaskForm({
                     {['high', 'medium', 'low', 'quick-win', 'custom'].map((option) => {
                       // Convert option to tagValue format for lookup
                       const tagValue = option === 'quick-win' ? 'quickWin' : option;
+                      const bgColor = getTagColor('priority', tagValue, priority === option);
+                      const textColor = getTextColor(bgColor);
                       
                       return (
                         <TouchableOpacity
                           key={option}
                           style={[
                             styles.optionButton,
-                            { 
-                              backgroundColor: getTagColor('priority', tagValue, priority === option)
-                            }
+                            { backgroundColor: bgColor }
                           ]}
                           onPress={() => {
                             setPriority(option);
@@ -509,9 +540,7 @@ export default function AddTaskForm({
                         >
                           <Text style={[
                             styles.optionText,
-                            { 
-                              color: priority === option ? '#FFFFFF' : veryDarkColor 
-                            }
+                            { color: textColor }
                           ]}>
                             {option === 'quick-win' ? 'Quick Win' : option.charAt(0).toUpperCase() + option.slice(1)}
                           </Text>
@@ -557,14 +586,15 @@ export default function AddTaskForm({
                                     option === 'Not Priority' ? 'notPriority' : 
                                     option.toLowerCase();
                       
+                      const bgColor = getTagColor('goalType', tagValue, goalType === option);
+                      const textColor = getTextColor(bgColor);
+                      
                       return (
                         <TouchableOpacity
                           key={option}
                           style={[
                             styles.optionButton,
-                            { 
-                              backgroundColor: getTagColor('goalType', tagValue, goalType === option)
-                            }
+                            { backgroundColor: bgColor }
                           ]}
                           onPress={() => {
                             setGoalType(option);
@@ -575,9 +605,7 @@ export default function AddTaskForm({
                         >
                           <Text style={[
                             styles.optionText,
-                            { 
-                              color: goalType === option ? '#FFFFFF' : veryDarkColor 
-                            }
+                            { color: textColor }
                           ]}>
                             {option.charAt(0).toUpperCase() + option.slice(1)}
                           </Text>
@@ -650,22 +678,21 @@ export default function AddTaskForm({
                   <Text style={[styles.label, { color: veryDarkColor }]}>Day of Week</Text>
                   <View style={styles.optionGrid}>
                     {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => {
+                      const bgColor = getTagColor('dayOfWeek', day, dayOfWeek === day);
+                      const textColor = getTextColor(bgColor);
+                      
                       return (
                         <TouchableOpacity
                           key={day}
                           style={[
                             styles.optionButton,
-                            { 
-                              backgroundColor: getTagColor('dayOfWeek', day, dayOfWeek === day)
-                            }
+                            { backgroundColor: bgColor }
                           ]}
                           onPress={() => setDayOfWeek(day)}
                         >
                           <Text style={[
                             styles.optionText,
-                            { 
-                              color: dayOfWeek === day ? '#FFFFFF' : veryDarkColor
-                            }
+                            { color: textColor }
                           ]}>
                             {day}
                           </Text>
@@ -728,29 +755,30 @@ export default function AddTaskForm({
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Location</Text>
                   <View style={styles.optionGrid}>
-                    {['kitchen', 'bathroom', 'bedroom', 'custom'].map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionButton,
-                          { 
-                            backgroundColor: getTagColor('cleaningLocation', option, cleaningLocation === option)
-                          }
-                        ]}
-                        onPress={() => {
-                          setCleaningLocation(option);
-                        }}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          { 
-                            color: cleaningLocation === option ? '#FFFFFF' : veryDarkColor
-                          }
-                        ]}>
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
+                    {['kitchen', 'bathroom', 'bedroom', 'custom'].map((option) => {
+                      const bgColor = getTagColor('cleaningLocation', option, cleaningLocation === option);
+                      const textColor = getTextColor(bgColor);
+                      
+                      return (
+                        <TouchableOpacity
+                          key={option}
+                          style={[
+                            styles.optionButton,
+                            { backgroundColor: bgColor }
+                          ]}
+                          onPress={() => {
+                            setCleaningLocation(option);
+                          }}
+                        >
+                          <Text style={[
+                            styles.optionText,
+                            { color: textColor }
+                          ]}>
+                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                          </Text>
+                        </TouchableOpacity>
+                      );
+                    })}
                   </View>
 
                   {cleaningLocation === 'custom' && (
