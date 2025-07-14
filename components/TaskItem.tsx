@@ -173,8 +173,8 @@ export default function TaskItem({
   // Get a lighter background color for habits based on the task category
   const getHabitBackgroundColor = (category: string) => {
     // If we have theme colors, use the bg color
-    if (colors?.bg) {
-      return colors.bg;
+    if (colors?.bgAlt) {
+      return colors.bgAlt;
     }
 
     switch(category) {
@@ -230,7 +230,7 @@ export default function TaskItem({
   };
 
   // Calculate habit progress percentage
-  const habitProgress = task.isHabit && task.habitCount && task.habitGoal
+  const habitProgress = task.isHabit && task.habitCount !== undefined && task.habitGoal
     ? (task.habitCount / task.habitGoal) * 100
     : 0;
 
@@ -311,7 +311,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customCleaningLocationColor || '#4A5568' }
+            { backgroundColor: getCleaningLocationColor('custom') }
           ]}>
             <Text style={styles.priorityText}>
               {task.customCleaningLocation.toUpperCase()}
@@ -326,6 +326,20 @@ export default function TaskItem({
         ]}>
           <Text style={styles.priorityText}>
             {task.cleaningLocation.toUpperCase()}
+          </Text>
+        </View>
+      );
+    }
+
+    // For self-care with type
+    else if (task.category === 'self-care' && task.selfCareType) {
+      return (
+        <View style={[
+          styles.priorityTag,
+          { backgroundColor: getSelfCareTypeColor(task.selfCareType) }
+        ]}>
+          <Text style={styles.priorityText}>
+            {task.selfCareType.toUpperCase()}
           </Text>
         </View>
       );
@@ -351,7 +365,7 @@ export default function TaskItem({
   // Choose text color based on completed state and theme
   const getTextColor = (completed: boolean) => {
     if (completed) return colors?.medium || '#A0AEC0'; // Completed tasks use medium color
-    return colors?.dark || '#2D3748'; // Active tasks use dark color
+    return colors?.veryDark || '#2D3748'; // Active tasks use veryDark color for better contrast
   };
 
   // Choose subtask text color based on completed state and theme
@@ -364,6 +378,26 @@ export default function TaskItem({
   const getIconColor = (disabled: boolean) => {
     if (disabled) return colors?.pastel || '#CBD5E0'; 
     return colors?.medium || '#4A5568';
+  };
+
+  // Get checkbox background color - logical flow from light to dark
+  const getCheckboxBgColor = (completed: boolean, isHabit: boolean) => {
+    if (completed) {
+      return taskAccentColor; // Completed checkbox uses accent color (darker)
+    } else {
+      return colors?.pastel || '#E2E8F0'; // Uncompleted uses pastel (lighter)
+    }
+  };
+
+  // Get checkbox text/icon color - logical flow from dark to light
+  const getCheckboxContentColor = (completed: boolean, isHabit: boolean) => {
+    if (completed) {
+      return colors?.pastel || '#FFFFFF'; // Completed checkbox uses light text
+    } else if (isHabit) {
+      return taskHabitColor; // Habit number uses accent color
+    } else {
+      return colors?.medium || '#A0AEC0'; // Default color
+    }
   };
 
   return (
@@ -390,18 +424,18 @@ export default function TaskItem({
               task.completed ? styles.checkedBox : null,
               task.isHabit ? styles.habitBox : null,
               { 
-                backgroundColor: task.completed ? taskAccentColor : (colors?.pastel || '#E2E8F0'),
+                backgroundColor: getCheckboxBgColor(task.completed, !!task.isHabit),
                 shadowColor: colors?.shadow || '#C8D0E0'
               },
             ]}
           >
             {task.completed ? (
-              <Check size={16} color={colors?.pastel || "#ffffff"} />
+              <Check size={16} color={getCheckboxContentColor(true, !!task.isHabit)} />
             ) : (
               task.isHabit && task.habitCount !== undefined && (
                 <Text style={[
                   styles.habitCount,
-                  { color: task.completed ? (colors?.pastel || '#ffffff') : taskHabitColor }
+                  { color: getCheckboxContentColor(false, true) }
                 ]}>
                   {task.habitCount}
                 </Text>
@@ -431,7 +465,7 @@ export default function TaskItem({
             {/* Display notes for meal prep tasks */}
             {task.category === 'meal-prep' && task.notes ? (
               <View style={[styles.notesContainer, { 
-                backgroundColor: colors?.bg || '#F7FAFC',
+                backgroundColor: colors?.bgAlt || '#F7FAFC',
                 borderLeftColor: colors?.accent || '#ED8936'
               }]}>
                 <Text style={[styles.notesText, { color: colors?.medium || '#4A5568' }]}>
@@ -468,11 +502,12 @@ export default function TaskItem({
                     <View 
                       style={[
                         styles.subtaskCheckbox, 
-                        { backgroundColor: colors?.pastel || '#E2E8F0' },
-                        subtask.completed ? [
-                          styles.subtaskCompleted,
-                          { backgroundColor: taskAccentColor }
-                        ] : null
+                        { 
+                          backgroundColor: subtask.completed 
+                            ? taskAccentColor 
+                            : (colors?.pastel || '#E2E8F0')
+                        },
+                        subtask.completed ? styles.subtaskCompleted : null
                       ]} 
                     >
                       {subtask.completed ? <Check size={8} color={colors?.pastel || "#ffffff"} /> : null}
@@ -497,7 +532,7 @@ export default function TaskItem({
                 style={[styles.orderButton, isFirst ? styles.disabledButton : null]}
                 disabled={isFirst}
               >
-                <ChevronUp size={16} color={getIconColor(isFirst || false)} />
+                <ChevronUp size={16} color={getIconColor(!!isFirst)} />
               </TouchableOpacity>
               
               <TouchableOpacity
@@ -505,7 +540,7 @@ export default function TaskItem({
                 style={[styles.orderButton, isLast ? styles.disabledButton : null]}
                 disabled={isLast}
               >
-                <ChevronDown size={16} color={getIconColor(isLast || false)} />
+                <ChevronDown size={16} color={getIconColor(!!isLast)} />
               </TouchableOpacity>
             </View>
             
