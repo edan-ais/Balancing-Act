@@ -172,78 +172,84 @@ export default function AddTaskForm({
     }
   };
 
-  // Get array of color options for custom color selection from the flat structure
+  // Get array of color options for custom color selection from the flat structure - UPDATED
   const getColorOptions = (tagType: string) => {
     // Get the appropriate tab colors based on the category
     const tabColorKey = getCategoryColorKey();
     const tabColors = colors?.tabColors?.[tabColorKey] || {};
     
-    // Array to store all relevant colors
-    const colorOptions = [];
+    // Object to store all relevant colors with their brightness value for sorting
+    const colorMap = new Map();
     
-    // Add the main tab colors
-    if (tabColors.veryDark) colorOptions.push(tabColors.veryDark);
-    if (tabColors.dark) colorOptions.push(tabColors.dark);
-    if (tabColors.medium) colorOptions.push(tabColors.medium);
-    if (tabColors.highlight) colorOptions.push(tabColors.highlight);
+    // Helper function to estimate color brightness (higher value = lighter color)
+    const getBrightness = (hexColor: string) => {
+      // Default to medium brightness if invalid color
+      if (!hexColor || !hexColor.startsWith('#')) return 128;
+      
+      const r = parseInt(hexColor.substring(1, 3), 16);
+      const g = parseInt(hexColor.substring(3, 5), 16);
+      const b = parseInt(hexColor.substring(5, 7), 16);
+      
+      // Perceived brightness formula
+      return (r * 299 + g * 587 + b * 114) / 1000;
+    };
     
-    // Add bold colors based on tag type
+    // Add colors to map with brightness as value for sorting
+    const addToColorMap = (color: string) => {
+      if (color && !colorMap.has(color)) {
+        colorMap.set(color, getBrightness(color));
+      }
+    };
+    
+    // Add the main tab colors first
+    if (tabColors.veryDark) addToColorMap(tabColors.veryDark);
+    if (tabColors.dark) addToColorMap(tabColors.dark);
+    if (tabColors.medium) addToColorMap(tabColors.medium);
+    if (tabColors.highlight) addToColorMap(tabColors.highlight);
+    
+    // Add category-specific colors based on tag type
     if (tagType === 'priority') {
       // Daily tab priority colors
-      if (tabColors.rainyRedBold) colorOptions.push(tabColors.rainyRedBold);
-      if (tabColors.muddyBold) colorOptions.push(tabColors.muddyBold);
-      if (tabColors.forestBold) colorOptions.push(tabColors.forestBold);
-      if (tabColors.thunderBold) colorOptions.push(tabColors.thunderBold);
-      if (tabColors.lightningBold) colorOptions.push(tabColors.lightningBold);
-      if (tabColors.cloudBold) colorOptions.push(tabColors.cloudBold);
+      if (tabColors.priorityHighSelected) addToColorMap(tabColors.priorityHighSelected);
+      if (tabColors.priorityMediumSelected) addToColorMap(tabColors.priorityMediumSelected);
+      if (tabColors.priorityLowSelected) addToColorMap(tabColors.priorityLowSelected);
+      if (tabColors.priorityQuickWinSelected) addToColorMap(tabColors.priorityQuickWinSelected);
+      if (tabColors.rainyRedBold) addToColorMap(tabColors.rainyRedBold);
+      if (tabColors.muddyBold) addToColorMap(tabColors.muddyBold);
+      if (tabColors.forestBold) addToColorMap(tabColors.forestBold);
+      if (tabColors.thunderBold) addToColorMap(tabColors.thunderBold);
+      if (tabColors.lightningBold) addToColorMap(tabColors.lightningBold);
+      if (tabColors.cloudBold) addToColorMap(tabColors.cloudBold);
     } 
     else if (tagType === 'goalType') {
       // Future tab goal type colors
-      if (tabColors.irisBold) colorOptions.push(tabColors.irisBold);
-      if (tabColors.rustBold) colorOptions.push(tabColors.rustBold);
-      if (tabColors.evergreenBold) colorOptions.push(tabColors.evergreenBold);
-      if (tabColors.soilBold) colorOptions.push(tabColors.soilBold);
-      if (tabColors.mistBold) colorOptions.push(tabColors.mistBold);
-    }
-    else if (tagType === 'dayOfWeek') {
-      // Meals tab day of week colors
-      if (tabColors.brickBold) colorOptions.push(tabColors.brickBold);
-      if (tabColors.sandBold) colorOptions.push(tabColors.sandBold);
-      if (tabColors.mossBold) colorOptions.push(tabColors.mossBold);
-      if (tabColors.tealBold) colorOptions.push(tabColors.tealBold);
-      if (tabColors.twilightBold) colorOptions.push(tabColors.twilightBold);
-      if (tabColors.denimBold) colorOptions.push(tabColors.denimBold);
-      if (tabColors.barkBold) colorOptions.push(tabColors.barkBold);
-      if (tabColors.stormBold) colorOptions.push(tabColors.stormBold);
+      if (tabColors.goalTbdSelected) addToColorMap(tabColors.goalTbdSelected);
+      if (tabColors.goalNotPrioritySelected) addToColorMap(tabColors.goalNotPrioritySelected);
+      if (tabColors.goalWishSelected) addToColorMap(tabColors.goalWishSelected);
+      if (tabColors.irisBold) addToColorMap(tabColors.irisBold);
+      if (tabColors.rustBold) addToColorMap(tabColors.rustBold);
+      if (tabColors.evergreenBold) addToColorMap(tabColors.evergreenBold);
+      if (tabColors.soilBold) addToColorMap(tabColors.soilBold);
+      if (tabColors.mistBold) addToColorMap(tabColors.mistBold);
     }
     else if (tagType === 'cleaningLocation') {
       // Cleaning tab location colors
-      if (tabColors.plantBold) colorOptions.push(tabColors.plantBold);
-      if (tabColors.mirrorBold) colorOptions.push(tabColors.mirrorBold);
-      if (tabColors.blanketBold) colorOptions.push(tabColors.blanketBold);
-      if (tabColors.roseBold) colorOptions.push(tabColors.roseBold);
-      if (tabColors.grayBold) colorOptions.push(tabColors.grayBold);
-    }
-    else if (tagType === 'delegateType') {
-      // Delegate tab type colors
-      if (tabColors.twilightAltBold) colorOptions.push(tabColors.twilightAltBold);
-      if (tabColors.woodBold) colorOptions.push(tabColors.woodBold);
-      if (tabColors.sageBold) colorOptions.push(tabColors.sageBold);
-      if (tabColors.berryBold) colorOptions.push(tabColors.berryBold);
-      if (tabColors.fogBold) colorOptions.push(tabColors.fogBold);
+      if (tabColors.cleaningKitchenSelected) addToColorMap(tabColors.cleaningKitchenSelected);
+      if (tabColors.cleaningBathroomSelected) addToColorMap(tabColors.cleaningBathroomSelected);
+      if (tabColors.cleaningBedroomSelected) addToColorMap(tabColors.cleaningBedroomSelected);
+      if (tabColors.plantBold) addToColorMap(tabColors.plantBold);
+      if (tabColors.mirrorBold) addToColorMap(tabColors.mirrorBold);
+      if (tabColors.blanketBold) addToColorMap(tabColors.blanketBold);
+      if (tabColors.roseBold) addToColorMap(tabColors.roseBold);
+      if (tabColors.grayBold) addToColorMap(tabColors.grayBold);
     }
     
-    // Add more color options from other tabs
-    Object.keys(colors?.tabColors || {}).forEach(otherTabKey => {
-      if (otherTabKey !== tabColorKey) {
-        const otherTabColors = colors?.tabColors?.[otherTabKey];
-        if (otherTabColors?.veryDark) colorOptions.push(otherTabColors.veryDark);
-        if (otherTabColors?.highlight) colorOptions.push(otherTabColors.highlight);
-      }
-    });
+    // Sort colors from darkest to lightest
+    const sortedColors = Array.from(colorMap.entries())
+      .sort((a, b) => a[1] - b[1]) // Sort by brightness (dark to light)
+      .map(entry => entry[0]); // Extract just the color hex codes
     
-    // Return a filtered array with no duplicates
-    return [...new Set(colorOptions)].slice(0, 20);
+    return sortedColors;
   };
 
   const resetForm = () => {
