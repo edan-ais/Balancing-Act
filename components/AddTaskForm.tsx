@@ -11,7 +11,6 @@ import {
 } from 'react-native';
 import { X, Plus, Minus } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import NeumorphicCard from './NeumorphicCard';
 
 interface AddTaskFormProps {
   visible: boolean;
@@ -278,10 +277,9 @@ export default function AddTaskForm({
           <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
             {/* Error Messages */}
             {errors.length > 0 && (
-              <NeumorphicCard style={[styles.errorCard, { 
+              <View style={[styles.errorCard, { 
                 backgroundColor: '#FED7D7',
                 borderLeftColor: '#FC8181',
-                shadowColor: shadowColor
               }]}>
                 <Text style={[styles.errorTitle, { color: '#C53030' }]}>Please fix the following:</Text>
                 {errors.map((error, index) => (
@@ -289,10 +287,10 @@ export default function AddTaskForm({
                     • {error}
                   </Text>
                 ))}
-              </NeumorphicCard>
+              </View>
             )}
 
-            <NeumorphicCard style={[styles.formCard, { shadowColor: shadowColor }]}>
+            <View style={styles.formSection}>
               <Text style={[styles.label, { color: darkColor }]}>Task Name *</Text>
               <TextInput
                 style={[styles.input, { 
@@ -807,7 +805,7 @@ export default function AddTaskForm({
                   </View>
                 ))}
               </View>
-            </NeumorphicCard>
+            </View>
           </ScrollView>
 
           <View style={[styles.footer, { borderTopColor: pastelColor }]}>
@@ -861,12 +859,23 @@ const styles = StyleSheet.create({
   },
   content: {
     flexGrow: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 16,
     maxHeight: '70%',
   },
   errorCard: {
-    margin: 12,
+    marginTop: 16,
+    marginBottom: 8,
+    padding: 12,
+    borderRadius: 8,
     borderLeftWidth: 4,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
   },
   errorTitle: {
     fontSize: 16,
@@ -878,8 +887,8 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Regular',
     marginBottom: 4,
   },
-  formCard: {
-    margin: 12,
+  formSection: {
+    paddingVertical: 8,
   },
   label: {
     fontSize: 16,
