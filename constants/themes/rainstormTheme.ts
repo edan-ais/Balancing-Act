@@ -88,5 +88,69 @@ export const rainstormTheme = {
       pastel: '#EEEFF6',       // Light storm lavender
       bg: '#FAFBFD'            // Ultra light storm lavender
     }
+  },
+  // Tag colors that complement the rainstorm theme but avoid using the same colors as the tabs
+  tagColors: {
+    // Priority colors - rich, saturated colors that pop against the cool backgrounds
+    priority: {
+      high: '#B83B3B',         // Rainy Day Red (distinct from all blues)
+      medium: '#906B3E',       // Muddy Puddle Brown (distinct from all blues)
+      low: '#50883C',          // Rainy Forest Green (distinct from all blues)
+      quickWin: '#C3773B',     // Thunder Orange (distinct from all blues)
+      custom: '#855C87',       // Lightning Purple (distinct from storm lavender)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    },
+    // Goal type colors - muted but distinct
+    goalType: {
+      tbd: '#75558D',          // Deep Iris Purple (distinct from storm lavender)
+      notPriority: '#9C4B4B',  // Rust Red (distinct from all blues)
+      wish: '#36745E',         // Evergreen (distinct from all blues)
+      custom: '#8A683F',       // Wet Soil Brown (distinct from all blues)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    },
+    // Day of week - colors inspired by changing weather conditions
+    dayOfWeek: {
+      mon: '#A15555',          // Wet Brick Red (distinct from all blues)
+      tue: '#7B6B43',          // Wet Sand (distinct from all blues)
+      wed: '#4F7347',          // Damp Moss (distinct from all blues)
+      thu: '#3F7380',          // Shallow Puddle Teal (distinct from ocean/rain blues)
+      fri: '#73426B',          // Twilight Purple (distinct from storm lavender)
+      sat: '#486A8D',          // Faded Denim (distinct shade from other blues)
+      sun: '#7D5E40',          // Wet Tree Bark (distinct from all blues)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    },
+    // Cleaning location - colors inspired by indoor spaces during rain
+    cleaningLocation: {
+      kitchen: '#5F8064',      // Indoor Plant Green (distinct from all blues)
+      bathroom: '#7C96A8',     // Foggy Mirror (distinct shade from misty sky)
+      bedroom: '#8A7969',      // Cozy Blanket Taupe (distinct from all blues)
+      custom: '#9D7277',       // Dusty Rose (distinct from all blues/purples)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    },
+    // Self-care type - soothing, nurturing colors for rainy day self-care
+    selfCareType: {
+      physical: '#6B7F55',     // Eucalyptus Leaf (distinct from all blues)
+      mental: '#6B5B7E',       // Calming Lavender (distinct from storm lavender)
+      rest: '#7D7462',         // Warm Wool Gray (distinct from all blues)
+      joy: '#A0746A',          // Terracotta (distinct from all blues)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    },
+    // Delegate type - warm, human tones to contrast with cool rain theme
+    delegateType: {
+      partner: '#665B83',      // Twilight Purple (distinct from storm lavender)
+      family: '#8D6F58',       // Warm Wood (distinct from all blues)
+      friends: '#5A8377',      // Sage Green (distinct from all blues)
+      kids: '#8B6A6E',         // Muted Berry (distinct from all blues)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    },
+    // Meal type colors - warm food-inspired tones to contrast with cool rain theme
+    mealType: {
+      breakfast: '#9D7E52',    // Toasted Oatmeal (distinct from all blues)
+      lunch: '#5C7C5E',        // Fresh Herb (distinct from all blues)
+      dinner: '#8E5F5F',       // Mulled Wine Red (distinct from all blues)
+      snack: '#8A7960',        // Warm Cinnamon (distinct from all blues)
+      custom: '#6A6B8D',       // Muted Plum (distinct from storm lavender)
+      default: '#657280'       // Neutral Rain Cloud Gray
+    }
   }
 };
