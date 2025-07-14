@@ -5,164 +5,140 @@ export const latteTheme = {
   backgroundImage: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
   addTaskIcon: 'coffee', // Added coffee icon for the Latte theme
   tabColors: {
-    // Deep Espresso - rich dark brown with reddish undertones
     daily: {
-      veryDark: '#100A06',     // Very dark espresso
-      shadow: '#1A110A',       // Deep shadow espresso
-      dark: '#2A1B0F',         // Dark espresso
-      accent: '#3F2A1A',       // Rich espresso
-      highlight: '#6E3B28',    // Bright reddish espresso
-      medium: '#7D5B47',       // Medium espresso
-      bgAlt: '#F5EBE5',        // Very light espresso
-      pastel: '#EAD9CF',       // Light espresso
-      bg: '#FAF5F2',           // Ultra light espresso
-      
-      // Priority tags
-      priorityHighSelected: '#9D2933',     // Cranberry red (avoiding espresso brown)
-      priorityHighUnselected: '#F6E7E8',    // Very light cranberry
-      priorityMediumSelected: '#4A6741',     // Forest green (avoiding hazelnut)
-      priorityMediumUnselected: '#EBEFEA',    // Very light forest green
-      priorityLowSelected: '#4B6584',     // Steel blue (avoiding caramel)
-      priorityLowUnselected: '#EBEFF4',    // Very light steel blue
-      priorityQuickWinSelected: '#E67E22',     // Pumpkin orange (distinct from all tabs)
-      priorityQuickWinUnselected: '#FCF2E8',    // Very light pumpkin
-      priorityCustomSelected: '#8B6B8C',     // Muted purple (distinct from lavender)
-      priorityCustomUnselected: '#F3EEF3',    // Very light muted purple
-      priorityDefaultSelected: '#8A7F6F',     // Neutral dark vanilla
-      priorityDefaultUnselected: '#F3F1EF'    // Very light vanilla
+      veryDark: '#100A06',
+      shadow: '#1A110A',
+      dark: '#2A1B0F',
+      accent: '#3F2A1A',
+      highlight: '#6E3B28',
+      medium: '#7D5B47',
+      bgAlt: '#F5EBE5',
+      pastel: '#EAD9CF',
+      bg: '#FAF5F2',
+      cranberryBold: '#9D2933',
+      cranberryLight: '#F6E7E8',
+      forestBold: '#4A6741',
+      forestLight: '#EBEFEA',
+      steelBold: '#4B6584',
+      steelLight: '#EBEFF4',
+      pumpkinBold: '#E67E22',
+      pumpkinLight: '#FCF2E8',
+      purpleBold: '#8B6B8C',
+      purpleLight: '#F3EEF3',
+      vanillaBold: '#8A7F6F',
+      vanillaLight: '#F3F1EF'
     },
-    
-    // Hazelnut - medium neutral brown with golden undertones
     future: {
-      veryDark: '#2A1F13',     // Very dark hazelnut
-      shadow: '#3D2D1E',       // Deep shadow hazelnut
-      dark: '#5E452D',         // Dark hazelnut
-      medium: '#8F6E49',       // Medium hazelnut
-      accent: '#A67C52',       // Rich hazelnut
-      highlight: '#BF8E5C',    // Bright hazelnut
-      bgAlt: '#F2EBD9',        // Very light hazelnut
-      pastel: '#E7DCCA',       // Light hazelnut
-      bg: '#F9F6ED',           // Ultra light hazelnut
-      
-      // Goal type tags
-      goalTbdSelected: '#6F4E7C',     // Muted grape (distinct from lavender)
-      goalTbdUnselected: '#F0EBF2',    // Very light grape
-      goalNotPrioritySelected: '#BA4A4A',     // Brick red (distinct from rose pink)
-      goalNotPriorityUnselected: '#F8EBEB',    // Very light brick red
-      goalWishSelected: '#5B6F4C',     // Olive green (distinct from pistachio)
-      goalWishUnselected: '#EDEFE9',    // Very light olive
-      goalCustomSelected: '#996B21',     // Bronze (distinct from hazelnut/caramel)
-      goalCustomUnselected: '#F5F0E8',    // Very light bronze
-      goalDefaultSelected: '#8A7F6F',     // Neutral dark vanilla
-      goalDefaultUnselected: '#F3F1EF'    // Very light vanilla
+      veryDark: '#2A1F13',
+      shadow: '#3D2D1E',
+      dark: '#5E452D',
+      medium: '#8F6E49',
+      accent: '#A67C52',
+      highlight: '#BF8E5C',
+      bgAlt: '#F2EBD9',
+      pastel: '#E7DCCA',
+      bg: '#F9F6ED',
+      grapeBold: '#6F4E7C',
+      grapeLight: '#F0EBF2',
+      brickBold: '#BA4A4A',
+      brickLight: '#F8EBEB',
+      oliveBold: '#5B6F4C',
+      oliveLight: '#EDEFE9',
+      bronzeBold: '#996B21',
+      bronzeLight: '#F5F0E8',
+      creamBold: '#8A7F6F',
+      creamLight: '#F3F1EF'
     },
-    
-    // Caramel Gold - amber brown with orange undertones
     calendar: {
-      veryDark: '#422E18',     // Very dark caramel
-      shadow: '#5E4020',       // Deep shadow caramel
-      dark: '#8C6030',         // Dark caramel
-      medium: '#C0904F',       // Medium caramel
-      accent: '#D9B382',       // Rich caramel
-      highlight: '#E9A456',    // Bright orange caramel
-      bgAlt: '#F7EBD6',        // Very light caramel
-      pastel: '#F5E4C7',       // Light caramel
-      bg: '#FDF8EE'            // Ultra light caramel
+      veryDark: '#422E18',
+      shadow: '#5E4020',
+      dark: '#8C6030',
+      medium: '#C0904F',
+      accent: '#D9B382',
+      highlight: '#E9A456',
+      bgAlt: '#F7EBD6',
+      pastel: '#F5E4C7',
+      bg: '#FDF8EE'
     },
-    
-    // Rose Pink - soft pink with brown undertones
     meals: {
-      veryDark: '#593636',     // Very dark rose pink
-      shadow: '#7A4D4D',       // Deep shadow rose pink
-      dark: '#A66868',         // Dark rose pink
-      medium: '#C98787',       // Medium rose pink
-      accent: '#D9A6A6',       // Rich rose pink
-      highlight: '#E6847F',    // Bright rose pink
-      bgAlt: '#FAECEC',        // Very light rose pink
-      pastel: '#F6DFDF',       // Light rose pink
-      bg: '#FDF7F7',           // Ultra light rose pink
-      
-      // Day of week tags
-      dayMonSelected: '#96514D',     // Terracotta (distinct from rose pink)
-      dayMonUnselected: '#F5ECEB',    // Very light terracotta
-      dayTueSelected: '#AD7D4C',     // Amber (distinct from caramel)
-      dayTueUnselected: '#F7F2EA',    // Very light amber
-      dayWedSelected: '#7D9148',     // Avocado (distinct from pistachio)
-      dayWedUnselected: '#F2F4EA',    // Very light avocado
-      dayThuSelected: '#5A8A72',     // Sage (distinct from pistachio)
-      dayThuUnselected: '#EDF3F0',    // Very light sage
-      dayFriSelected: '#577E9F',     // Denim blue (distinct from all tabs)
-      dayFriUnselected: '#ECF2F6',    // Very light denim
-      daySatSelected: '#7A6C93',     // Dusty purple (distinct from lavender)
-      daySatUnselected: '#F1EFF4',    // Very light dusty purple
-      daySunSelected: '#B25D85',     // Raspberry (distinct from rose pink)
-      daySunUnselected: '#F7EDF2',    // Very light raspberry
-      dayDefaultSelected: '#8A7F6F',     // Neutral dark vanilla
-      dayDefaultUnselected: '#F3F1EF'    // Very light vanilla
+      veryDark: '#593636',
+      shadow: '#7A4D4D',
+      dark: '#A66868',
+      medium: '#C98787',
+      accent: '#D9A6A6',
+      highlight: '#E6847F',
+      bgAlt: '#FAECEC',
+      pastel: '#F6DFDF',
+      bg: '#FDF7F7',
+      terracottaBold: '#96514D',
+      terracottaLight: '#F5ECEB',
+      amberBold: '#AD7D4C',
+      amberLight: '#F7F2EA',
+      avocadoBold: '#7D9148',
+      avocadoLight: '#F2F4EA',
+      sageBold: '#5A8A72',
+      sageLight: '#EDF3F0',
+      denimBold: '#577E9F',
+      denimLight: '#ECF2F6',
+      dustyPurpleBold: '#7A6C93',
+      dustyPurpleLight: '#F1EFF4',
+      raspberryBold: '#B25D85',
+      raspberryLight: '#F7EDF2',
+      neutralBold: '#8A7F6F',
+      neutralLight: '#F3F1EF'
     },
-    
-    // Lavender Mist - soft purple with warm undertones
     cleaning: {
-      veryDark: '#3D364E',     // Very dark lavender
-      shadow: '#534A67',       // Deep shadow lavender
-      dark: '#7B6C96',         // Dark lavender
-      medium: '#A598C7',       // Medium lavender
-      accent: '#C9BED9',       // Rich lavender
-      highlight: '#AB95E0',    // Bright lavender
-      bgAlt: '#F0ECF7',        // Very light lavender
-      pastel: '#E9E4F4',       // Light lavender
-      bg: '#F9F7FC',           // Ultra light lavender
-      
-      // Cleaning location tags
-      cleaningKitchenSelected: '#D4A04F',     // Golden honey (distinct from caramel)
-      cleaningKitchenUnselected: '#FAF6EB',    // Very light honey
-      cleaningBathroomSelected: '#6487A5',     // Powder blue (distinct from all tabs)
-      cleaningBathroomUnselected: '#EEF3F6',    // Very light powder blue
-      cleaningBedroomSelected: '#8D6E63',     // Coffee brown (distinct from espresso/hazelnut)
-      cleaningBedroomUnselected: '#F3EFED',    // Very light coffee
-      cleaningCustomSelected: '#AF6458',     // Terra cotta (distinct from rose pink)
-      cleaningCustomUnselected: '#F7EDEC',    // Very light terra cotta
-      cleaningDefaultSelected: '#8A7F6F',     // Neutral dark vanilla
-      cleaningDefaultUnselected: '#F3F1EF'    // Very light vanilla
+      veryDark: '#3D364E',
+      shadow: '#534A67',
+      dark: '#7B6C96',
+      medium: '#A598C7',
+      accent: '#C9BED9',
+      highlight: '#AB95E0',
+      bgAlt: '#F0ECF7',
+      pastel: '#E9E4F4',
+      bg: '#F9F7FC',
+      honeyBold: '#D4A04F',
+      honeyLight: '#FAF6EB',
+      powderBold: '#6487A5',
+      powderLight: '#EEF3F6',
+      coffeeBold: '#8D6E63',
+      coffeeLight: '#F3EFED',
+      terracottaAltBold: '#AF6458',
+      terracottaAltLight: '#F7EDEC',
+      sandBold: '#8A7F6F',
+      sandLight: '#F3F1EF'
     },
-    
-    // Pistachio Green - muted sage green
     selfCare: {
-      veryDark: '#2A3820',     // Very dark pistachio
-      shadow: '#3F5333',       // Deep shadow pistachio
-      dark: '#5E7B4D',         // Dark pistachio
-      medium: '#8EAB7D',       // Medium pistachio
-      accent: '#B5C9A8',       // Rich pistachio
-      highlight: '#97BF71',    // Bright pistachio
-      bgAlt: '#EAF2E3',        // Very light pistachio
-      pastel: '#E4EEDE',       // Light pistachio
-      bg: '#F6FAF4'            // Ultra light pistachio
-      // Removed selfCare type tags as they are required tags
+      veryDark: '#2A3820',
+      shadow: '#3F5333',
+      dark: '#5E7B4D',
+      medium: '#8EAB7D',
+      accent: '#B5C9A8',
+      highlight: '#97BF71',
+      bgAlt: '#EAF2E3',
+      pastel: '#E4EEDE',
+      bg: '#F6FAF4'
     },
-    
-    // Vanilla Cream - warm off-white
     delegate: {
-      veryDark: '#8A7F6F',     // Very dark vanilla cream
-      shadow: '#A69986',       // Deep shadow vanilla cream
-      dark: '#BFB3A2',         // Dark vanilla cream
-      medium: '#D1C7B7',       // Medium vanilla cream
-      accent: '#EAE0D0',       // Rich vanilla cream
-      highlight: '#F2D8B6',    // Bright vanilla cream
-      bgAlt: '#F7F3EB',        // Very light vanilla cream
-      pastel: '#F8F5EF',       // Light vanilla cream
-      bg: '#FEFCF9',           // Ultra light vanilla cream
-      
-      // Delegate type tags
-      delegatePartnerSelected: '#7D93B2',     // Steel blue (distinct from all tabs)
-      delegatePartnerUnselected: '#F1F4F7',    // Very light steel blue
-      delegateFamilySelected: '#C7874F',     // Copper (distinct from caramel)
-      delegateFamilyUnselected: '#F9F2EB',    // Very light copper
-      delegateFriendsSelected: '#8B7D7B',     // Taupe (distinct from vanilla)
-      delegateFriendsUnselected: '#F3F1F1',    // Very light taupe
-      delegateKidsSelected: '#8DAA7B',     // Moss green (distinct from pistachio)
-      delegateKidsUnselected: '#F3F6F1',    // Very light moss
-      delegateDefaultSelected: '#8A7F6F',     // Neutral dark vanilla
-      delegateDefaultUnselected: '#F3F1EF'    // Very light vanilla
+      veryDark: '#8A7F6F',
+      shadow: '#A69986',
+      dark: '#BFB3A2',
+      medium: '#D1C7B7',
+      accent: '#EAE0D0',
+      highlight: '#F2D8B6',
+      bgAlt: '#F7F3EB',
+      pastel: '#F8F5EF',
+      bg: '#FEFCF9',
+      azureBold: '#7D93B2',
+      azureLight: '#F1F4F7',
+      copperBold: '#C7874F',
+      copperLight: '#F9F2EB',
+      taupeBold: '#8B7D7B',
+      taupeLight: '#F3F1F1',
+      mossBold: '#8DAA7B',
+      mossLight: '#F3F6F1',
+      beigeBold: '#8A7F6F',
+      beigeLight: '#F3F1EF'
     }
   }
 };
