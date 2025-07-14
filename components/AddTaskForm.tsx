@@ -174,162 +174,76 @@ export default function AddTaskForm({
 
   // Get array of color options for custom color selection from the flat structure
   const getColorOptions = (tagType: string) => {
+    // Get the appropriate tab colors based on the category
     const tabColorKey = getCategoryColorKey();
     const tabColors = colors?.tabColors?.[tabColorKey] || {};
     
-    // Create a complete list of all tag colors from all tabs
-    const allTagColors = {
-      // Priority colors
-      priorityHighSelected: colors?.tabColors?.daily?.priorityHighSelected,
-      priorityMediumSelected: colors?.tabColors?.daily?.priorityMediumSelected,
-      priorityLowSelected: colors?.tabColors?.daily?.priorityLowSelected,
-      priorityQuickWinSelected: colors?.tabColors?.daily?.priorityQuickWinSelected,
-      priorityCustomSelected: colors?.tabColors?.daily?.priorityCustomSelected,
-      
-      // Goal type colors
-      goalTbdSelected: colors?.tabColors?.future?.goalTbdSelected,
-      goalNotPrioritySelected: colors?.tabColors?.future?.goalNotPrioritySelected,
-      goalWishSelected: colors?.tabColors?.future?.goalWishSelected,
-      goalCustomSelected: colors?.tabColors?.future?.goalCustomSelected,
-      
-      // Day of week colors
-      dayMonSelected: colors?.tabColors?.meals?.dayMonSelected,
-      dayTueSelected: colors?.tabColors?.meals?.dayTueSelected,
-      dayWedSelected: colors?.tabColors?.meals?.dayWedSelected,
-      dayThuSelected: colors?.tabColors?.meals?.dayThuSelected,
-      dayFriSelected: colors?.tabColors?.meals?.dayFriSelected,
-      daySatSelected: colors?.tabColors?.meals?.daySatSelected,
-      daySunSelected: colors?.tabColors?.meals?.daySunSelected,
-      
-      // Cleaning location colors
-      cleaningKitchenSelected: colors?.tabColors?.cleaning?.cleaningKitchenSelected,
-      cleaningBathroomSelected: colors?.tabColors?.cleaning?.cleaningBathroomSelected,
-      cleaningBedroomSelected: colors?.tabColors?.cleaning?.cleaningBedroomSelected,
-      cleaningCustomSelected: colors?.tabColors?.cleaning?.cleaningCustomSelected,
-      
-      // Delegate type colors
-      delegatePartnerSelected: colors?.tabColors?.delegate?.delegatePartnerSelected,
-      delegateFamilySelected: colors?.tabColors?.delegate?.delegateFamilySelected,
-      delegateFriendsSelected: colors?.tabColors?.delegate?.delegateFriendsSelected,
-      delegateKidsSelected: colors?.tabColors?.delegate?.delegateKidsSelected,
-      
-      // Tab base colors (for all tabs)
-      dailyVeryDark: colors?.tabColors?.daily?.veryDark,
-      dailyDark: colors?.tabColors?.daily?.dark,
-      dailyMedium: colors?.tabColors?.daily?.medium,
-      dailyHighlight: colors?.tabColors?.daily?.highlight,
-      
-      futureVeryDark: colors?.tabColors?.future?.veryDark,
-      futureDark: colors?.tabColors?.future?.dark,
-      futureMedium: colors?.tabColors?.future?.medium,
-      futureHighlight: colors?.tabColors?.future?.highlight,
-      
-      calendarVeryDark: colors?.tabColors?.calendar?.veryDark,
-      calendarDark: colors?.tabColors?.calendar?.dark,
-      calendarMedium: colors?.tabColors?.calendar?.medium,
-      calendarHighlight: colors?.tabColors?.calendar?.highlight,
-      
-      mealsVeryDark: colors?.tabColors?.meals?.veryDark,
-      mealsDark: colors?.tabColors?.meals?.dark,
-      mealsMedium: colors?.tabColors?.meals?.medium,
-      mealsHighlight: colors?.tabColors?.meals?.highlight,
-      
-      cleaningVeryDark: colors?.tabColors?.cleaning?.veryDark,
-      cleaningDark: colors?.tabColors?.cleaning?.dark,
-      cleaningMedium: colors?.tabColors?.cleaning?.medium,
-      cleaningHighlight: colors?.tabColors?.cleaning?.highlight,
-      
-      selfCareVeryDark: colors?.tabColors?.selfCare?.veryDark,
-      selfCareDark: colors?.tabColors?.selfCare?.dark,
-      selfCareMedium: colors?.tabColors?.selfCare?.medium,
-      selfCareHighlight: colors?.tabColors?.selfCare?.highlight,
-      
-      delegateVeryDark: colors?.tabColors?.delegate?.veryDark,
-      delegateDark: colors?.tabColors?.delegate?.dark,
-      delegateMedium: colors?.tabColors?.delegate?.medium,
-      delegateHighlight: colors?.tabColors?.delegate?.highlight
-    };
+    // Array to store all relevant colors
+    const colorOptions = [];
     
-    // Filter out undefined values
-    const availableColors = Object.values(allTagColors).filter(Boolean);
+    // Add the main tab colors
+    if (tabColors.veryDark) colorOptions.push(tabColors.veryDark);
+    if (tabColors.dark) colorOptions.push(tabColors.dark);
+    if (tabColors.medium) colorOptions.push(tabColors.medium);
+    if (tabColors.highlight) colorOptions.push(tabColors.highlight);
     
-    // Get specific colors based on tag type
+    // Add bold colors based on tag type
     if (tagType === 'priority') {
-      return [
-        colors?.tabColors?.daily?.priorityHighSelected,
-        colors?.tabColors?.daily?.priorityMediumSelected,
-        colors?.tabColors?.daily?.priorityLowSelected,
-        colors?.tabColors?.daily?.priorityQuickWinSelected,
-        colors?.tabColors?.daily?.veryDark,
-        colors?.tabColors?.daily?.dark,
-        colors?.tabColors?.daily?.medium,
-        colors?.tabColors?.daily?.highlight,
-        ...availableColors.slice(0, 10) // Add some other colors for variety
-      ].filter(Boolean);
+      // Daily tab priority colors
+      if (tabColors.rainyRedBold) colorOptions.push(tabColors.rainyRedBold);
+      if (tabColors.muddyBold) colorOptions.push(tabColors.muddyBold);
+      if (tabColors.forestBold) colorOptions.push(tabColors.forestBold);
+      if (tabColors.thunderBold) colorOptions.push(tabColors.thunderBold);
+      if (tabColors.lightningBold) colorOptions.push(tabColors.lightningBold);
+      if (tabColors.cloudBold) colorOptions.push(tabColors.cloudBold);
+    } 
+    else if (tagType === 'goalType') {
+      // Future tab goal type colors
+      if (tabColors.irisBold) colorOptions.push(tabColors.irisBold);
+      if (tabColors.rustBold) colorOptions.push(tabColors.rustBold);
+      if (tabColors.evergreenBold) colorOptions.push(tabColors.evergreenBold);
+      if (tabColors.soilBold) colorOptions.push(tabColors.soilBold);
+      if (tabColors.mistBold) colorOptions.push(tabColors.mistBold);
+    }
+    else if (tagType === 'dayOfWeek') {
+      // Meals tab day of week colors
+      if (tabColors.brickBold) colorOptions.push(tabColors.brickBold);
+      if (tabColors.sandBold) colorOptions.push(tabColors.sandBold);
+      if (tabColors.mossBold) colorOptions.push(tabColors.mossBold);
+      if (tabColors.tealBold) colorOptions.push(tabColors.tealBold);
+      if (tabColors.twilightBold) colorOptions.push(tabColors.twilightBold);
+      if (tabColors.denimBold) colorOptions.push(tabColors.denimBold);
+      if (tabColors.barkBold) colorOptions.push(tabColors.barkBold);
+      if (tabColors.stormBold) colorOptions.push(tabColors.stormBold);
+    }
+    else if (tagType === 'cleaningLocation') {
+      // Cleaning tab location colors
+      if (tabColors.plantBold) colorOptions.push(tabColors.plantBold);
+      if (tabColors.mirrorBold) colorOptions.push(tabColors.mirrorBold);
+      if (tabColors.blanketBold) colorOptions.push(tabColors.blanketBold);
+      if (tabColors.roseBold) colorOptions.push(tabColors.roseBold);
+      if (tabColors.grayBold) colorOptions.push(tabColors.grayBold);
+    }
+    else if (tagType === 'delegateType') {
+      // Delegate tab type colors
+      if (tabColors.twilightAltBold) colorOptions.push(tabColors.twilightAltBold);
+      if (tabColors.woodBold) colorOptions.push(tabColors.woodBold);
+      if (tabColors.sageBold) colorOptions.push(tabColors.sageBold);
+      if (tabColors.berryBold) colorOptions.push(tabColors.berryBold);
+      if (tabColors.fogBold) colorOptions.push(tabColors.fogBold);
     }
     
-    if (tagType === 'goalType') {
-      return [
-        colors?.tabColors?.future?.goalTbdSelected,
-        colors?.tabColors?.future?.goalNotPrioritySelected,
-        colors?.tabColors?.future?.goalWishSelected,
-        colors?.tabColors?.future?.veryDark,
-        colors?.tabColors?.future?.dark,
-        colors?.tabColors?.future?.medium,
-        colors?.tabColors?.future?.highlight,
-        ...availableColors.slice(0, 10) // Add some other colors for variety
-      ].filter(Boolean);
-    }
+    // Add more color options from other tabs
+    Object.keys(colors?.tabColors || {}).forEach(otherTabKey => {
+      if (otherTabKey !== tabColorKey) {
+        const otherTabColors = colors?.tabColors?.[otherTabKey];
+        if (otherTabColors?.veryDark) colorOptions.push(otherTabColors.veryDark);
+        if (otherTabColors?.highlight) colorOptions.push(otherTabColors.highlight);
+      }
+    });
     
-    if (tagType === 'cleaningLocation') {
-      return [
-        colors?.tabColors?.cleaning?.cleaningKitchenSelected,
-        colors?.tabColors?.cleaning?.cleaningBathroomSelected,
-        colors?.tabColors?.cleaning?.cleaningBedroomSelected,
-        colors?.tabColors?.cleaning?.veryDark,
-        colors?.tabColors?.cleaning?.dark,
-        colors?.tabColors?.cleaning?.medium,
-        colors?.tabColors?.cleaning?.highlight,
-        ...availableColors.slice(0, 10) // Add some other colors for variety
-      ].filter(Boolean);
-    }
-    
-    if (tagType === 'delegateType') {
-      return [
-        colors?.tabColors?.delegate?.delegatePartnerSelected,
-        colors?.tabColors?.delegate?.delegateFamilySelected,
-        colors?.tabColors?.delegate?.delegateFriendsSelected,
-        colors?.tabColors?.delegate?.delegateKidsSelected,
-        colors?.tabColors?.delegate?.veryDark,
-        colors?.tabColors?.delegate?.dark,
-        colors?.tabColors?.delegate?.medium,
-        colors?.tabColors?.delegate?.highlight,
-        ...availableColors.slice(0, 10) // Add some other colors for variety
-      ].filter(Boolean);
-    }
-    
-    if (tagType === 'dayOfWeek') {
-      return [
-        colors?.tabColors?.meals?.dayMonSelected,
-        colors?.tabColors?.meals?.dayTueSelected,
-        colors?.tabColors?.meals?.dayWedSelected,
-        colors?.tabColors?.meals?.dayThuSelected,
-        colors?.tabColors?.meals?.dayFriSelected,
-        colors?.tabColors?.meals?.daySatSelected,
-        colors?.tabColors?.meals?.daySunSelected,
-        colors?.tabColors?.meals?.veryDark,
-        colors?.tabColors?.meals?.dark,
-        colors?.tabColors?.meals?.medium,
-        colors?.tabColors?.meals?.highlight,
-        ...availableColors.slice(0, 10) // Add some other colors for variety
-      ].filter(Boolean);
-    }
-    
-    // If no specific tag type matched, return a good variety of colors
-    return availableColors.filter((color, index, self) => 
-      // Remove duplicate colors
-      self.indexOf(color) === index
-    ).slice(0, 20); // Limit to 20 colors max
+    // Return a filtered array with no duplicates
+    return [...new Set(colorOptions)].slice(0, 20);
   };
 
   const resetForm = () => {
