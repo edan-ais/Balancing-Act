@@ -29,6 +29,7 @@ export interface Task {
   frequency?: string;
   cleaningLocation?: string;
   customCleaningLocation?: string;
+  customCleaningLocationColor?: string;
   // Self-care specific
   selfCareType?: string;
   // Delegation specific
@@ -70,216 +71,154 @@ export default function TaskItem({
 }: TaskItemProps) {
   const [scaleAnim] = useState(new Animated.Value(1));
 
-  // Use theme colors if provided, otherwise fallback to the old color logic
+  // Use theme colors if provided, otherwise use props
   const themeColors = colors || {};
+  const effectiveAccentColor = colors?.accent || accentColor || '#4055C5';
+  const effectiveDarkColor = colors?.dark || '#2B6CB0';
+  const effectiveBgColor = colors?.bg || '#F5F7FA';
+  const effectiveMediumColor = colors?.medium || '#4A5568';
+  const effectivePastelColor = colors?.pastel || '#E2E8F0';
+  const effectiveShadowColor = colors?.shadow || '#C8D0E0';
+  
+  // Map category to appropriate tab color key
+  const getCategoryColorKey = () => {
+    switch (task.category) {
+      case 'daily': return 'daily';
+      case 'future': return 'future';
+      case 'weekly': return 'calendar';
+      case 'meal-prep': return 'meals';
+      case 'cleaning': return 'cleaning';
+      case 'self-care': return 'selfCare';
+      case 'delegation': return 'delegate';
+      case 'goals': return 'future'; // Goals can use future colors
+      default: return 'daily'; // Fallback to daily colors
+    }
+  };
+  
+  // Get the appropriate theme colors based on category
+  const tabColorKey = getCategoryColorKey();
+  const tabColors = colors?.tabColors?.[tabColorKey] || {};
+  
+  // Use the tab colors from the theme or fallback to effective colors
+  const veryDarkColor = tabColors.veryDark || effectiveDarkColor;
+  const highlightColor = tabColors.highlight || effectiveAccentColor;
+  const bgAltColor = tabColors.bgAlt || effectivePastelColor;
+  const lightColor = tabColors.light || effectivePastelColor;
 
-  const getPriorityColor = (priority?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.priority) {
-      switch (priority) {
-        case 'high': return colors.tagColors.priority.high;
-        case 'medium': return colors.tagColors.priority.medium;
-        case 'low': return colors.tagColors.priority.low;
-        case 'quick-win': return colors.tagColors.priority.quickWin;
-        case 'custom': return task.customPriorityColor || colors.tagColors.priority.custom;
-        default: return colors.tagColors.priority.default;
+  // Helper to get tag color - using the flat structure
+  const getTagColor = (tagType: string, tagValue: string) => {
+    // For custom tags, use their specific custom color
+    if (tagValue === 'custom') {
+      const customColorMap = {
+        'priority': task.customPriorityColor,
+        'goalType': task.customGoalTypeColor,
+        'cleaningLocation': task.customCleaningLocationColor,
+      };
+      
+      return customColorMap[tagType] || veryDarkColor;
+    }
+    
+    // Convert option to proper format for lookup in theme
+    let lookupKey;
+    if (tagType === 'priority') {
+      lookupKey = `priority${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      if (tagValue === 'quick-win') {
+        lookupKey = 'priorityQuickWin';
       }
+    } else if (tagType === 'goalType') {
+      if (tagValue === 'TBD') {
+        lookupKey = 'goalTbd';
+      } else if (tagValue === 'Not Priority') {
+        lookupKey = 'goalNotPriority';
+      } else {
+        lookupKey = `goal${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      }
+    } else if (tagType === 'dayOfWeek') {
+      lookupKey = `day${tagValue}`;
+    } else if (tagType === 'cleaningLocation') {
+      lookupKey = `cleaning${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+    } else if (tagType === 'delegateType') {
+      lookupKey = `delegate${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+    } else if (tagType === 'mealType') {
+      lookupKey = `meal${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+    } else if (tagType === 'selfCareType') {
+      lookupKey = `selfCare${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
     }
-    // Otherwise fallback to hardcoded colors
-    switch (priority) {
-      case 'high': return '#FC8181'; // Red
-      case 'medium': return '#4299E1'; // Blue
-      case 'low': return '#68D391'; // Green
-      case 'quick-win': return '#F6AD55'; // Orange
-      case 'custom': return task.customPriorityColor || '#4A5568';
-      default: return '#A0AEC0'; // Default gray
+    
+    // Add Selected suffix to get the selected color
+    lookupKey = `${lookupKey}Selected`;
+    
+    // Return the color from the tab's colors or default to tab's main colors
+    return tabColors[lookupKey] || veryDarkColor;
+  };
+
+  // Helper to get text color based on background color
+  const getTextColor = (backgroundColor: string) => {
+    // For standard cases where we know the intent
+    if (backgroundColor === bgAltColor || backgroundColor.toUpperCase().startsWith('#F')) {
+      return veryDarkColor; // Dark text on light backgrounds
+    } else {
+      return '#FFFFFF'; // White text on dark backgrounds
     }
+  };
+
+  // Function to get priority tag color
+  const getPriorityColor = (priority?: string) => {
+    if (!priority) return tabColors.priorityDefaultSelected || veryDarkColor;
+    
+    return getTagColor('priority', priority);
   };
 
   // Function to get goal type tag color
   const getGoalTypeColor = (goalType?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.goalType) {
-      switch (goalType) {
-        case 'TBD': return colors.tagColors.goalType.tbd;
-        case 'Not Priority': return colors.tagColors.goalType.notPriority;
-        case 'Wish': return colors.tagColors.goalType.wish;
-        case 'custom': return task.customGoalTypeColor || colors.tagColors.goalType.custom;
-        default: return colors.tagColors.goalType.default;
-      }
-    }
-    // Otherwise fallback to hardcoded colors
-    switch (goalType) {
-      case 'TBD': return '#9F7AEA'; // Purple
-      case 'Not Priority': return '#FC8181'; // Red
-      case 'Wish': return '#4299E1'; // Blue
-      case 'custom': return task.customGoalTypeColor || '#4A5568';
-      default: return '#A0AEC0'; // Default gray
-    }
+    if (!goalType) return tabColors.goalDefaultSelected || veryDarkColor;
+    
+    return getTagColor('goalType', goalType);
   };
 
   // Function to get day of week color
   const getDayOfWeekColor = (day?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.dayOfWeek) {
-      switch (day) {
-        case 'Mon': return colors.tagColors.dayOfWeek.mon;
-        case 'Tue': return colors.tagColors.dayOfWeek.tue;
-        case 'Wed': return colors.tagColors.dayOfWeek.wed;
-        case 'Thu': return colors.tagColors.dayOfWeek.thu;
-        case 'Fri': return colors.tagColors.dayOfWeek.fri;
-        case 'Sat': return colors.tagColors.dayOfWeek.sat;
-        case 'Sun': return colors.tagColors.dayOfWeek.sun;
-        default: return colors.tagColors.dayOfWeek.default;
-      }
-    }
-    // Otherwise fallback to hardcoded colors
-    switch (day) {
-      case 'Mon': return '#FC8181'; // Red
-      case 'Tue': return '#F6AD55'; // Orange
-      case 'Wed': return '#F6E05E'; // Yellow
-      case 'Thu': return '#68D391'; // Green
-      case 'Fri': return '#4FD1C5'; // Teal
-      case 'Sat': return '#63B3ED'; // Blue
-      case 'Sun': return '#B794F4'; // Purple
-      default: return '#A0AEC0'; // Default gray
-    }
+    if (!day) return veryDarkColor;
+    
+    return getTagColor('dayOfWeek', day);
   };
 
   // Function to get cleaning location color
   const getCleaningLocationColor = (location?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.cleaningLocation) {
-      switch (location) {
-        case 'kitchen': return colors.tagColors.cleaningLocation.kitchen;
-        case 'bathroom': return colors.tagColors.cleaningLocation.bathroom;
-        case 'bedroom': return colors.tagColors.cleaningLocation.bedroom;
-        case 'custom': return colors.tagColors.cleaningLocation.custom;
-        default: return colors.tagColors.cleaningLocation.default;
-      }
-    }
-    // Otherwise fallback to hardcoded colors
-    switch (location) {
-      case 'kitchen': return '#F6E05E'; // Yellow
-      case 'bathroom': return '#4FD1C5'; // Teal
-      case 'bedroom': return '#9F7AEA'; // Purple
-      case 'custom': return '#FC8181'; // Red
-      default: return '#A0AEC0'; // Default gray
-    }
+    if (!location) return tabColors.cleaningDefaultSelected || veryDarkColor;
+    
+    return getTagColor('cleaningLocation', location);
   };
 
   // Function to get self-care type color
   const getSelfCareTypeColor = (type?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.selfCareType) {
-      switch (type) {
-        case 'physical': return colors.tagColors.selfCareType.physical;
-        case 'mental': return colors.tagColors.selfCareType.mental;
-        case 'rest': return colors.tagColors.selfCareType.rest;
-        case 'joy': return colors.tagColors.selfCareType.joy;
-        default: return colors.tagColors.selfCareType.default;
-      }
-    }
-    // Otherwise fallback to hardcoded colors
-    switch (type) {
-      case 'physical': return '#68D391'; // Green
-      case 'mental': return '#9F7AEA'; // Purple
-      case 'rest': return '#4FD1C5'; // Teal
-      case 'joy': return '#F6AD55'; // Orange
-      default: return '#A0AEC0'; // Default gray
-    }
+    if (!type) return tabColors.selfCareDefaultSelected || veryDarkColor;
+    
+    return getTagColor('selfCareType', type);
   };
 
   // Function to get delegate type color
   const getDelegateTypeColor = (type?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.delegateType) {
-      switch (type) {
-        case 'partner': return colors.tagColors.delegateType.partner;
-        case 'family': return colors.tagColors.delegateType.family;
-        case 'friends': return colors.tagColors.delegateType.friends;
-        case 'kids': return colors.tagColors.delegateType.kids;
-        default: return colors.tagColors.delegateType.default;
-      }
-    }
-    // Otherwise fallback to hardcoded colors
-    switch (type) {
-      case 'partner': return '#63B3ED'; // Blue
-      case 'family': return '#F6AD55'; // Orange
-      case 'friends': return '#9F7AEA'; // Purple
-      case 'kids': return '#68D391'; // Green
-      default: return '#A0AEC0'; // Default gray
-    }
+    if (!type) return tabColors.delegateDefaultSelected || veryDarkColor;
+    
+    return getTagColor('delegateType', type);
   };
 
   // Function to get meal type color
   const getMealTypeColor = (type?: string) => {
-    // If we have theme tag colors, use them
-    if (colors?.tagColors?.mealType) {
-      switch (type) {
-        case 'breakfast': return colors.tagColors.mealType.breakfast;
-        case 'lunch': return colors.tagColors.mealType.lunch;
-        case 'dinner': return colors.tagColors.mealType.dinner;
-        case 'snack': return colors.tagColors.mealType.snack;
-        case 'custom': return colors.tagColors.mealType.custom;
-        default: return colors.tagColors.mealType.default;
-      }
-    }
-    // Otherwise fallback to hardcoded colors
-    switch (type) {
-      case 'breakfast': return '#F6E05E'; // Yellow
-      case 'lunch': return '#68D391'; // Green
-      case 'dinner': return '#F56565'; // Red
-      case 'snack': return '#ED8936'; // Orange
-      default: return '#A0AEC0'; // Default gray
-    }
+    if (!type) return tabColors.mealDefaultSelected || veryDarkColor;
+    
+    return getTagColor('mealType', type);
   };
 
-  const getTabColor = (category: string) => {
-    switch (category) {
-      case 'daily': return '#2B6CB0';
-      case 'goals': return '#276749'; // Using the color from emergency icon
-      case 'weekly': return '#9F7AEA';
-      case 'meal-prep': return '#ED8936';
-      case 'cleaning': return '#4299E1';
-      case 'self-care': return '#F56565';
-      case 'delegation': return '#38B2AC';
-      default: return '#2B6CB0';
-    }
-  };
-
-  // If theme colors provided, use them, otherwise fallback to props or category colors
-  const taskColor = colors?.dark || borderColor || getTabColor(task.category);
-  
-  // Updated: Use dark first for better contrast with light backgrounds
-  const taskAccentColor = colors?.dark || colors?.accent || taskColor;
-  
-  // Updated: Use dark first for habit progress fill
-  const taskHabitColor = colors?.dark || colors?.accent || taskColor;
-  
   // Get a lighter version of the color for borders
-  const getLightBorderColor = (color: string) => {
-    // If we have theme colors, use the pastel color
-    if (colors?.pastel) {
-      return colors.pastel;
-    }
-    // Otherwise make the border color more subtle by adding transparency
-    return color + '40'; // Adding 40 for 25% opacity
+  const getLightBorderColor = () => {
+    return colors?.pastel || effectivePastelColor;
   };
   
   // Get a lighter background color for habits based on the task category
-  const getHabitBackgroundColor = (category: string) => {
-    // If we have theme colors, use the bgAlt color
-    if (colors?.bgAlt) {
-      return colors.bgAlt;
-    }
-
-    switch(category) {
-      case 'daily': return '#E6F0FA'; // Light blue for daily tasks
-      case 'goals': return '#E3F5EC'; // Light green for goals
-      case 'weekly': return '#F3F0FF'; // Light purple for weekly
-      default: return '#F7FAFC'; // Default light color
-    }
+  const getHabitBackgroundColor = () => {
+    return tabColors.bgAlt || bgAltColor;
   };
 
   const handleToggle = () => {
@@ -340,7 +279,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customGoalTypeColor || (colors?.tagColors?.goalType?.custom || '#4A5568') }
+            { backgroundColor: task.customGoalTypeColor || (tabColors.goalCustomSelected || veryDarkColor) }
           ]}>
             <Text style={styles.priorityText}>
               {task.customGoalTypeText.toUpperCase()}
@@ -368,7 +307,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customPriorityColor || (colors?.tagColors?.priority?.custom || '#4A5568') }
+            { backgroundColor: task.customPriorityColor || (tabColors.priorityCustomSelected || veryDarkColor) }
           ]}>
             <Text style={styles.priorityText}>
               {task.customPriorityText.toUpperCase()}
@@ -447,7 +386,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: getCleaningLocationColor('custom') }
+            { backgroundColor: task.customCleaningLocationColor || (tabColors.cleaningCustomSelected || veryDarkColor) }
           ]}>
             <Text style={styles.priorityText}>
               {task.customCleaningLocation.toUpperCase()}
@@ -497,36 +436,36 @@ export default function TaskItem({
   };
 
   // Choose text color based on completed state and theme
-  const getTextColor = (completed: boolean) => {
-    if (completed) return colors?.medium || '#A0AEC0'; // Completed tasks use medium color
-    return colors?.veryDark || '#1A202C'; // Active tasks use veryDark color for better contrast
+  const getTaskTextColor = (completed: boolean) => {
+    if (completed) return colors?.medium || effectiveMediumColor; // Completed tasks use medium color
+    return colors?.veryDark || veryDarkColor; // Active tasks use veryDark color for better contrast
   };
 
   // Choose subtask text color based on completed state and theme
   const getSubtaskTextColor = (completed: boolean) => {
-    if (completed) return colors?.medium || '#A0AEC0'; // Completed subtasks use medium color
-    return colors?.dark || '#4A5568'; // Active subtasks use dark color
+    if (completed) return colors?.medium || effectiveMediumColor; // Completed subtasks use medium color
+    return colors?.dark || effectiveDarkColor; // Active subtasks use dark color
   };
 
   // Choose icon colors based on theme - ensuring good contrast
   const getIconColor = (disabled: boolean) => {
-    if (disabled) return colors?.medium || '#A0AEC0'; // Using medium instead of pastel for better visibility
-    return colors?.dark || '#4A5568'; // Using dark instead of medium for better contrast
+    if (disabled) return colors?.medium || effectiveMediumColor; // Using medium instead of pastel for better visibility
+    return colors?.dark || effectiveDarkColor; // Using dark instead of medium for better contrast
   };
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
       <NeumorphicCard style={[
         styles.taskCard,
-        { backgroundColor: colors?.bg || '#FFFFFF' },
-        task.isHabit ? [styles.habitCard, { backgroundColor: getHabitBackgroundColor(task.category) }] : null,
+        { backgroundColor: colors?.bg || effectiveBgColor },
+        task.isHabit ? [styles.habitCard, { backgroundColor: getHabitBackgroundColor() }] : null,
         { 
-          borderColor: getLightBorderColor(taskColor),
-          borderWidth: 1,
+          borderColor: getLightBorderColor(),
+          borderWidth: 2, // Updated to 2px as requested
           // Add left border accent for habits
           ...(task.isHabit ? {
             borderLeftWidth: 6,
-            borderLeftColor: taskColor
+            borderLeftColor: veryDarkColor
           } : {})
         }
       ]}>
@@ -539,11 +478,11 @@ export default function TaskItem({
               task.isHabit ? styles.habitBox : null,
               { 
                 // LIGHT when unchecked, DARK when checked
-                backgroundColor: task.completed ? taskAccentColor : (colors?.pastel || '#E2E8F0'),
-                // Add border when unchecked for visibility
-                borderColor: task.completed ? 'transparent' : taskColor,
+                backgroundColor: task.completed ? veryDarkColor : effectivePastelColor,
+                // Add border when unchecked for visibility - changed to 2px as requested
+                borderColor: task.completed ? 'transparent' : veryDarkColor,
                 borderWidth: task.completed ? 0 : 2,
-                shadowColor: colors?.shadow || '#C8D0E0'
+                shadowColor: colors?.shadow || effectiveShadowColor
               },
             ]}
           >
@@ -555,7 +494,7 @@ export default function TaskItem({
                 // DARK text on LIGHT background when unchecked
                 <Text style={[
                   styles.habitCount,
-                  { color: colors?.veryDark || '#1A202C' }
+                  { color: veryDarkColor }
                 ]}>
                   {task.habitCount}
                 </Text>
@@ -568,11 +507,11 @@ export default function TaskItem({
               styles.taskTitle,
               task.completed ? styles.completedTitle : null,
               task.isHabit ? styles.habitTitle : null,
-              { color: getTextColor(task.completed) }
+              { color: getTaskTextColor(task.completed) }
             ]}>
               {task.title}
               {task.isDelegated && (
-                <Text style={[styles.delegatedBadge, { color: colors?.accent || '#38B2AC' }]}>
+                <Text style={[styles.delegatedBadge, { color: highlightColor }]}>
                   {" "}→ {task.delegatedTo}
                 </Text>
               )}
@@ -585,11 +524,11 @@ export default function TaskItem({
             {/* Display notes for meal prep tasks */}
             {task.category === 'meal-prep' && task.notes ? (
               <View style={[styles.notesContainer, { 
-                backgroundColor: colors?.bgAlt || '#F7FAFC',
-                borderLeftColor: colors?.accent || '#ED8936',
+                backgroundColor: bgAltColor,
+                borderLeftColor: highlightColor,
                 borderLeftWidth: 3
               }]}>
-                <Text style={[styles.notesText, { color: colors?.dark || '#4A5568' }]}>
+                <Text style={[styles.notesText, { color: effectiveDarkColor }]}>
                   {task.notes}
                 </Text>
               </View>
@@ -599,19 +538,19 @@ export default function TaskItem({
               <View style={[
                 styles.habitProgressContainer, 
                 // LIGHT background for progress bar
-                { backgroundColor: colors?.pastel || '#E2E8F0' }
+                { backgroundColor: effectivePastelColor }
               ]}>
                 <View 
                   style={[
                     styles.habitProgressBar, 
                     { 
                       width: `${habitProgress}%`,
-                      // DARK fill for completed portion - using dark directly from theme
-                      backgroundColor: colors?.dark || '#2A1B0F'
+                      // DARK fill for completed portion
+                      backgroundColor: veryDarkColor
                     }
                   ]} 
                 />
-                <Text style={[styles.habitGoalText, { color: colors?.dark || '#4A5568' }]}>
+                <Text style={[styles.habitGoalText, { color: effectiveDarkColor }]}>
                   {task.habitCount || 0}/{task.habitGoal}
                 </Text>
               </View>
@@ -631,10 +570,11 @@ export default function TaskItem({
                         { 
                           // LIGHT when unchecked, DARK when checked
                           backgroundColor: subtask.completed 
-                            ? taskAccentColor 
-                            : (colors?.pastel || '#E2E8F0'),
-                          borderColor: subtask.completed ? 'transparent' : taskColor,
-                          borderWidth: subtask.completed ? 0 : 1.5,
+                            ? veryDarkColor 
+                            : effectivePastelColor,
+                          // Updated to 2px as requested for consistent style
+                          borderColor: subtask.completed ? 'transparent' : veryDarkColor,
+                          borderWidth: subtask.completed ? 0 : 2,
                         },
                       ]} 
                     >
@@ -681,7 +621,7 @@ export default function TaskItem({
                 onPress={() => onEdit(task)}
                 style={styles.editIconButton}
               >
-                <Pencil size={20} color={colors?.dark || "#4A5568"} />
+                <Pencil size={20} color={effectiveDarkColor} />
               </TouchableOpacity>
             )}
             
