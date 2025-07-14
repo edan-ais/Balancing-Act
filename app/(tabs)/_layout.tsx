@@ -69,12 +69,6 @@ const allTabIds = Object.keys(tabConfig);
 // Get screen width for calculations
 const screenWidth = Dimensions.get('window').width;
 
-// Constants for layout measurements
-const TAB_ITEM_HEIGHT = 70;  // Total height of tab item
-const ICON_SIZE = 30;        // Size of the icon
-const LABEL_HEIGHT = 16;     // Height of the label
-const LABEL_MARGIN = 5;      // Margin between icon and label
-
 // Individual Tab Item component to properly use hooks
 const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, selectedTabsSet, visibleRoutes }) => {
   const { options } = descriptor;
@@ -104,29 +98,10 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
     }).start();
   }, [isFocused, animatedScale, isFirstRender]);
   
-  // Calculate the distance the icon needs to move to be perfectly centered
-  // When not focused: Icon is positioned at its default spot with label below
-  // When focused: Icon should be in the middle of the entire tab item height
-  
-  // When not focused, the icon's center is at:
-  // (ICON_SIZE / 2) from the top of the icon container
-  
-  // When focused, we want the icon's center to be at:
-  // TAB_ITEM_HEIGHT / 2 from the top of the tab item
-  
-  // Calculate resting position of icon's center (from top of the tab item)
-  const iconCenterY = ICON_SIZE / 2;
-  
-  // Calculate target position for centered icon
-  const targetCenterY = TAB_ITEM_HEIGHT / 2;
-  
-  // The difference is how much we need to move the icon when focused
-  const centeringOffset = targetCenterY - iconCenterY;
-  
-  // Create interpolated values for animations
-  const animatedIconTranslateY = animatedScale.interpolate({
+  // Create interpolated values for smooth animations
+  const animatedTranslateY = animatedScale.interpolate({
     inputRange: [1, 1.8],
-    outputRange: [0, centeringOffset],
+    outputRange: [0, 10], // Move down to center in the full space
     extrapolate: 'clamp',
   });
   
@@ -143,8 +118,14 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
   });
   
   const animatedLabelOpacity = animatedScale.interpolate({
-    inputRange: [1, 1.4, 1.8], // Start fading out earlier for smoother transition
-    outputRange: [1, 0.3, 0],
+    inputRange: [1, 1.8],
+    outputRange: [1, 0],
+    extrapolate: 'clamp',
+  });
+  
+  const animatedLabelTranslateY = animatedScale.interpolate({
+    inputRange: [1, 1.8],
+    outputRange: [0, 5],
     extrapolate: 'clamp',
   });
   
@@ -196,53 +177,68 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
       onPress={onPress}
       style={{
         width: tabWidth,
-        height: TAB_ITEM_HEIGHT,
+        height: '100%',
         alignItems: 'center',
-        justifyContent: 'flex-start', // Start from the top to position items correctly
-        paddingTop: 10, // Add some padding at the top
+        justifyContent: 'center',
       }}
     >
-      {/* Icon container with centered positioning */}
-      <Animated.View style={{
-        width: 40,
-        height: 40,
-        transform: [
-          { scale: animatedScale },
-          { translateY: animatedIconTranslateY }
-        ],
-        shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
-        shadowOffset: { width: 0, height: 0 },
-        shadowOpacity: animatedShadowOpacity,
-        shadowRadius: animatedShadowRadius,
+      {/* Content container with fixed height to ensure consistent layout */}
+      <View style={{
         alignItems: 'center',
         justifyContent: 'center',
-      }}>
-        {Icon && <Icon size={ICON_SIZE} color={tabColor} />}
-      </Animated.View>
-      
-      {/* Label container positioned absolutely under the icon */}
-      <Animated.View style={{
-        position: 'absolute',
-        top: 50, // Position below the icon (40px height + 10px padding)
-        opacity: animatedLabelOpacity,
-        alignItems: 'center',
-        justifyContent: 'center',
+        height: 70, // Combined height for icon + text with some spacing
         width: '100%',
-        height: LABEL_HEIGHT,
+        paddingBottom: 10, // Add some bottom padding to account for safe area
       }}>
-        <Text
-          style={{
-            color: tabColor,
-            fontFamily: 'Quicksand-SemiBold',
-            fontSize: 12,
-            textAlign: 'center',
-          }}
-          numberOfLines={1}
-          ellipsizeMode="tail"
-        >
-          {tabConfig[route.name]?.title || label}
-        </Text>
-      </Animated.View>
+        {/* Container for both icon and label, allows for better positioning */}
+        <Animated.View style={{
+          height: 70,
+          alignItems: 'center',
+          justifyContent: 'flex-start', // Start from top to allow proper positioning
+          transform: [
+            { translateY: animatedTranslateY }
+          ],
+        }}>
+          {/* Icon container */}
+          <Animated.View style={{
+            height: 40,
+            width: 40,
+            transform: [
+              { scale: animatedScale },
+            ],
+            shadowColor: tabColors[colorKey]?.shadow || 'rgba(0,0,0,0.5)',
+            shadowOffset: { width: 0, height: 0 },
+            shadowOpacity: animatedShadowOpacity,
+            shadowRadius: animatedShadowRadius,
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}>
+            {Icon && <Icon size={30} color={tabColor} />}
+          </Animated.View>
+          
+          {/* Label container */}
+          <Animated.View style={{
+            height: 20,
+            alignItems: 'center',
+            justifyContent: 'center',
+            opacity: animatedLabelOpacity,
+            marginTop: 4,
+          }}>
+            <Text
+              style={{
+                color: tabColor,
+                fontFamily: 'Quicksand-SemiBold',
+                fontSize: 12,
+                textAlign: 'center',
+              }}
+              numberOfLines={1}
+              ellipsizeMode="tail"
+            >
+              {tabConfig[route.name]?.title || label}
+            </Text>
+          </Animated.View>
+        </Animated.View>
+      </View>
     </TouchableOpacity>
   );
 };
@@ -303,7 +299,6 @@ const CustomTabBar = ({ state, descriptors, navigation }) => {
       shadowOpacity: 0.3,
       shadowRadius: 6,
       elevation: 8,
-      justifyContent: 'center', // Center content vertically
     }}>
       <ScrollView
         ref={scrollViewRef}
