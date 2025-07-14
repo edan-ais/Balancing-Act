@@ -80,37 +80,37 @@ export default function MonthlyCalendar() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: colors.bg }]}>
       <View style={styles.header}>
-        <View>
-          <Text style={[styles.title, { color: colors.dark }]}>Calendar</Text>
-          <Text style={[styles.subtitle, { color: colors.medium }]}>Plan your future tasks</Text>
+        <View style={styles.headerTitleContainer}>
+          <Text style={[styles.title, { color: colors.veryDark }]}>Calendar</Text>
+          <Text style={[styles.subtitle, { color: colors.dark }]}>Plan your future tasks</Text>
         </View>
         <View style={styles.monthNavigation}>
           <TouchableOpacity
             style={[styles.homeButton, { 
-              backgroundColor: colors.accent,
+              backgroundColor: colors.dark,
               shadowColor: colors.shadow
             }]}
             onPress={() => router.push('/home')}
           >
-            <Home size={20} color={colors.pastel} />
+            <Home size={18} color={colors.pastel} />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.navButton, { 
-              backgroundColor: colors.accent,
+              backgroundColor: colors.dark,
               shadowColor: colors.shadow
             }]}
             onPress={() => navigateMonth('prev')}
           >
-            <ChevronLeft size={20} color={colors.pastel} />
+            <ChevronLeft size={18} color={colors.pastel} />
           </TouchableOpacity>
           <TouchableOpacity
             style={[styles.navButton, { 
-              backgroundColor: colors.accent,
+              backgroundColor: colors.dark,
               shadowColor: colors.shadow
             }]}
             onPress={() => navigateMonth('next')}
           >
-            <ChevronRight size={20} color={colors.pastel} />
+            <ChevronRight size={18} color={colors.pastel} />
           </TouchableOpacity>
         </View>
       </View>
@@ -118,11 +118,11 @@ export default function MonthlyCalendar() {
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         {selectedDate && (
           <NeumorphicCard style={[styles.selectedDateCard, { 
-            backgroundColor: colors.accent,
+            backgroundColor: colors.bgAlt,
             borderLeftColor: colors.dark,
             shadowColor: colors.shadow
           }]}>
-            <Text style={[styles.selectedDateTitle, { color: colors.dark }]}>
+            <Text style={[styles.selectedDateTitle, { color: colors.veryDark }]}>
               {selectedDate.toLocaleDateString('en-US', { 
                 weekday: 'long', 
                 year: 'numeric', 
@@ -133,7 +133,7 @@ export default function MonthlyCalendar() {
             
             {getTasksForDate(selectedDate).length === 0 ? (
               <View style={styles.emptyDate}>
-                <Text style={[styles.emptyDateText, { color: colors.medium }]}>
+                <Text style={[styles.emptyDateText, { color: colors.dark }]}>
                   No tasks scheduled for this date
                 </Text>
               </View>
@@ -154,18 +154,18 @@ export default function MonthlyCalendar() {
 
         <NeumorphicCard style={[styles.calendarCard, { 
           shadowColor: colors.shadow,
-          borderColor: colors.accent,
+          borderColor: colors.medium,
           borderWidth: 1 
         }]}>
           <View style={styles.calendarHeader}>
-            <Text style={[styles.monthTitle, { color: colors.dark }]}>
+            <Text style={[styles.monthTitle, { color: colors.veryDark }]}>
               {monthNames[currentMonth.getMonth()]} {currentMonth.getFullYear()}
             </Text>
           </View>
 
           <View style={styles.dayHeaders}>
             {dayNames.map(day => (
-              <Text key={day} style={[styles.dayHeader, { color: colors.medium }]}>{day}</Text>
+              <Text key={day} style={[styles.dayHeader, { color: colors.dark }]}>{day}</Text>
             ))}
           </View>
 
@@ -176,15 +176,14 @@ export default function MonthlyCalendar() {
                 style={[
                   styles.dayCell,
                   !day && styles.emptyDayCell,
-                  day && selectedDate && day.toDateString() === selectedDate.toDateString() && styles.selectedDayCell,
-                  day && day.toDateString() === new Date().toDateString() && styles.todayCell,
-                  day && selectedDate && day.toDateString() === selectedDate.toDateString() && { 
-                    backgroundColor: colors.dark,
-                    shadowColor: colors.shadow
-                  },
-                  day && day.toDateString() === new Date().toDateString() && { 
-                    backgroundColor: colors.accent
-                  },
+                  day && selectedDate && day.toDateString() === selectedDate.toDateString() && [
+                    styles.selectedDayCell,
+                    { backgroundColor: colors.dark, shadowColor: colors.shadow }
+                  ],
+                  day && day.toDateString() === new Date().toDateString() && [
+                    styles.todayCell,
+                    { backgroundColor: colors.medium }
+                  ],
                 ]}
                 onPress={() => day && setSelectedDate(day)}
                 disabled={!day}
@@ -193,16 +192,24 @@ export default function MonthlyCalendar() {
                   <>
                     <Text style={[
                       styles.dayNumber,
-                      { color: colors.medium },
-                      day.toDateString() === new Date().toDateString() && styles.todayNumber,
-                      day.toDateString() === new Date().toDateString() && { color: colors.dark },
-                      selectedDate && day.toDateString() === selectedDate.toDateString() && styles.selectedDayNumber,
-                      selectedDate && day.toDateString() === selectedDate.toDateString() && { color: colors.pastel },
+                      { color: colors.dark },
+                      day.toDateString() === new Date().toDateString() && [
+                        styles.todayNumber,
+                        { color: colors.veryDark }
+                      ],
+                      selectedDate && day.toDateString() === selectedDate.toDateString() && [
+                        styles.selectedDayNumber,
+                        { color: colors.pastel }
+                      ],
                     ]}>
                       {day.getDate()}
                     </Text>
                     {getTasksForDate(day).length > 0 && (
-                      <View style={[styles.taskIndicator, { backgroundColor: colors.dark }]} />
+                      <View style={[styles.taskIndicator, { backgroundColor: 
+                        selectedDate && day.toDateString() === selectedDate.toDateString() 
+                          ? colors.pastel 
+                          : colors.dark 
+                      }]} />
                     )}
                   </>
                 )}
@@ -234,6 +241,9 @@ export default function MonthlyCalendar() {
         mediumColor={colors.medium}
         pastelColor={colors.pastel}
         shadowColor={colors.shadow}
+        veryDarkColor={colors.veryDark}
+        highlightColor={colors.highlight}
+        bgAltColor={colors.bgAlt}
       />
     </SafeAreaView>
   );
@@ -247,137 +257,150 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingTop: 20,
-    paddingBottom: 10,
+    paddingHorizontal: 16,
+    paddingTop: 12,
+    paddingBottom: 8,
+  },
+  headerTitleContainer: {
+    flex: 1,
+    paddingRight: 8,
   },
   title: {
-    fontSize: 28,
+    fontSize: 26,
     fontFamily: 'Quicksand-Bold',
   },
   subtitle: {
-    fontSize: 14,
+    fontSize: 16,
     fontFamily: 'Quicksand-Medium',
     marginTop: 2,
   },
   monthNavigation: {
     flexDirection: 'row',
-    gap: 8,
+    gap: 6,
   },
   navButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 3,
+    elevation: 3,
   },
   homeButton: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 38,
+    height: 38,
+    borderRadius: 19,
     justifyContent: 'center',
     alignItems: 'center',
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
-    shadowRadius: 4,
+    shadowRadius: 3,
+    marginRight: 4,
+    elevation: 3,
   },
   content: {
     flex: 1,
-    paddingHorizontal: 12,
+    paddingHorizontal: 10,
   },
   selectedDateCard: {
-    margin: 12,
-    marginBottom: 8,
+    margin: 10,
+    marginBottom: 6,
     borderLeftWidth: 4,
+    padding: 12,
   },
   selectedDateTitle: {
     fontSize: 18,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 12,
+    fontFamily: 'Quicksand-Bold',
+    marginBottom: 10,
   },
   emptyDate: {
     alignItems: 'center',
-    paddingVertical: 20,
+    paddingVertical: 16,
   },
   emptyDateText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
+    fontSize: 16,
+    fontFamily: 'Quicksand-Medium',
     fontStyle: 'italic',
   },
   calendarCard: {
-    margin: 12,
+    margin: 10,
+    padding: 12,
   },
   calendarHeader: {
     alignItems: 'center',
-    marginBottom: 16,
+    marginBottom: 12,
   },
   monthTitle: {
     fontSize: 20,
-    fontFamily: 'Quicksand-SemiBold',
+    fontFamily: 'Quicksand-Bold',
   },
   dayHeaders: {
     flexDirection: 'row',
-    marginBottom: 8,
+    marginBottom: 6,
   },
   dayHeader: {
     flex: 1,
     textAlign: 'center',
-    fontSize: 12,
-    fontFamily: 'Quicksand-SemiBold',
-    paddingVertical: 8,
+    fontSize: 14,
+    fontFamily: 'Quicksand-Bold',
+    paddingVertical: 6,
   },
   calendar: {
     flexDirection: 'row',
     flexWrap: 'wrap',
   },
   dayCell: {
-    width: '14.28%',
+    width: '14.28%', // (100% / 7) for 7 days a week
     aspectRatio: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    borderRadius: 8,
-    margin: 1,
+    borderRadius: 6,
+    margin: 0,
+    padding: 0,
   },
   emptyDayCell: {
     backgroundColor: 'transparent',
   },
   selectedDayCell: {
-    shadowOffset: { width: 2, height: 2 },
+    shadowOffset: { width: 1, height: 1 },
     shadowOpacity: 0.3,
-    shadowRadius: 4,
+    shadowRadius: 2,
+    elevation: 3,
   },
   todayCell: {
+    borderRadius: 6,
   },
   dayNumber: {
-    fontSize: 14,
+    fontSize: 15,
     fontFamily: 'Quicksand-SemiBold',
   },
   todayNumber: {
     fontFamily: 'Quicksand-Bold',
   },
   selectedDayNumber: {
+    fontFamily: 'Quicksand-Bold',
   },
   taskIndicator: {
-    width: 4,
-    height: 4,
-    borderRadius: 2,
+    width: 6,
+    height: 6,
+    borderRadius: 3,
     marginTop: 2,
   },
   addButton: {
     position: 'absolute',
-    bottom: 20,
-    right: 20,
-    width: 60,
-    height: 60,
-    borderRadius: 30,
+    bottom: 16,
+    right: 16,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     justifyContent: 'center',
     alignItems: 'center',
-    shadowOffset: { width: 4, height: 4 },
+    shadowOffset: { width: 3, height: 3 },
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: 6,
+    elevation: 6,
   },
 });
