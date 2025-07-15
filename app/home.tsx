@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette, Coffee, Cloud, CloudRain, User, LogOut } from 'lucide-react-native';
+import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette, Coffee, Cloud, CloudRain, User, LogOut, Leaf } from 'lucide-react-native';
 import NeumorphicCard from '@/components/NeumorphicCard';
 import AuthModal from '@/components/AuthModal';
 import { useTabContext } from '@/contexts/TabContext';
@@ -76,7 +76,30 @@ const tabOptions = [
 const themeIcons = {
   'balance': Palette,
   'latte': Coffee,
-  'rainstorm': CloudRain
+  'rainstorm': CloudRain,
+  'autumn': Leaf
+};
+
+// Function to dynamically get icon based on theme properties
+const getThemeIconComponent = (theme) => {
+  // First check if we have a direct mapping for the theme ID
+  if (themeIcons[theme.id]) {
+    return themeIcons[theme.id];
+  }
+  
+  // If not, check if the theme has a specified addTaskIcon property that matches an icon name
+  if (theme.addTaskIcon) {
+    // Match theme.addTaskIcon to icon components
+    // This handles cases like "leaf-fall" by looking for a matching icon
+    const iconName = theme.addTaskIcon.toLowerCase();
+    if (iconName.includes('leaf')) return Leaf;
+    if (iconName.includes('palette')) return Palette;
+    if (iconName.includes('coffee')) return Coffee;
+    if (iconName.includes('rain') || iconName.includes('cloud')) return CloudRain;
+  }
+  
+  // Default to Palette if no match is found
+  return Palette;
 };
 
 export default function HomeScreen() {
@@ -98,11 +121,6 @@ export default function HomeScreen() {
 
   // Use primary colors from the current theme
   const primaryColors = currentTheme.tabColors.daily;
-
-  // Helper function to get the appropriate icon for a theme
-  const getThemeIcon = (themeId) => {
-    return themeIcons[themeId] || Palette;
-  };
 
   const toggleTab = (tabId: string) => {
     if (localSelectedTabs.includes(tabId)) {
@@ -164,7 +182,7 @@ export default function HomeScreen() {
           {availableThemes.map((theme) => {
             const isSelected = currentTheme.id === theme.id;
             const themeColors = theme.tabColors.daily;
-            const ThemeIconComponent = getThemeIcon(theme.id);
+            const ThemeIconComponent = getThemeIconComponent(theme);
             
             return (
               <TouchableOpacity
