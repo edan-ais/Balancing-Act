@@ -14,19 +14,7 @@ export const latteTheme = {
       medium: '#7D5B47',
       bgAlt: '#F5EBE5',
       pastel: '#EAD9CF',
-      bg: '#FAF5F2',
-      cranberryBold: '#9D2933',
-      cranberryLight: '#F6E7E8',
-      forestBold: '#4A6741',
-      forestLight: '#EBEFEA',
-      steelBold: '#4B6584',
-      steelLight: '#EBEFF4',
-      pumpkinBold: '#E67E22',
-      pumpkinLight: '#FCF2E8',
-      purpleBold: '#8B6B8C',
-      purpleLight: '#F3EEF3',
-      vanillaBold: '#756A5B', // Darker vanilla
-      vanillaLight: '#ECEAE6' // Darker vanilla light
+      bg: '#FAF5F2'
     },
     future: {
       veryDark: '#2A1F13',
@@ -37,17 +25,7 @@ export const latteTheme = {
       highlight: '#BF8E5C',
       bgAlt: '#F2EBD9',
       pastel: '#E7DCCA',
-      bg: '#F9F6ED',
-      grapeBold: '#6F4E7C',
-      grapeLight: '#F0EBF2',
-      brickBold: '#BA4A4A',
-      brickLight: '#F8EBEB',
-      oliveBold: '#5B6F4C',
-      oliveLight: '#EDEFE9',
-      bronzeBold: '#996B21',
-      bronzeLight: '#F5F0E8',
-      creamBold: '#756A5B', // Darker cream
-      creamLight: '#ECEAE6' // Darker cream light
+      bg: '#F9F6ED'
     },
     calendar: {
       veryDark: '#422E18',
@@ -69,23 +47,7 @@ export const latteTheme = {
       highlight: '#E6847F',
       bgAlt: '#FAECEC',
       pastel: '#F6DFDF',
-      bg: '#FDF7F7',
-      terracottaBold: '#96514D',
-      terracottaLight: '#F5ECEB',
-      amberBold: '#AD7D4C',
-      amberLight: '#F7F2EA',
-      avocadoBold: '#7D9148',
-      avocadoLight: '#F2F4EA',
-      sageBold: '#5A8A72',
-      sageLight: '#EDF3F0',
-      denimBold: '#577E9F',
-      denimLight: '#ECF2F6',
-      dustyPurpleBold: '#7A6C93',
-      dustyPurpleLight: '#F1EFF4',
-      raspberryBold: '#B25D85',
-      raspberryLight: '#F7EDF2',
-      neutralBold: '#756A5B', // Darker neutral
-      neutralLight: '#ECEAE6' // Darker neutral light
+      bg: '#FDF7F7'
     },
     cleaning: {
       veryDark: '#3D364E',
@@ -96,17 +58,7 @@ export const latteTheme = {
       highlight: '#AB95E0',
       bgAlt: '#F0ECF7',
       pastel: '#E9E4F4',
-      bg: '#F9F7FC',
-      honeyBold: '#D4A04F',
-      honeyLight: '#FAF6EB',
-      powderBold: '#6487A5',
-      powderLight: '#EEF3F6',
-      coffeeBold: '#8D6E63',
-      coffeeLight: '#F3EFED',
-      terracottaAltBold: '#AF6458',
-      terracottaAltLight: '#F7EDEC',
-      sandBold: '#756A5B', // Darker sand
-      sandLight: '#ECEAE6' // Darker sand light
+      bg: '#F9F7FC'
     },
     selfCare: {
       veryDark: '#2A3820',
@@ -128,17 +80,48 @@ export const latteTheme = {
       highlight: '#E6CDA8', // Darker highlight
       bgAlt: '#F1EDE5', // Darker bgAlt
       pastel: '#F2EFEA', // Darker pastel
-      bg: '#F8F6F3', // Darker bg
-      azureBold: '#7D93B2',
-      azureLight: '#F1F4F7',
-      copperBold: '#C7874F',
-      copperLight: '#F9F2EB',
-      taupeBold: '#8B7D7B',
-      taupeLight: '#F3F1F1',
-      mossBold: '#8DAA7B',
-      mossLight: '#F3F6F1',
-      beigeBold: '#756A5B', // Darker beige
-      beigeLight: '#ECEAE6' // Darker beige light
+      bg: '#F8F6F3' // Darker bg
+    },
+    themeColorWheel: {
+      // Red - rich espresso red
+      redBold: '#9F3A36',
+      redLight: '#F6EAEA',
+      
+      // Orange - warm caramel orange
+      orangeBold: '#C17F46',
+      orangeLight: '#F8F1EA',
+      
+      // Yellow - golden honey yellow
+      yellowBold: '#C6A03F',
+      yellowLight: '#F9F5EA',
+      
+      // Green - rich matcha green
+      greenBold: '#5B7D55',
+      greenLight: '#EDF1EC',
+      
+      // Blue - muted coffee-shop blue
+      blueBold: '#4D6D89',
+      blueLight: '#EBF0F4',
+      
+      // Indigo - deep coffee indigo
+      indigoBold: '#4F527A',
+      indigoLight: '#ECEDF2',
+      
+      // Purple - rich mocha purple
+      purpleBold: '#725682',
+      purpleLight: '#F0ECF2',
+      
+      // Pink - cinnamon rose pink
+      pinkBold: '#A45A76',
+      pinkLight: '#F6ECF0',
+      
+      // Brown - deep roast brown
+      brownBold: '#6E4E3A',
+      brownLight: '#F0EBE8',
+      
+      // Gray - coffee shop gray
+      grayBold: '#6D655A',
+      grayLight: '#EFEDEA'
     }
   }
 };
