@@ -2,10 +2,12 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
-import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette, Coffee, Cloud, CloudRain } from 'lucide-react-native';
+import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users, ArrowRight, Palette, Coffee, Cloud, CloudRain, User, LogOut } from 'lucide-react-native';
 import NeumorphicCard from '@/components/NeumorphicCard';
+import AuthModal from '@/components/AuthModal';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import { useAuth } from '@/contexts/AuthContext';
 
 // Mapping between tab IDs and theme color keys
 const tabToThemeKeyMap = {
@@ -80,7 +82,9 @@ const themeIcons = {
 export default function HomeScreen() {
   const { selectedTabs, setSelectedTabs } = useTabContext();
   const { currentTheme, setTheme, availableThemes } = useTheme();
+  const { user, signOut, loading } = useAuth();
   const [localSelectedTabs, setLocalSelectedTabs] = useState<string[]>(selectedTabs);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const router = useRouter();
 
   // Helper function to get tab colors from the theme
@@ -123,10 +127,38 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
-        <Text style={[styles.title, { color: primaryColors.veryDark }]}>Balancing Act</Text>
-        <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
-          Choose which areas of life you want to focus on
-        </Text>
+        <View style={styles.headerContent}>
+          <Text style={[styles.title, { color: primaryColors.veryDark }]}>Balancing Act</Text>
+          <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
+            Choose which areas of life you want to focus on
+          </Text>
+        </View>
+        
+        <View style={styles.authSection}>
+          {user ? (
+            <View style={styles.userInfo}>
+              <Text style={[styles.userEmail, { color: primaryColors.dark }]} numberOfLines={1}>
+                {user.email}
+              </Text>
+              <TouchableOpacity
+                style={[styles.authButton, { backgroundColor: primaryColors.medium }]}
+                onPress={signOut}
+              >
+                <LogOut size={18} color={primaryColors.pastel} />
+              </TouchableOpacity>
+            </View>
+          ) : (
+            <TouchableOpacity
+              style={[styles.authButton, { backgroundColor: primaryColors.dark }]}
+              onPress={() => setShowAuthModal(true)}
+            >
+              <User size={18} color={primaryColors.pastel} />
+              <Text style={[styles.authButtonText, { color: primaryColors.pastel }]}>
+                Sign In
+              </Text>
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -264,6 +296,12 @@ export default function HomeScreen() {
           color={primaryColors.pastel} 
         />
       </TouchableOpacity>
+
+      <AuthModal
+        visible={showAuthModal}
+        onClose={() => setShowAuthModal(false)}
+        colors={primaryColors}
+      />
     </SafeAreaView>
   );
 }
@@ -273,10 +311,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'flex-start',
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
+  },
+  headerContent: {
+    flex: 1,
     alignItems: 'center',
+    paddingRight: 8,
   },
   title: {
     fontSize: 32,
@@ -288,6 +333,36 @@ const styles = StyleSheet.create({
     fontFamily: 'Quicksand-Medium',
     textAlign: 'center',
     lineHeight: 24,
+  },
+  authSection: {
+    alignItems: 'flex-end',
+    minWidth: 100,
+  },
+  userInfo: {
+    alignItems: 'flex-end',
+    maxWidth: 120,
+  },
+  userEmail: {
+    fontSize: 12,
+    fontFamily: 'Quicksand-Medium',
+    marginBottom: 4,
+    textAlign: 'right',
+  },
+  authButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 12,
+    paddingVertical: 8,
+    borderRadius: 20,
+    shadowOffset: { width: 2, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 3,
+    elevation: 3,
+  },
+  authButtonText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-SemiBold',
+    marginLeft: 6,
   },
   content: {
     flex: 1,
