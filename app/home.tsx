@@ -127,38 +127,34 @@ export default function HomeScreen() {
   return (
     <SafeAreaView style={[styles.container, { backgroundColor: primaryColors.bg }]}>
       <View style={styles.header}>
-        <View style={styles.headerContent}>
-          <Text style={[styles.title, { color: primaryColors.veryDark }]}>Balancing Act</Text>
-          <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
-            Choose which areas of life you want to focus on
-          </Text>
-        </View>
-        
-        <View style={styles.authSection}>
-          {user ? (
-            <View style={styles.userInfo}>
-              <Text style={[styles.userEmail, { color: primaryColors.dark }]} numberOfLines={1}>
-                {user.email}
-              </Text>
-              <TouchableOpacity
-                style={[styles.authButton, { backgroundColor: primaryColors.medium }]}
-                onPress={signOut}
-              >
-                <LogOut size={18} color={primaryColors.pastel} />
-              </TouchableOpacity>
-            </View>
-          ) : (
-            <TouchableOpacity
-              style={[styles.authButton, { backgroundColor: primaryColors.dark }]}
-              onPress={() => setShowAuthModal(true)}
-            >
-              <User size={18} color={primaryColors.pastel} />
-              <Text style={[styles.authButtonText, { color: primaryColors.pastel }]}>
-                Sign In
-              </Text>
-            </TouchableOpacity>
-          )}
-        </View>
+        <Text style={[styles.title, { color: primaryColors.veryDark }]}>Balancing Act</Text>
+        <Text style={[styles.subtitle, { color: primaryColors.dark }]}>
+          Choose which areas of life you want to focus on
+        </Text>
+      </View>
+      
+      <View style={styles.authSection}>
+        {user ? (
+          <TouchableOpacity
+            style={[styles.authButton, { backgroundColor: primaryColors.medium }]}
+            onPress={signOut}
+          >
+            <Text style={[styles.userEmail, { color: primaryColors.pastel }]} numberOfLines={1}>
+              {user.email}
+            </Text>
+            <LogOut size={18} color={primaryColors.pastel} />
+          </TouchableOpacity>
+        ) : (
+          <TouchableOpacity
+            style={[styles.authButton, { backgroundColor: primaryColors.dark }]}
+            onPress={() => setShowAuthModal(true)}
+          >
+            <User size={18} color={primaryColors.pastel} />
+            <Text style={[styles.authButtonText, { color: primaryColors.pastel }]}>
+              Sign In
+            </Text>
+          </TouchableOpacity>
+        )}
       </View>
 
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
@@ -311,53 +307,48 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+    alignItems: 'center',
     paddingHorizontal: 16,
     paddingTop: 16,
     paddingBottom: 8,
-  },
-  headerContent: {
-    flex: 1,
-    alignItems: 'center',
-    paddingRight: 8,
   },
   title: {
     fontSize: 32,
     fontFamily: 'Quicksand-Bold',
     marginBottom: 6,
+    textAlign: 'center',
   },
   subtitle: {
     fontSize: 18,
     fontFamily: 'Quicksand-Medium',
     textAlign: 'center',
     lineHeight: 24,
+    paddingHorizontal: 10,
   },
   authSection: {
-    alignItems: 'flex-end',
-    minWidth: 100,
-  },
-  userInfo: {
-    alignItems: 'flex-end',
-    maxWidth: 120,
-  },
-  userEmail: {
-    fontSize: 12,
-    fontFamily: 'Quicksand-Medium',
-    marginBottom: 4,
-    textAlign: 'right',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    marginTop: 12,
+    marginBottom: 8,
   },
   authButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
-    paddingVertical: 8,
+    justifyContent: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
     borderRadius: 20,
     shadowOffset: { width: 2, height: 2 },
     shadowOpacity: 0.2,
     shadowRadius: 3,
     elevation: 3,
+    minWidth: 120,
+  },
+  userEmail: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-SemiBold',
+    marginRight: 8,
+    maxWidth: 180,
   },
   authButtonText: {
     fontSize: 14,
