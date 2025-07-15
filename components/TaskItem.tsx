@@ -109,13 +109,16 @@ export default function TaskItem({
   const getTagColor = (tagType: string, tagValue: string) => {
     // For custom tags, use their specific custom color
     if (tagValue === 'custom') {
-      const customColorMap = {
-        'priority': task.customPriorityColor,
-        'goalType': task.customGoalTypeColor,
-        'cleaningLocation': task.customCleaningLocationColor,
-      };
-      
-      return customColorMap[tagType] || veryDarkColor;
+      // FIX 1: Type-safe approach for custom colors
+      if (tagType === 'priority') {
+        return task.customPriorityColor || veryDarkColor;
+      } else if (tagType === 'goalType') {
+        return task.customGoalTypeColor || veryDarkColor;
+      } else if (tagType === 'cleaningLocation') {
+        return task.customCleaningLocationColor || veryDarkColor;
+      } else {
+        return veryDarkColor;
+      }
     }
     
     // Convert option to proper format for lookup in theme
@@ -407,20 +410,19 @@ export default function TaskItem({
 
   return (
     <Animated.View style={{ transform: [{ scale: scaleAnim }] }}>
-      <NeumorphicCard style={[
-        styles.taskCard,
-        { backgroundColor: colors?.bg || effectiveBgColor },
-        task.isHabit ? [styles.habitCard, { backgroundColor: getHabitBackgroundColor() }] : null,
-        { 
-          borderColor: getLightBorderColor(),
-          borderWidth: 2, // Updated to 2px as requested
-          // Add left border accent for habits
-          ...(task.isHabit ? {
-            borderLeftWidth: 6,
-            borderLeftColor: veryDarkColor
-          } : {})
-        }
-      ]}>
+      {/* FIX 2: Style object instead of array for NeumorphicCard */}
+      <NeumorphicCard style={{
+        ...styles.taskCard,
+        backgroundColor: colors?.bg || effectiveBgColor,
+        ...(task.isHabit ? {
+          ...styles.habitCard,
+          backgroundColor: getHabitBackgroundColor(),
+          borderLeftWidth: 6,
+          borderLeftColor: veryDarkColor
+        } : {}),
+        borderColor: getLightBorderColor(),
+        borderWidth: 2
+      }}>
         <View style={styles.taskHeader}>
           <TouchableOpacity
             onPress={task.isHabit ? handleHabitIncrement : handleToggle}
