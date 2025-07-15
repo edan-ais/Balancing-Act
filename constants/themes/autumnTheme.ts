@@ -2,7 +2,7 @@ export const autumnTheme = {
   name: 'Autumn Harvest Theme',
   id: 'autumn',
   backgroundImage: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
-  addTaskIcon: 'leaf-fall', // Custom fall leaf icon
+  addTaskIcon: 'leaf', // Custom fall leaf icon
   tabColors: {
     daily: {
       veryDark: '#5C1A1A', // Deep burgundy
