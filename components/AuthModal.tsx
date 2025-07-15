@@ -56,6 +56,19 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
       Alert.alert('Error', 'Password must be at least 6 characters');
       return;
     }
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    // Password validation
+    if (password.length < 6) {
+      setError('Password must be at least 6 characters long');
+      return;
+    }
+
 
     setLoading(true);
 
@@ -78,7 +91,14 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
         }
       }
     } catch (error) {
-      Alert.alert('Error', 'An unexpected error occurred');
+      // Provide user-friendly error messages
+      if (result.error.includes('Invalid login credentials')) {
+        setError(isSignUp ? 'Failed to create account. Please try again.' : 'Invalid email or password. Please check your credentials.');
+      } else if (result.error.includes('User already registered')) {
+        setError('An account with this email already exists. Try signing in instead.');
+      } else {
+        setError(result.error);
+      }
     } finally {
       setLoading(false);
     }

@@ -38,7 +38,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') { // Ignore "not found" errors
         console.error('Error loading user preferences:', error);
         return;
       }

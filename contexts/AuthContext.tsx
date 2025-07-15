@@ -47,11 +47,35 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
+
+      // Create user profile after successful signup
+      if (data.user) {
+        await createUserProfile(data.user.id);
+      }
+
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
     return { error };
+  };
+
+  const createUserProfile = async (userId: string) => {
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .insert({
+          id: userId,
+          current_theme: 'balance',
+          selected_tabs: ['index', 'goals', 'weekly', 'meal-prep', 'cleaning', 'self-care', 'delegation']
+        });
+
+      if (error && error.code !== '23505') { // Ignore duplicate key errors
+        console.error('Error creating user profile:', error);
+      }
+    } catch (error) {
+      console.error('Error creating user profile:', error);
+    }
   };
 
   const signOut = async () => {

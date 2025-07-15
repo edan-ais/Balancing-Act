@@ -34,7 +34,7 @@ export function TabProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single();
 
-      if (error) {
+      if (error && error.code !== 'PGRST116') { // Ignore "not found" errors
         console.error('Error loading user tabs:', error);
         return;
       }
