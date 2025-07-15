@@ -38,7 +38,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // Ignore "not found" errors
+      if (error) {
+        // If table doesn't exist, use default theme
+        if (error.code === '42P01' || error.code === 'PGRST116') {
+          console.log('User profiles table not found, using default theme');
+          return;
+        }
         console.error('Error loading user preferences:', error);
         return;
       }
