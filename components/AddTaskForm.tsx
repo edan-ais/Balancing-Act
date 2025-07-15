@@ -30,6 +30,7 @@ interface AddTaskFormProps {
   mediumColor?: string;
   pastelColor?: string;
   shadowColor?: string;
+  customTags?: any; // Custom tags collection for each category and tag type
 }
 
 export default function AddTaskForm({
@@ -44,24 +45,25 @@ export default function AddTaskForm({
   bgColor = '#F5F7FA',
   mediumColor = '#4A5568',
   pastelColor = '#E2E8F0',
-  shadowColor = '#C8D0E0'
+  shadowColor = '#C8D0E0',
+  customTags = {}
 }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [taskType, setTaskType] = useState<string>('task'); // Default to 'task'
   const [habitGoal, setHabitGoal] = useState('1');
   const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tabColors?.daily?.priorityCustomSelected || '#4A5568');
+  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tabColors?.daily?.contrastOne || '#4A5568');
   const [goalType, setGoalType] = useState<string>('');
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tabColors?.future?.goalCustomSelected || '#4A5568');
+  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tabColors?.future?.contrastOne || '#4A5568');
   const [mealType, setMealType] = useState<string>('');
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [frequency, setFrequency] = useState<string>('');
   const [cleaningLocation, setCleaningLocation] = useState<string>('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
-  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tabColors?.cleaning?.cleaningCustomSelected || '#996B77');
+  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tabColors?.cleaning?.contrastOne || '#996B77');
   const [selfCareType, setSelfCareType] = useState<string>('');
   const [delegatedTo, setDelegatedTo] = useState('');
   const [delegateType, setDelegateType] = useState<string>('');
@@ -103,7 +105,7 @@ export default function AddTaskForm({
   const bgAltColor = tabColors.bgAlt || effectivePastelColor;
   const lightColor = tabColors.light || effectivePastelColor;
 
-  // Helper to get tag color - updated to work with the new flat structure
+  // Helper to get tag color
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
     // Required tags use tab's colors
     if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
@@ -114,52 +116,148 @@ export default function AddTaskForm({
     const tabColorKey = getCategoryColorKey();
     const tabColors = colors?.tabColors?.[tabColorKey] || {};
     
+    // Check for saved custom tags first
+    const savedCustomTags = customTags[category]?.[tagType] || [];
+    const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === tagValue);
+    
+    if (matchingCustomTag) {
+      return isSelected ? matchingCustomTag.color : bgAltColor;
+    }
+    
     // Handle custom tag option
     if (tagValue === 'custom') {
-      const customColorMap = {
-        'priority': customPriorityColor,
-        'goalType': customGoalTypeColor,
-        'cleaningLocation': customCleaningLocationColor,
-      };
-      
-      if (isSelected) {
-        // Try to use the user selected custom color first
-        return customColorMap[tagType] || veryDarkColor;
-      } else {
-        // For unselected state of custom tag
-        const unselectedKey = `${tagType}CustomUnselected`;
-        return tabColors[unselectedKey] || bgAltColor;
+      if (tagType === 'priority' && isSelected) {
+        return customPriorityColor;
+      } 
+      else if (tagType === 'goalType' && isSelected) {
+        return customGoalTypeColor;
       }
+      else if (tagType === 'cleaningLocation' && isSelected) {
+        return customCleaningLocationColor;
+      }
+      return isSelected ? veryDarkColor : bgAltColor;
     }
     
-    // Convert option to proper format for lookup in theme
-    let lookupKey;
+    // Priority tags
     if (tagType === 'priority') {
-      lookupKey = `priority${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-      if (tagValue === 'quick-win') {
-        lookupKey = 'priorityQuickWin';
+      if (tagValue === 'high' && isSelected) {
+        return tabColors.contrastOne || veryDarkColor;
       }
-    } else if (tagType === 'goalType') {
-      if (tagValue === 'TBD') {
-        lookupKey = 'goalTbd';
-      } else if (tagValue === 'Not Priority') {
-        lookupKey = 'goalNotPriority';
-      } else {
-        lookupKey = `goal${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      else if (tagValue === 'high' && !isSelected) {
+        return tabColors.contrastOneLight || bgAltColor;
       }
-    } else if (tagType === 'dayOfWeek') {
-      lookupKey = `day${tagValue}`;
-    } else if (tagType === 'cleaningLocation') {
-      lookupKey = `cleaning${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-    } else if (tagType === 'delegateType') {
-      lookupKey = `delegate${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      else if (tagValue === 'medium' && isSelected) {
+        return tabColors.contrastTwo || veryDarkColor;
+      }
+      else if (tagValue === 'medium' && !isSelected) {
+        return tabColors.contrastTwoLight || bgAltColor;
+      }
+      else if (tagValue === 'low' && isSelected) {
+        return tabColors.contrastThree || veryDarkColor;
+      }
+      else if (tagValue === 'low' && !isSelected) {
+        return tabColors.contrastThreeLight || bgAltColor;
+      }
+      else if (tagValue === 'quick-win' && isSelected) {
+        return tabColors.contrastFour || veryDarkColor;
+      }
+      else if (tagValue === 'quick-win' && !isSelected) {
+        return tabColors.contrastFourLight || bgAltColor;
+      }
     }
     
-    // Add Selected/Unselected suffix based on state
-    lookupKey = `${lookupKey}${isSelected ? 'Selected' : 'Unselected'}`;
+    // Goal Type tags
+    else if (tagType === 'goalType') {
+      if ((tagValue === 'TBD' || tagValue === 'tbd') && isSelected) {
+        return tabColors.contrastOne || veryDarkColor;
+      }
+      else if ((tagValue === 'TBD' || tagValue === 'tbd') && !isSelected) {
+        return tabColors.contrastOneLight || bgAltColor;
+      }
+      else if ((tagValue === 'Not Priority' || tagValue === 'notPriority') && isSelected) {
+        return tabColors.contrastTwo || veryDarkColor;
+      }
+      else if ((tagValue === 'Not Priority' || tagValue === 'notPriority') && !isSelected) {
+        return tabColors.contrastTwoLight || bgAltColor;
+      }
+      else if ((tagValue === 'Wish' || tagValue === 'wish') && isSelected) {
+        return tabColors.contrastThree || veryDarkColor;
+      }
+      else if ((tagValue === 'Wish' || tagValue === 'wish') && !isSelected) {
+        return tabColors.contrastThreeLight || bgAltColor;
+      }
+    }
     
-    // Return the color from the tab's colors or default to tab's main colors
-    return tabColors[lookupKey] || (isSelected ? veryDarkColor : bgAltColor);
+    // Day of Week tags
+    else if (tagType === 'dayOfWeek') {
+      if (tagValue === 'Mon' && isSelected) {
+        return tabColors.contrastOne || veryDarkColor;
+      }
+      else if (tagValue === 'Mon' && !isSelected) {
+        return tabColors.contrastOneLight || bgAltColor;
+      }
+      else if (tagValue === 'Tue' && isSelected) {
+        return tabColors.contrastTwo || veryDarkColor;
+      }
+      else if (tagValue === 'Tue' && !isSelected) {
+        return tabColors.contrastTwoLight || bgAltColor;
+      }
+      else if (tagValue === 'Wed' && isSelected) {
+        return tabColors.contrastThree || veryDarkColor;
+      }
+      else if (tagValue === 'Wed' && !isSelected) {
+        return tabColors.contrastThreeLight || bgAltColor;
+      }
+      else if (tagValue === 'Thu' && isSelected) {
+        return tabColors.contrastFour || veryDarkColor;
+      }
+      else if (tagValue === 'Thu' && !isSelected) {
+        return tabColors.contrastFourLight || bgAltColor;
+      }
+      else if (tagValue === 'Fri' && isSelected) {
+        return tabColors.contrastFive || veryDarkColor;
+      }
+      else if (tagValue === 'Fri' && !isSelected) {
+        return tabColors.contrastFiveLight || bgAltColor;
+      }
+      else if (tagValue === 'Sat' && isSelected) {
+        return tabColors.contrastSix || veryDarkColor;
+      }
+      else if (tagValue === 'Sat' && !isSelected) {
+        return tabColors.contrastSixLight || bgAltColor;
+      }
+      else if (tagValue === 'Sun' && isSelected) {
+        return tabColors.contrastSeven || veryDarkColor;
+      }
+      else if (tagValue === 'Sun' && !isSelected) {
+        return tabColors.contrastSevenLight || bgAltColor;
+      }
+    }
+    
+    // Cleaning Location tags
+    else if (tagType === 'cleaningLocation') {
+      if (tagValue === 'kitchen' && isSelected) {
+        return tabColors.contrastOne || veryDarkColor;
+      }
+      else if (tagValue === 'kitchen' && !isSelected) {
+        return tabColors.contrastOneLight || bgAltColor;
+      }
+      else if (tagValue === 'bathroom' && isSelected) {
+        return tabColors.contrastTwo || veryDarkColor;
+      }
+      else if (tagValue === 'bathroom' && !isSelected) {
+        return tabColors.contrastTwoLight || bgAltColor;
+      }
+      else if (tagValue === 'bedroom' && isSelected) {
+        return tabColors.contrastThree || veryDarkColor;
+      }
+      else if (tagValue === 'bedroom' && !isSelected) {
+        return tabColors.contrastThreeLight || bgAltColor;
+      }
+    }
+    
+    // Default to theme colors if no specific color is found
+    return isSelected ? veryDarkColor : bgAltColor;
   };
 
   // Helper to get text color based on background color
@@ -172,84 +270,49 @@ export default function AddTaskForm({
     }
   };
 
-  // Get array of color options for custom color selection from the flat structure - UPDATED
+  // Get predefined color options for custom color selection
   const getColorOptions = (tagType: string) => {
     // Get the appropriate tab colors based on the category
     const tabColorKey = getCategoryColorKey();
     const tabColors = colors?.tabColors?.[tabColorKey] || {};
     
-    // Object to store all relevant colors with their brightness value for sorting
-    const colorMap = new Map();
+    // Create a fixed array of contrast colors with fallbacks
+    const colorOptions = [
+      tabColors.contrastOne || '#B83232',
+      tabColors.contrastTwo || '#996633',
+      tabColors.contrastThree || '#547133',
+      tabColors.contrastFour || '#B8671D',
+      tabColors.contrastFive || '#6E416F',
+      tabColors.contrastSix || '#666F7A',
+      tabColors.contrastSeven || '#BD5B35',
+      tabColors.contrastEight || '#4B7994',
+      veryDarkColor
+    ];
     
-    // Helper function to estimate color brightness (higher value = lighter color)
-    const getBrightness = (hexColor: string) => {
-      // Default to medium brightness if invalid color
-      if (!hexColor || !hexColor.startsWith('#')) return 128;
-      
-      const r = parseInt(hexColor.substring(1, 3), 16);
-      const g = parseInt(hexColor.substring(3, 5), 16);
-      const b = parseInt(hexColor.substring(5, 7), 16);
-      
-      // Perceived brightness formula
-      return (r * 299 + g * 587 + b * 114) / 1000;
-    };
+    // Filter out any duplicates
+    return [...new Set(colorOptions)];
+  };
+
+  // Get available options for a tag type (including custom saved ones)
+  const getTagOptions = (tagType: string) => {
+    const savedCustomTags = customTags[category]?.[tagType] || [];
     
-    // Add colors to map with brightness as value for sorting
-    const addToColorMap = (color: string) => {
-      if (color && !colorMap.has(color)) {
-        colorMap.set(color, getBrightness(color));
-      }
-    };
+    // Default options based on tag type
+    let defaultOptions = [];
     
-    // Add the main tab colors first
-    if (tabColors.veryDark) addToColorMap(tabColors.veryDark);
-    if (tabColors.dark) addToColorMap(tabColors.dark);
-    if (tabColors.medium) addToColorMap(tabColors.medium);
-    if (tabColors.highlight) addToColorMap(tabColors.highlight);
-    
-    // Add category-specific colors based on tag type
     if (tagType === 'priority') {
-      // Daily tab priority colors
-      if (tabColors.priorityHighSelected) addToColorMap(tabColors.priorityHighSelected);
-      if (tabColors.priorityMediumSelected) addToColorMap(tabColors.priorityMediumSelected);
-      if (tabColors.priorityLowSelected) addToColorMap(tabColors.priorityLowSelected);
-      if (tabColors.priorityQuickWinSelected) addToColorMap(tabColors.priorityQuickWinSelected);
-      if (tabColors.rainyRedBold) addToColorMap(tabColors.rainyRedBold);
-      if (tabColors.muddyBold) addToColorMap(tabColors.muddyBold);
-      if (tabColors.forestBold) addToColorMap(tabColors.forestBold);
-      if (tabColors.thunderBold) addToColorMap(tabColors.thunderBold);
-      if (tabColors.lightningBold) addToColorMap(tabColors.lightningBold);
-      if (tabColors.cloudBold) addToColorMap(tabColors.cloudBold);
-    } 
-    else if (tagType === 'goalType') {
-      // Future tab goal type colors
-      if (tabColors.goalTbdSelected) addToColorMap(tabColors.goalTbdSelected);
-      if (tabColors.goalNotPrioritySelected) addToColorMap(tabColors.goalNotPrioritySelected);
-      if (tabColors.goalWishSelected) addToColorMap(tabColors.goalWishSelected);
-      if (tabColors.irisBold) addToColorMap(tabColors.irisBold);
-      if (tabColors.rustBold) addToColorMap(tabColors.rustBold);
-      if (tabColors.evergreenBold) addToColorMap(tabColors.evergreenBold);
-      if (tabColors.soilBold) addToColorMap(tabColors.soilBold);
-      if (tabColors.mistBold) addToColorMap(tabColors.mistBold);
-    }
-    else if (tagType === 'cleaningLocation') {
-      // Cleaning tab location colors
-      if (tabColors.cleaningKitchenSelected) addToColorMap(tabColors.cleaningKitchenSelected);
-      if (tabColors.cleaningBathroomSelected) addToColorMap(tabColors.cleaningBathroomSelected);
-      if (tabColors.cleaningBedroomSelected) addToColorMap(tabColors.cleaningBedroomSelected);
-      if (tabColors.plantBold) addToColorMap(tabColors.plantBold);
-      if (tabColors.mirrorBold) addToColorMap(tabColors.mirrorBold);
-      if (tabColors.blanketBold) addToColorMap(tabColors.blanketBold);
-      if (tabColors.roseBold) addToColorMap(tabColors.roseBold);
-      if (tabColors.grayBold) addToColorMap(tabColors.grayBold);
+      defaultOptions = ['high', 'medium', 'low', 'quick-win'];
+    } else if (tagType === 'goalType') {
+      defaultOptions = ['TBD', 'Not Priority', 'Wish'];
+    } else if (tagType === 'cleaningLocation') {
+      defaultOptions = ['kitchen', 'bathroom', 'bedroom'];
     }
     
-    // Sort colors from darkest to lightest
-    const sortedColors = Array.from(colorMap.entries())
-      .sort((a, b) => a[1] - b[1]) // Sort by brightness (dark to light)
-      .map(entry => entry[0]); // Extract just the color hex codes
+    // Add saved custom tags
+    const savedOptions = savedCustomTags.map((tag: any) => tag.text);
     
-    return sortedColors;
+    // Always include the "custom" option as the last one
+    return [...defaultOptions, ...savedOptions, 'custom'];
   };
 
   const resetForm = () => {
@@ -258,17 +321,17 @@ export default function AddTaskForm({
     setHabitGoal('1');
     setPriority('');
     setCustomPriorityText('');
-    setCustomPriorityColor(colors?.tabColors?.daily?.priorityCustomSelected || '#4A5568');
+    setCustomPriorityColor(colors?.tabColors?.daily?.contrastOne || '#4A5568');
     setGoalType('');
     setCustomGoalTypeText('');
-    setCustomGoalTypeColor(colors?.tabColors?.future?.goalCustomSelected || '#4A5568');
+    setCustomGoalTypeColor(colors?.tabColors?.future?.contrastOne || '#4A5568');
     setMealType('');
     setDayOfWeek('');
     setNotes('');
     setFrequency('');
     setCleaningLocation('');
     setCustomCleaningLocation('');
-    setCustomCleaningLocationColor(colors?.tabColors?.cleaning?.cleaningCustomSelected || '#996B77');
+    setCustomCleaningLocationColor(colors?.tabColors?.cleaning?.contrastOne || '#996B77');
     setSelfCareType('');
     setDelegatedTo('');
     setDelegateType('');
@@ -371,6 +434,7 @@ export default function AddTaskForm({
       reminderEnabled,
       subtasks: subtasks.length > 0 ? subtasks : undefined,
       scheduledDate: selectedDate, // For calendar tasks
+      category: category, // Add category to make tracking easier
     };
 
     onSubmit(newTask);
@@ -408,7 +472,7 @@ export default function AddTaskForm({
     }
   };
 
-  // Render custom color picker for a tag type
+  // Render simplified color picker for a tag type
   const renderColorPicker = (tagType: string, selectedColor: string, setColorFunction: (color: string) => void) => {
     const colorOptions = getColorOptions(tagType);
     
@@ -417,7 +481,7 @@ export default function AddTaskForm({
         <Text style={[styles.label, { color: veryDarkColor }]}>Custom Color</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
           <View style={styles.colorWheel}>
-            {colorOptions.map((color: string, index: number) => (
+            {colorOptions.map((color, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -551,11 +615,16 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Priority</Text>
                   <View style={styles.optionGrid}>
-                    {['high', 'medium', 'low', 'quick-win', 'custom'].map((option) => {
-                      // Convert option to tagValue format for lookup
-                      const tagValue = option === 'quick-win' ? 'quickWin' : option;
-                      const bgColor = getTagColor('priority', tagValue, priority === option);
+                    {getTagOptions('priority').map((option) => {
+                      const bgColor = getTagColor('priority', option, priority === option);
                       const textColor = getTextColor(bgColor);
+                      
+                      // Use custom text for saved custom tags
+                      const savedCustomTags = customTags[category]?.priority || [];
+                      const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === option);
+                      const displayText = matchingCustomTag ? matchingCustomTag.text : 
+                                          option === 'quick-win' ? 'Quick Win' : 
+                                          option.charAt(0).toUpperCase() + option.slice(1);
                       
                       return (
                         <TouchableOpacity
@@ -575,7 +644,7 @@ export default function AddTaskForm({
                             styles.optionText,
                             { color: textColor }
                           ]}>
-                            {option === 'quick-win' ? 'Quick Win' : option.charAt(0).toUpperCase() + option.slice(1)}
+                            {displayText}
                           </Text>
                         </TouchableOpacity>
                       );
@@ -613,14 +682,15 @@ export default function AddTaskForm({
                 <>
                   <Text style={[styles.label, { color: veryDarkColor }]}>Goal Type</Text>
                   <View style={styles.optionGrid}>
-                    {['TBD', 'Not Priority', 'Wish', 'custom'].map((option) => {
-                      // Convert option to tagValue format for lookup
-                      const tagValue = option === 'TBD' ? 'tbd' : 
-                                    option === 'Not Priority' ? 'notPriority' : 
-                                    option.toLowerCase();
-                      
-                      const bgColor = getTagColor('goalType', tagValue, goalType === option);
+                    {getTagOptions('goalType').map((option) => {
+                      const bgColor = getTagColor('goalType', option, goalType === option);
                       const textColor = getTextColor(bgColor);
+                      
+                      // Use custom text for saved custom tags
+                      const savedCustomTags = customTags[category]?.goalType || [];
+                      const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === option);
+                      const displayText = matchingCustomTag ? matchingCustomTag.text : 
+                                          option.charAt(0).toUpperCase() + option.slice(1);
                       
                       return (
                         <TouchableOpacity
@@ -640,7 +710,7 @@ export default function AddTaskForm({
                             styles.optionText,
                             { color: textColor }
                           ]}>
-                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                            {displayText}
                           </Text>
                         </TouchableOpacity>
                       );
@@ -788,9 +858,15 @@ export default function AddTaskForm({
 
                   <Text style={[styles.label, { color: veryDarkColor }]}>Location</Text>
                   <View style={styles.optionGrid}>
-                    {['kitchen', 'bathroom', 'bedroom', 'custom'].map((option) => {
+                    {getTagOptions('cleaningLocation').map((option) => {
                       const bgColor = getTagColor('cleaningLocation', option, cleaningLocation === option);
                       const textColor = getTextColor(bgColor);
+                      
+                      // Use custom text for saved custom tags
+                      const savedCustomTags = customTags[category]?.cleaningLocation || [];
+                      const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === option);
+                      const displayText = matchingCustomTag ? matchingCustomTag.text : 
+                                          option.charAt(0).toUpperCase() + option.slice(1);
                       
                       return (
                         <TouchableOpacity
@@ -807,7 +883,7 @@ export default function AddTaskForm({
                             styles.optionText,
                             { color: textColor }
                           ]}>
-                            {option.charAt(0).toUpperCase() + option.slice(1)}
+                            {displayText}
                           </Text>
                         </TouchableOpacity>
                       );
