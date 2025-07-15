@@ -4,160 +4,160 @@ export const autumnTheme = {
   backgroundImage: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
   addTaskIcon: 'leaf', // Custom fall leaf icon
   tabColors: {
-    daily: { // Maple Burgundy - now deeper and more burgundy
-      veryDark: '#7D0A0A', // Deeper Maple Burgundy
-      shadow: '#8F2222',
-      dark: '#A13838',
-      medium: '#BE6969',
-      pastel: '#E1B6B6',
-      bgAlt: '#F7E6E6',
-      highlight: '#B54444',
-      bg: '#FDF7F7',
-      accent: '#F0DAD9',
-      crimsonBold: '#6E0E0E', // Deep burgundy maple
-      crimsonLight: '#F1E4E4',
-      amberBold: '#7A1818', // Rich burgundy
-      amberLight: '#F2E5E5',
-      oliveBold: '#761212', // Dark burgundy
-      oliveLight: '#F1E4E4',
-      rustBold: '#8A1E1E', // Auburn burgundy
-      rustLight: '#F3E6E6',
-      plumBold: '#690505', // Deep wine burgundy
-      plumLight: '#F0E3E3',
-      slateBold: '#7C1414', // Russet burgundy
-      slateLight: '#F2E5E5'
+    daily: { // True Burgundy
+      veryDark: '#5C0A22', // Deep burgundy
+      shadow: '#700D2A',
+      dark: '#841031',
+      medium: '#AB4660',
+      pastel: '#D9A7B5',
+      bgAlt: '#F5E5EA',
+      highlight: '#962D47',
+      bg: '#FDF7F9',
+      accent: '#F0DAE0',
+      crimsonBold: '#52081E', // Deep burgundy
+      crimsonLight: '#F1E4E8',
+      amberBold: '#5F0923', // Rich burgundy
+      amberLight: '#F2E5E9',
+      oliveBold: '#590820', // Dark burgundy
+      oliveLight: '#F1E4E8',
+      rustBold: '#6A0C28', // Auburn burgundy
+      rustLight: '#F3E6EA',
+      plumBold: '#4F0720', // Deep wine burgundy
+      plumLight: '#F0E3E7',
+      slateBold: '#5E0A24', // Russet burgundy
+      slateLight: '#F2E5E9'
     },
-    meals: { // Clay Earth
-      veryDark: '#A3422C', // Clay Earth
-      shadow: '#B45A44',
-      dark: '#C26D59',
-      medium: '#D49485',
-      pastel: '#E9C5BD',
-      bgAlt: '#F9EAE7',
-      highlight: '#D47E6B',
-      bg: '#FDF8F7',
-      accent: '#F2DDD9',
-      mulberryBold: '#954536', // Terra clay
-      mulberryLight: '#F4E9E7',
-      honeyBold: '#AB513B', // Sun-baked clay
-      honeyLight: '#F6ECE9',
-      forestBold: '#985039', // Rustic clay
-      forestLight: '#F5EBE9',
-      seaBold: '#8E4B3A', // Weathered clay
-      seaLight: '#F3E9E7',
-      mauveBold: '#9B4E3C', // Warm clay
-      mauveLight: '#F5EBE9',
-      khakiBold: '#A14E3C', // Rich clay
-      khakiLight: '#F5ECE9',
-      terraBold: '#9A4832', // Deep clay
-      terraLight: '#F4EAE7'
+    goals: { // True Mustard
+      veryDark: '#A88A0B', // True Mustard
+      shadow: '#BC9B0F',
+      dark: '#CDAB19',
+      medium: '#DDC449',
+      pastel: '#EBDB93',
+      bgAlt: '#F9F6E2',
+      highlight: '#D4B82D',
+      bg: '#FEFDF7',
+      accent: '#F6F0D5',
+      lavenderBold: '#9C7F0A', // Rich mustard
+      lavenderLight: '#F5F2E3',
+      cedarBold: '#A5850C', // Deep mustard
+      cedarLight: '#F6F3E4',
+      jungleBold: '#9F841D', // Forest mustard
+      jungleLight: '#F5F3E5',
+      brownBold: '#987D0E', // Antique mustard
+      brownLight: '#F4F1E3',
+      slateAltBold: '#927C16', // Muted mustard
+      slateAltLight: '#F4F1E4'
     },
-    calendar: { // Vibrant Pumpkin
-      veryDark: '#E05E00', // Vibrant Pumpkin
-      shadow: '#E77929',
-      dark: '#EA8D49',
-      medium: '#F0B07E',
-      pastel: '#F7D7BC',
-      bgAlt: '#FCF2E9',
-      highlight: '#EE9D62',
-      bg: '#FEFAF7',
-      accent: '#F9E6D7',
-      mulberryBold: '#D16515', // Harvest pumpkin
-      mulberryLight: '#FAEFE6',
-      honeyBold: '#D85D00', // Bright pumpkin
-      honeyLight: '#FBEDE4',
-      forestBold: '#C85F10', // Spicy pumpkin
-      forestLight: '#F9EEE6',
-      seaBold: '#C96A20', // Autumn pumpkin
-      seaLight: '#F9EFE7',
-      mauveBold: '#CE6218', // Glowing pumpkin
-      mauveLight: '#F9EEE6',
-      khakiBold: '#C76921', // Golden pumpkin
-      khakiLight: '#F9EFE7'
+    calendar: { // Burnt Orange
+      veryDark: '#BF4800', // Burnt Orange
+      shadow: '#CE5A10',
+      dark: '#DA6B24',
+      medium: '#E8934B',
+      pastel: '#F3C99E',
+      bgAlt: '#FBEFE5',
+      highlight: '#E1813A',
+      bg: '#FEF9F5',
+      accent: '#F9E5D3',
+      mulberryBold: '#B14400', // Deep burnt orange
+      mulberryLight: '#F8ECE3',
+      honeyBold: '#BD4C07', // Rich burnt orange
+      honeyLight: '#F9EDE4',
+      forestBold: '#AD4A10', // Rustic burnt orange
+      forestLight: '#F8ECE4',
+      seaBold: '#B54F14', // Autumn burnt orange
+      seaLight: '#F8EDE5',
+      mauveBold: '#AE4C0D', // Warm burnt orange
+      mauveLight: '#F8ECE4',
+      khakiBold: '#B75016', // Golden burnt orange
+      khakiLight: '#F9EDE5'
     },
-    future: { // Golden Amber
-      veryDark: '#B7940B', // Golden Amber
-      shadow: '#C4A42F',
-      dark: '#CFB24C',
-      medium: '#DDC87C',
-      pastel: '#EEDFB6',
-      bgAlt: '#FAF5E6',
-      highlight: '#D9C365',
-      bg: '#FEFCF7',
-      accent: '#F6F0D8',
-      lavenderBold: '#A88D22', // Rich amber
-      lavenderLight: '#F6F3E5',
-      cedarBold: '#B19220', // Deep amber
-      cedarLight: '#F7F3E6',
-      jungleBold: '#AB9030', // Forest amber
-      jungleLight: '#F6F3E7',
-      brownBold: '#A4891F', // Antique amber
-      brownLight: '#F5F2E4',
-      slateAltBold: '#9E8828', // Muted amber
-      slateAltLight: '#F5F2E6'
+    meals: { // True Terracotta
+      veryDark: '#9A3B1E', // True Terracotta
+      shadow: '#AC4C2E',
+      dark: '#BC5D3D',
+      medium: '#D08566',
+      pastel: '#E5BBAA',
+      bgAlt: '#F8E9E4',
+      highlight: '#CA7250',
+      bg: '#FDF8F6',
+      accent: '#F2DCD5',
+      mulberryBold: '#8B3519', // Deep terracotta
+      mulberryLight: '#F3E6E2',
+      honeyBold: '#A04023', // Sun-baked terracotta
+      honeyLight: '#F5E7E3',
+      forestBold: '#913C25', // Rustic terracotta
+      forestLight: '#F3E7E3',
+      seaBold: '#873A24', // Weathered terracotta
+      seaLight: '#F2E6E2',
+      mauveBold: '#944026', // Warm terracotta
+      mauveLight: '#F4E7E3',
+      khakiBold: '#9A3F26', // Rich terracotta
+      khakiLight: '#F4E7E3',
+      terraBold: '#8F3A1D', // Deep terracotta
+      terraLight: '#F3E6E2'
     },
     cleaning: { // Dried Sage
-      veryDark: '#8A9A7B', // Dried Sage
-      shadow: '#9AA98E',
-      dark: '#A9B59F',
-      medium: '#C2CBBB',
-      pastel: '#DEE3D9',
-      bgAlt: '#F4F6F2',
-      highlight: '#B9C3AE',
-      bg: '#FDFEFB',
-      accent: '#E9EEE4',
-      avocadoBold: '#798A6D', // Olive sage
-      avocadoLight: '#F0F3ED',
-      steelBold: '#7D9274', // Forest sage
-      steelLight: '#F1F4EE',
-      walnutBold: '#84937A', // Earth sage
-      walnutLight: '#F2F4EF',
-      roseBold: '#7E8C74', // Muted sage
-      roseLight: '#F1F3EE',
-      slateNeutralBold: '#7A8871', // Stone sage
-      slateNeutralLight: '#F0F2ED'
-    },
-    delegate: { // Pine Green
-      veryDark: '#2D5F2E', // Pine Green
-      shadow: '#4A7249',
-      dark: '#5F8260',
-      medium: '#8AA58B',
-      pastel: '#C4D3C4',
-      bgAlt: '#ECF2EC',
-      highlight: '#7A9B7A',
-      bg: '#FAFCFA',
-      accent: '#E2EBE2',
-      navyBold: '#2A5428', // Deep pine
-      navyLight: '#E5EDE5',
-      auburnBold: '#355D32', // Forest pine
-      auburnLight: '#E7EDE7',
-      sageBold: '#3D6241', // Moss pine
-      sageLight: '#E9EEE9',
-      berryBold: '#315734', // Lush pine
-      berryLight: '#E6EDE6',
-      grayBold: '#3A5E3B', // Mountain pine
-      grayLight: '#E8EDE8'
+      veryDark: '#7C8B6F', // Dried Sage
+      shadow: '#8D9A82',
+      dark: '#9CA992',
+      medium: '#B8C1B0',
+      pastel: '#D8DDD3',
+      bgAlt: '#F2F4EF',
+      highlight: '#ABB7A2',
+      bg: '#FCFDFB',
+      accent: '#E7ECE2',
+      avocadoBold: '#6D7D62', // Olive sage
+      avocadoLight: '#EFF2EB',
+      steelBold: '#718569', // Forest sage
+      steelLight: '#F0F3EC',
+      walnutBold: '#77846F', // Earth sage
+      walnutLight: '#F0F2ED',
+      roseBold: '#717F69', // Muted sage
+      roseLight: '#EFF1EC',
+      slateNeutralBold: '#6D7B65', // Stone sage
+      slateNeutralLight: '#EFF1EB'
     },
     selfCare: { // Autumn Chestnut
-      veryDark: '#644736', // Autumn Chestnut
-      shadow: '#7A5F4E',
-      dark: '#8C7462',
-      medium: '#AA9788',
-      pastel: '#D1C5BB',
-      bgAlt: '#F2EDE9',
-      highlight: '#9D8676',
-      bg: '#FCFAF9',
-      accent: '#EBE3DE',
-      navyBold: '#5A4030', // Deep chestnut
-      navyLight: '#EDE9E5',
-      auburnBold: '#6A4C3A', // Rich chestnut
-      auburnLight: '#EFE9E6',
-      sageBold: '#624B3D', // Earth chestnut
-      sageLight: '#EEEAE7',
-      berryBold: '#5E4434', // Dark chestnut
-      berryLight: '#EDE9E6',
-      grayBold: '#5D4B3E', // Muted chestnut
-      grayLight: '#EDEAE7'
+      veryDark: '#5A3D2B', // Autumn Chestnut
+      shadow: '#6F5241',
+      dark: '#806453',
+      medium: '#A08878',
+      pastel: '#CABCB3',
+      bgAlt: '#EFEBE7',
+      highlight: '#937B6A',
+      bg: '#FBF9F8',
+      accent: '#E9E2DC',
+      navyBold: '#513725', // Deep chestnut
+      navyLight: '#ECE7E3',
+      auburnBold: '#5F422F', // Rich chestnut
+      auburnLight: '#EDE8E5',
+      sageBold: '#584232', // Earth chestnut
+      sageLight: '#ECE8E5',
+      berryBold: '#533B29', // Dark chestnut
+      berryLight: '#EBE7E3',
+      grayBold: '#544134', // Muted chestnut
+      grayLight: '#ECE8E5'
+    },
+    delegate: { // Deep Kale Green
+      veryDark: '#1E3F23', // Deep Kale Green
+      shadow: '#2A4D2F',
+      dark: '#365A3A',
+      medium: '#5D7B61',
+      pastel: '#AAC0AD',
+      bgAlt: '#E6EDE7',
+      highlight: '#4A6B4F',
+      bg: '#F8FBF9',
+      accent: '#DFEAE0',
+      navyBold: '#19381E', // Deep kale
+      navyLight: '#E3EAE4',
+      auburnBold: '#1F3D24', // Forest kale
+      auburnLight: '#E4EAE5',
+      sageBold: '#24422A', // Moss kale
+      sageLight: '#E5EBE6',
+      berryBold: '#1C3A21', // Lush kale
+      berryLight: '#E3E9E4',
+      grayBold: '#213F27', // Mountain kale
+      grayLight: '#E4EAE5'
     }
   }
 };
