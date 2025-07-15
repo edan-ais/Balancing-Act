@@ -14,19 +14,7 @@ export const balanceTheme = {
       bgAlt: '#E5EBFF',
       highlight: '#5E7CFF',
       bg: '#F2F5FF',
-      accent: '#D9E0FC',
-      crimsonBold: '#B83232',
-      crimsonLight: '#F8E8E8',
-      amberBold: '#996633',
-      amberLight: '#F5EFE3',
-      oliveBold: '#547133',
-      oliveLight: '#EDF1E8',
-      rustBold: '#B8671D',
-      rustLight: '#F8F0E7',
-      plumBold: '#6E416F',
-      plumLight: '#F0E9F0',
-      slateBold: '#666F7A',
-      slateLight: '#EFF1F3'
+      accent: '#D9E0FC'
     },
     future: {
       veryDark: '#0E5A28',
@@ -37,17 +25,7 @@ export const balanceTheme = {
       bgAlt: '#E1F7E9',
       highlight: '#3AD174',
       bg: '#F2FFF7',
-      accent: '#C9F2D9',
-      lavenderBold: '#695C87',
-      lavenderLight: '#EFEDF3',
-      cedarBold: '#9C4848',
-      cedarLight: '#F5EAEA',
-      jungleBold: '#3D7266',
-      jungleLight: '#E9F0EE',
-      brownBold: '#79553D',
-      brownLight: '#F1ECE9',
-      slateAltBold: '#666F7A',
-      slateAltLight: '#EFF1F3'
+      accent: '#C9F2D9'
     },
     calendar: {
       veryDark: '#3E2980',
@@ -69,23 +47,7 @@ export const balanceTheme = {
       bgAlt: '#FFE6F4',
       highlight: '#FF57B3',
       bg: '#FFF5FB',
-      accent: '#FAD8EE',
-      mulberryBold: '#9E4352',
-      mulberryLight: '#F5E9EB',
-      honeyBold: '#8D7144',
-      honeyLight: '#F3F0E9',
-      forestBold: '#456855',
-      forestLight: '#EAEFED',
-      seaBold: '#2E7391',
-      seaLight: '#E8F0F4',
-      mauveBold: '#7C5876',
-      mauveLight: '#F1ECF1',
-      khakiBold: '#856B4D',
-      khakiLight: '#F2EFEA',
-      terraBold: '#BD5B35',
-      terraLight: '#F8ECE8',
-      slateClassicBold: '#666F7A',
-      slateClassicLight: '#EFF1F3'
+      accent: '#FAD8EE'
     },
     cleaning: {
       veryDark: '#0F4578',
@@ -96,17 +58,7 @@ export const balanceTheme = {
       bgAlt: '#E1EEFF',
       highlight: '#4AA5FF',
       bg: '#F2F8FF',
-      accent: '#D4E8FE',
-      avocadoBold: '#748547',
-      avocadoLight: '#F1F3EA',
-      steelBold: '#4E7891',
-      steelLight: '#EBF1F4',
-      walnutBold: '#8A6D59',
-      walnutLight: '#F3EFEC',
-      roseBold: '#996B77',
-      roseLight: '#F5EFF1',
-      slateNeutralBold: '#666F7A',
-      slateNeutralLight: '#EFF1F3'
+      accent: '#D4E8FE'
     },
     selfCare: {
       veryDark: '#8C1E1E',
@@ -128,17 +80,48 @@ export const balanceTheme = {
       bgAlt: '#DEFAF8',
       highlight: '#2DCCBB',
       bg: '#F2FFFE',
-      accent: '#C9F0EE',
-      navyBold: '#4B7994',
-      navyLight: '#EBF1F4',
-      auburnBold: '#A56F4B',
-      auburnLight: '#F6F0EA',
-      sageBold: '#637A54',
-      sageLight: '#EEF1EC',
-      berryBold: '#8D5F75',
-      berryLight: '#F4EDF1',
-      grayBold: '#666F7A',
-      grayLight: '#EFF1F3'
+      accent: '#C9F0EE'
+    },
+    themeColorWheel: {
+      // Red
+      redBold: '#FF3B30',
+      redLight: '#FFE8E7',
+      
+      // Orange
+      orangeBold: '#FF9500',
+      orangeLight: '#FFF4E5',
+      
+      // Yellow
+      yellowBold: '#FFCC00',
+      yellowLight: '#FFFBE5',
+      
+      // Green
+      greenBold: '#34C759',
+      greenLight: '#E8F8ED',
+      
+      // Blue
+      blueBold: '#007AFF',
+      blueLight: '#E5F0FF',
+      
+      // Indigo
+      indigoBold: '#5856D6',
+      indigoLight: '#ECEEFF',
+      
+      // Purple
+      purpleBold: '#AF52DE',
+      purpleLight: '#F5EBFA',
+      
+      // Pink
+      pinkBold: '#FF2D55',
+      pinkLight: '#FFE8EC',
+      
+      // Brown
+      brownBold: '#A2845E',
+      brownLight: '#F5F1EB',
+      
+      // Gray
+      grayBold: '#8E8E93',
+      grayLight: '#F2F2F2'
     }
   }
 };
