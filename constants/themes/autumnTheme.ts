@@ -4,7 +4,7 @@ export const autumnTheme = {
   backgroundImage: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
   addTaskIcon: 'leaf', // Custom fall leaf icon
   tabColors: {
-    daily: { // True Burgundy
+    daily: { // True Burgundy (formerly Maple Burgundy)
       veryDark: '#5C0A22', // Deep burgundy
       shadow: '#700D2A',
       dark: '#841031',
@@ -26,50 +26,6 @@ export const autumnTheme = {
       plumLight: '#F0E3E7',
       slateBold: '#5E0A24', // Russet burgundy
       slateLight: '#F2E5E9'
-    },
-    future: { // True Mustard (formerly Golden Amber)
-      veryDark: '#A88A0B', // True Mustard
-      shadow: '#BC9B0F',
-      dark: '#CDAB19',
-      medium: '#DDC449',
-      pastel: '#EBDB93',
-      bgAlt: '#F9F6E2',
-      highlight: '#D4B82D',
-      bg: '#FEFDF7',
-      accent: '#F6F0D5',
-      lavenderBold: '#9C7F0A', // Rich mustard
-      lavenderLight: '#F5F2E3',
-      cedarBold: '#A5850C', // Deep mustard
-      cedarLight: '#F6F3E4',
-      jungleBold: '#9F841D', // Forest mustard
-      jungleLight: '#F5F3E5',
-      brownBold: '#987D0E', // Antique mustard
-      brownLight: '#F4F1E3',
-      slateAltBold: '#927C16', // Muted mustard
-      slateAltLight: '#F4F1E4'
-    },
-    calendar: { // Burnt Orange (formerly Vibrant Pumpkin)
-      veryDark: '#BF4800', // Burnt Orange
-      shadow: '#CE5A10',
-      dark: '#DA6B24',
-      medium: '#E8934B',
-      pastel: '#F3C99E',
-      bgAlt: '#FBEFE5',
-      highlight: '#E1813A',
-      bg: '#FEF9F5',
-      accent: '#F9E5D3',
-      mulberryBold: '#B14400', // Deep burnt orange
-      mulberryLight: '#F8ECE3',
-      honeyBold: '#BD4C07', // Rich burnt orange
-      honeyLight: '#F9EDE4',
-      forestBold: '#AD4A10', // Rustic burnt orange
-      forestLight: '#F8ECE4',
-      seaBold: '#B54F14', // Autumn burnt orange
-      seaLight: '#F8EDE5',
-      mauveBold: '#AE4C0D', // Warm burnt orange
-      mauveLight: '#F8ECE4',
-      khakiBold: '#B75016', // Golden burnt orange
-      khakiLight: '#F9EDE5'
     },
     meals: { // True Terracotta (formerly Clay Earth)
       veryDark: '#9A3B1E', // True Terracotta
@@ -96,6 +52,50 @@ export const autumnTheme = {
       terraBold: '#8F3A1D', // Deep terracotta
       terraLight: '#F3E6E2'
     },
+    calendar: { // Burnt Orange (formerly Vibrant Pumpkin)
+      veryDark: '#BF4800', // Burnt Orange
+      shadow: '#CE5A10',
+      dark: '#DA6B24',
+      medium: '#E8934B',
+      pastel: '#F3C99E',
+      bgAlt: '#FBEFE5',
+      highlight: '#E1813A',
+      bg: '#FEF9F5',
+      accent: '#F9E5D3',
+      mulberryBold: '#B14400', // Deep burnt orange
+      mulberryLight: '#F8ECE3',
+      honeyBold: '#BD4C07', // Rich burnt orange
+      honeyLight: '#F9EDE4',
+      forestBold: '#AD4A10', // Rustic burnt orange
+      forestLight: '#F8ECE4',
+      seaBold: '#B54F14', // Autumn burnt orange
+      seaLight: '#F8EDE5',
+      mauveBold: '#AE4C0D', // Warm burnt orange
+      mauveLight: '#F8ECE4',
+      khakiBold: '#B75016', // Golden burnt orange
+      khakiLight: '#F9EDE5'
+    },
+    future: { // True Mustard (formerly Golden Amber)
+      veryDark: '#A88A0B', // True Mustard
+      shadow: '#BC9B0F',
+      dark: '#CDAB19',
+      medium: '#DDC449',
+      pastel: '#EBDB93',
+      bgAlt: '#F9F6E2',
+      highlight: '#D4B82D',
+      bg: '#FEFDF7',
+      accent: '#F6F0D5',
+      lavenderBold: '#9C7F0A', // Rich mustard
+      lavenderLight: '#F5F2E3',
+      cedarBold: '#A5850C', // Deep mustard
+      cedarLight: '#F6F3E4',
+      jungleBold: '#9F841D', // Forest mustard
+      jungleLight: '#F5F3E5',
+      brownBold: '#987D0E', // Antique mustard
+      brownLight: '#F4F1E3',
+      slateAltBold: '#927C16', // Muted mustard
+      slateAltLight: '#F4F1E4'
+    },
     cleaning: { // Dried Sage
       veryDark: '#7C8B6F', // Dried Sage
       shadow: '#8D9A82',
@@ -117,27 +117,6 @@ export const autumnTheme = {
       slateNeutralBold: '#6D7B65', // Stone sage
       slateNeutralLight: '#EFF1EB'
     },
-    selfCare: { // Autumn Chestnut
-      veryDark: '#5A3D2B', // Autumn Chestnut
-      shadow: '#6F5241',
-      dark: '#806453',
-      medium: '#A08878',
-      pastel: '#CABCB3',
-      bgAlt: '#EFEBE7',
-      highlight: '#937B6A',
-      bg: '#FBF9F8',
-      accent: '#E9E2DC',
-      navyBold: '#513725', // Deep chestnut
-      navyLight: '#ECE7E3',
-      auburnBold: '#5F422F', // Rich chestnut
-      auburnLight: '#EDE8E5',
-      sageBold: '#584232', // Earth chestnut
-      sageLight: '#ECE8E5',
-      berryBold: '#533B29', // Dark chestnut
-      berryLight: '#EBE7E3',
-      grayBold: '#544134', // Muted chestnut
-      grayLight: '#ECE8E5'
-    },
     delegate: { // Deep Kale Green (formerly Pine Green)
       veryDark: '#1E3F23', // Deep Kale Green
       shadow: '#2A4D2F',
@@ -158,6 +137,27 @@ export const autumnTheme = {
       berryLight: '#E3E9E4',
       grayBold: '#213F27', // Mountain kale
       grayLight: '#E4EAE5'
+    },
+    selfCare: { // Autumn Chestnut
+      veryDark: '#5A3D2B', // Autumn Chestnut
+      shadow: '#6F5241',
+      dark: '#806453',
+      medium: '#A08878',
+      pastel: '#CABCB3',
+      bgAlt: '#EFEBE7',
+      highlight: '#937B6A',
+      bg: '#FBF9F8',
+      accent: '#E9E2DC',
+      navyBold: '#513725', // Deep chestnut
+      navyLight: '#ECE7E3',
+      auburnBold: '#5F422F', // Rich chestnut
+      auburnLight: '#EDE8E5',
+      sageBold: '#584232', // Earth chestnut
+      sageLight: '#ECE8E5',
+      berryBold: '#533B29', // Dark chestnut
+      berryLight: '#EBE7E3',
+      grayBold: '#544134', // Muted chestnut
+      grayLight: '#ECE8E5'
     }
   }
 };
