@@ -25,8 +25,8 @@ export const latteTheme = {
       pumpkinLight: '#FCF2E8',
       purpleBold: '#8B6B8C',
       purpleLight: '#F3EEF3',
-      vanillaBold: '#8A7F6F',
-      vanillaLight: '#F3F1EF'
+      vanillaBold: '#756A5B', // Darker vanilla
+      vanillaLight: '#ECEAE6' // Darker vanilla light
     },
     future: {
       veryDark: '#2A1F13',
@@ -46,8 +46,8 @@ export const latteTheme = {
       oliveLight: '#EDEFE9',
       bronzeBold: '#996B21',
       bronzeLight: '#F5F0E8',
-      creamBold: '#8A7F6F',
-      creamLight: '#F3F1EF'
+      creamBold: '#756A5B', // Darker cream
+      creamLight: '#ECEAE6' // Darker cream light
     },
     calendar: {
       veryDark: '#422E18',
@@ -84,8 +84,8 @@ export const latteTheme = {
       dustyPurpleLight: '#F1EFF4',
       raspberryBold: '#B25D85',
       raspberryLight: '#F7EDF2',
-      neutralBold: '#8A7F6F',
-      neutralLight: '#F3F1EF'
+      neutralBold: '#756A5B', // Darker neutral
+      neutralLight: '#ECEAE6' // Darker neutral light
     },
     cleaning: {
       veryDark: '#3D364E',
@@ -105,8 +105,8 @@ export const latteTheme = {
       coffeeLight: '#F3EFED',
       terracottaAltBold: '#AF6458',
       terracottaAltLight: '#F7EDEC',
-      sandBold: '#8A7F6F',
-      sandLight: '#F3F1EF'
+      sandBold: '#756A5B', // Darker sand
+      sandLight: '#ECEAE6' // Darker sand light
     },
     selfCare: {
       veryDark: '#2A3820',
@@ -120,15 +120,15 @@ export const latteTheme = {
       bg: '#F6FAF4'
     },
     delegate: {
-      veryDark: '#8A7F6F',
-      shadow: '#A69986',
-      dark: '#BFB3A2',
-      medium: '#D1C7B7',
-      accent: '#EAE0D0',
-      highlight: '#F2D8B6',
-      bgAlt: '#F7F3EB',
-      pastel: '#F8F5EF',
-      bg: '#FEFCF9',
+      veryDark: '#756A5B', // Darker veryDark
+      shadow: '#8F8573', // Darker shadow
+      dark: '#A9A091', // Darker dark
+      medium: '#C0B8AA', // Darker medium
+      accent: '#D9D0C2', // Darker accent
+      highlight: '#E6CDA8', // Darker highlight
+      bgAlt: '#F1EDE5', // Darker bgAlt
+      pastel: '#F2EFEA', // Darker pastel
+      bg: '#F8F6F3', // Darker bg
       azureBold: '#7D93B2',
       azureLight: '#F1F4F7',
       copperBold: '#C7874F',
@@ -137,8 +137,8 @@ export const latteTheme = {
       taupeLight: '#F3F1F1',
       mossBold: '#8DAA7B',
       mossLight: '#F3F6F1',
-      beigeBold: '#8A7F6F',
-      beigeLight: '#F3F1EF'
+      beigeBold: '#756A5B', // Darker beige
+      beigeLight: '#ECEAE6' // Darker beige light
     }
   }
 };
