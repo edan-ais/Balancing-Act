@@ -27,7 +27,7 @@ export const autumnTheme = {
       slateBold: '#5E0A24', // Russet burgundy
       slateLight: '#F2E5E9'
     },
-    goals: { // True Mustard
+    future: { // True Mustard (formerly Golden Amber)
       veryDark: '#A88A0B', // True Mustard
       shadow: '#BC9B0F',
       dark: '#CDAB19',
@@ -48,7 +48,7 @@ export const autumnTheme = {
       slateAltBold: '#927C16', // Muted mustard
       slateAltLight: '#F4F1E4'
     },
-    calendar: { // Burnt Orange
+    calendar: { // Burnt Orange (formerly Vibrant Pumpkin)
       veryDark: '#BF4800', // Burnt Orange
       shadow: '#CE5A10',
       dark: '#DA6B24',
@@ -71,7 +71,7 @@ export const autumnTheme = {
       khakiBold: '#B75016', // Golden burnt orange
       khakiLight: '#F9EDE5'
     },
-    meals: { // True Terracotta
+    meals: { // True Terracotta (formerly Clay Earth)
       veryDark: '#9A3B1E', // True Terracotta
       shadow: '#AC4C2E',
       dark: '#BC5D3D',
@@ -138,7 +138,7 @@ export const autumnTheme = {
       grayBold: '#544134', // Muted chestnut
       grayLight: '#ECE8E5'
     },
-    delegate: { // Deep Kale Green
+    delegate: { // Deep Kale Green (formerly Pine Green)
       veryDark: '#1E3F23', // Deep Kale Green
       shadow: '#2A4D2F',
       dark: '#365A3A',
