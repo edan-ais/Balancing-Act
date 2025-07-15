@@ -40,8 +40,6 @@ export function TabProvider({ children }: { children: ReactNode }) {
           console.log('User profiles table not found, using default tabs');
           return;
         }
-        throw error;
-      }
         console.error('Error loading user tabs:', error);
         return;
       }
