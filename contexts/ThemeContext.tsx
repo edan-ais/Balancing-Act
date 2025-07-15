@@ -1,4 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import { supabase } from '@/lib/supabase';
+import { useAuth } from '@/contexts/AuthContext';
 import { Theme, defaultTheme, themes } from '@/constants/themes';
 
 interface ThemeContextType {
@@ -14,11 +16,72 @@ const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<Theme>(defaultTheme);
   const [currentTab, setCurrentTab] = useState<string>('daily'); // Default to 'daily' tab
+  const { user } = useAuth();
+
+  // Load user preferences when user logs in
+  useEffect(() => {
+    if (user) {
+      loadUserPreferences();
+    } else {
+      // Reset to defaults when user logs out
+      setCurrentTheme(defaultTheme);
+    }
+  }, [user]);
+
+  const loadUserPreferences = async () => {
+    if (!user) return;
+
+    try {
+      const { data, error } = await supabase
+        .from('user_profiles')
+        .select('current_theme')
+        .eq('id', user.id)
+        .single();
+
+      if (error) {
+        console.error('Error loading user preferences:', error);
+        return;
+      }
+
+      if (data?.current_theme) {
+        const theme = themes.find(t => t.id === data.current_theme);
+        if (theme) {
+          setCurrentTheme(theme);
+        }
+      }
+    } catch (error) {
+      console.error('Error loading user preferences:', error);
+    }
+  };
+
+  const saveUserPreferences = async (themeId: string) => {
+    if (!user) return;
+
+    try {
+      const { error } = await supabase
+        .from('user_profiles')
+        .upsert({
+          id: user.id,
+          current_theme: themeId,
+        });
+
+      if (error) {
+        console.error('Error saving user preferences:', error);
+      }
+    } catch (error) {
+      console.error('Error saving user preferences:', error);
+    }
+  };
 
   const setTheme = (themeId: string) => {
     const theme = themes.find(t => t.id === themeId);
     if (theme) {
       setCurrentTheme(theme);
+      
+      // Save to Supabase if user is logged in
+      if (user) {
+        saveUserPreferences(themeId);
+      }
     }
   };
 
