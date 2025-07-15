@@ -1,6 +1,7 @@
 import { balanceTheme } from './balanceTheme';
 import { latteTheme } from './latteTheme';
 import { rainstormTheme } from './rainstormTheme';
+import { autumnTheme } from './autumnTheme';
 
 export interface ThemeColors {
   pastel: string;
@@ -32,9 +33,10 @@ export interface Theme {
 export const themes: Theme[] = [
   balanceTheme,
   latteTheme,
-  rainstormTheme
+  rainstormTheme,
+  autumnTheme
 ];
 
 export const defaultTheme = balanceTheme;
 
-export { balanceTheme, latteTheme, rainstormTheme };
+export { balanceTheme, latteTheme, rainstormTheme, autumnTheme };
