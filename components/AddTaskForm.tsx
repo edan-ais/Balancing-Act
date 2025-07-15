@@ -83,17 +83,17 @@ export default function AddTaskForm({
   const [habitGoal, setHabitGoal] = useState('1');
   const [priority, setPriority] = useState<string>('');
   const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tabColors?.daily?.contrastOne || '#4A5568');
+  const [customPriorityColor, setCustomPriorityColor] = useState('');
   const [goalType, setGoalType] = useState<string>('');
   const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tabColors?.future?.contrastOne || '#4A5568');
+  const [customGoalTypeColor, setCustomGoalTypeColor] = useState('');
   const [mealType, setMealType] = useState<string>('');
   const [dayOfWeek, setDayOfWeek] = useState<string>('');
   const [notes, setNotes] = useState('');
   const [frequency, setFrequency] = useState<string>('');
   const [cleaningLocation, setCleaningLocation] = useState<string>('');
   const [customCleaningLocation, setCustomCleaningLocation] = useState('');
-  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tabColors?.cleaning?.contrastOne || '#996B77');
+  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState('');
   const [selfCareType, setSelfCareType] = useState<string>('');
   const [delegatedTo, setDelegatedTo] = useState('');
   const [delegateType, setDelegateType] = useState<string>('');
@@ -138,16 +138,28 @@ export default function AddTaskForm({
   const bgAltColor = tabColors.bgAlt || effectivePastelColor;
   const lightColor = tabColors.light || effectivePastelColor;
 
-  // Helper to get tag color
+  // Initialize custom colors with theme colors if they haven't been set yet
+  React.useEffect(() => {
+    if (!customPriorityColor) {
+      setCustomPriorityColor(colors?.tabColors?.themeColorWheel?.redBold || veryDarkColor);
+    }
+    if (!customGoalTypeColor) {
+      setCustomGoalTypeColor(colors?.tabColors?.themeColorWheel?.blueBold || veryDarkColor);
+    }
+    if (!customCleaningLocationColor) {
+      setCustomCleaningLocationColor(colors?.tabColors?.themeColorWheel?.greenBold || veryDarkColor);
+    }
+  }, [colors]);
+
+  // Helper to get tag color - using the new themeColorWheel
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
     // Required tags use tab's colors
     if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
       return isSelected ? veryDarkColor : bgAltColor;
     }
 
-    // For non-required tags, use their specific color from the tab section in theme
-    const tabColorKey = getCategoryColorKey();
-    const tabColors = colors?.tabColors?.[tabColorKey] || {};
+    // For non-required tags, use the themeColorWheel
+    const colorWheel = colors?.tabColors?.themeColorWheel || {};
     
     // Check for saved custom tags first
     const savedCustomTags = customTags[category]?.[tagType] || [];
@@ -171,126 +183,56 @@ export default function AddTaskForm({
       return isSelected ? veryDarkColor : bgAltColor;
     }
     
-    // Priority tags
+    // Use the color wheel mapping for specific tag types and values
     if (tagType === 'priority') {
-      if (tagValue === 'high' && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if (tagValue === 'high' && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if (tagValue === 'medium' && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if (tagValue === 'medium' && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if (tagValue === 'low' && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if (tagValue === 'low' && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
-      else if (tagValue === 'quick-win' && isSelected) {
-        return tabColors.contrastFour || veryDarkColor;
-      }
-      else if (tagValue === 'quick-win' && !isSelected) {
-        return tabColors.contrastFourLight || bgAltColor;
-      }
+      if (tagValue === 'high') 
+        return isSelected ? colorWheel.redBold || veryDarkColor : colorWheel.redLight || bgAltColor;
+      if (tagValue === 'medium') 
+        return isSelected ? colorWheel.orangeBold || veryDarkColor : colorWheel.orangeLight || bgAltColor;
+      if (tagValue === 'low') 
+        return isSelected ? colorWheel.yellowBold || veryDarkColor : colorWheel.yellowLight || bgAltColor;
+      if (tagValue === 'quick-win') 
+        return isSelected ? colorWheel.greenBold || veryDarkColor : colorWheel.greenLight || bgAltColor;
     }
-    
-    // Goal Type tags
     else if (tagType === 'goalType') {
-      if ((tagValue === 'TBD' || tagValue === 'tbd') && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if ((tagValue === 'TBD' || tagValue === 'tbd') && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if ((tagValue === 'Not Priority' || tagValue === 'notPriority') && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if ((tagValue === 'Not Priority' || tagValue === 'notPriority') && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if ((tagValue === 'Wish' || tagValue === 'wish') && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if ((tagValue === 'Wish' || tagValue === 'wish') && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
+      if (tagValue === 'Personal') 
+        return isSelected ? colorWheel.purpleBold || veryDarkColor : colorWheel.purpleLight || bgAltColor;
+      if (tagValue === 'Career') 
+        return isSelected ? colorWheel.blueBold || veryDarkColor : colorWheel.blueLight || bgAltColor;
+      if (tagValue === 'Financial') 
+        return isSelected ? colorWheel.greenBold || veryDarkColor : colorWheel.greenLight || bgAltColor;
+      if (tagValue === 'TBD' || tagValue === 'Not Priority') 
+        return isSelected ? colorWheel.grayBold || veryDarkColor : colorWheel.grayLight || bgAltColor;
+      if (tagValue === 'Wish')
+        return isSelected ? colorWheel.pinkBold || veryDarkColor : colorWheel.pinkLight || bgAltColor;
     }
-    
-    // Day of Week tags
     else if (tagType === 'dayOfWeek') {
-      if (tagValue === 'Mon' && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if (tagValue === 'Mon' && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if (tagValue === 'Tue' && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if (tagValue === 'Tue' && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if (tagValue === 'Wed' && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if (tagValue === 'Wed' && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
-      else if (tagValue === 'Thu' && isSelected) {
-        return tabColors.contrastFour || veryDarkColor;
-      }
-      else if (tagValue === 'Thu' && !isSelected) {
-        return tabColors.contrastFourLight || bgAltColor;
-      }
-      else if (tagValue === 'Fri' && isSelected) {
-        return tabColors.contrastFive || veryDarkColor;
-      }
-      else if (tagValue === 'Fri' && !isSelected) {
-        return tabColors.contrastFiveLight || bgAltColor;
-      }
-      else if (tagValue === 'Sat' && isSelected) {
-        return tabColors.contrastSix || veryDarkColor;
-      }
-      else if (tagValue === 'Sat' && !isSelected) {
-        return tabColors.contrastSixLight || bgAltColor;
-      }
-      else if (tagValue === 'Sun' && isSelected) {
-        return tabColors.contrastSeven || veryDarkColor;
-      }
-      else if (tagValue === 'Sun' && !isSelected) {
-        return tabColors.contrastSevenLight || bgAltColor;
-      }
+      if (tagValue === 'Mon') 
+        return isSelected ? colorWheel.redBold || veryDarkColor : colorWheel.redLight || bgAltColor;
+      if (tagValue === 'Tue') 
+        return isSelected ? colorWheel.orangeBold || veryDarkColor : colorWheel.orangeLight || bgAltColor;
+      if (tagValue === 'Wed') 
+        return isSelected ? colorWheel.yellowBold || veryDarkColor : colorWheel.yellowLight || bgAltColor;
+      if (tagValue === 'Thu') 
+        return isSelected ? colorWheel.greenBold || veryDarkColor : colorWheel.greenLight || bgAltColor;
+      if (tagValue === 'Fri') 
+        return isSelected ? colorWheel.blueBold || veryDarkColor : colorWheel.blueLight || bgAltColor;
+      if (tagValue === 'Sat') 
+        return isSelected ? colorWheel.purpleBold || veryDarkColor : colorWheel.purpleLight || bgAltColor;
+      if (tagValue === 'Sun') 
+        return isSelected ? colorWheel.pinkBold || veryDarkColor : colorWheel.pinkLight || bgAltColor;
     }
-    
-    // Cleaning Location tags
     else if (tagType === 'cleaningLocation') {
-      if (tagValue === 'kitchen' && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if (tagValue === 'kitchen' && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if (tagValue === 'bathroom' && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if (tagValue === 'bathroom' && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if (tagValue === 'bedroom' && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if (tagValue === 'bedroom' && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
+      if (tagValue === 'kitchen') 
+        return isSelected ? colorWheel.redBold || veryDarkColor : colorWheel.redLight || bgAltColor;
+      if (tagValue === 'bathroom') 
+        return isSelected ? colorWheel.blueBold || veryDarkColor : colorWheel.blueLight || bgAltColor;
+      if (tagValue === 'bedroom') 
+        return isSelected ? colorWheel.purpleBold || veryDarkColor : colorWheel.purpleLight || bgAltColor;
     }
     
-    // Default to theme colors if no specific color is found
-    return isSelected ? veryDarkColor : bgAltColor;
+    // Fallback to first available color or veryDarkColor
+    return isSelected ? colorWheel.grayBold || veryDarkColor : colorWheel.grayLight || bgAltColor;
   };
 
   // Helper to get text color based on background color
@@ -305,22 +247,23 @@ export default function AddTaskForm({
 
   // Get predefined color options for custom color selection
   const getColorOptions = (tagType: string) => {
-    // Get the appropriate tab colors based on the category
-    const tabColorKey = getCategoryColorKey();
-    const tabColors = colors?.tabColors?.[tabColorKey] || {};
+    // Use the theme color wheel for color options
+    const colorWheel = colors?.tabColors?.themeColorWheel || {};
     
-    // Create a fixed array of contrast colors with fallbacks
+    // Extract all the bold colors from the color wheel
     const colorOptions = [
-      tabColors.contrastOne || '#B83232',
-      tabColors.contrastTwo || '#996633',
-      tabColors.contrastThree || '#547133',
-      tabColors.contrastFour || '#B8671D',
-      tabColors.contrastFive || '#6E416F',
-      tabColors.contrastSix || '#666F7A',
-      tabColors.contrastSeven || '#BD5B35',
-      tabColors.contrastEight || '#4B7994',
-      veryDarkColor
-    ];
+      colorWheel.redBold,
+      colorWheel.orangeBold,
+      colorWheel.yellowBold,
+      colorWheel.greenBold,
+      colorWheel.blueBold,
+      colorWheel.indigoBold,
+      colorWheel.purpleBold,
+      colorWheel.pinkBold,
+      colorWheel.brownBold,
+      colorWheel.grayBold,
+      veryDarkColor // Add veryDarkColor as a fallback
+    ].filter(Boolean); // Filter out undefined values
     
     // Filter out any duplicates
     return [...new Set(colorOptions)];
@@ -354,17 +297,17 @@ export default function AddTaskForm({
     setHabitGoal('1');
     setPriority('');
     setCustomPriorityText('');
-    setCustomPriorityColor(colors?.tabColors?.daily?.contrastOne || '#4A5568');
+    setCustomPriorityColor(colors?.tabColors?.themeColorWheel?.redBold || veryDarkColor);
     setGoalType('');
     setCustomGoalTypeText('');
-    setCustomGoalTypeColor(colors?.tabColors?.future?.contrastOne || '#4A5568');
+    setCustomGoalTypeColor(colors?.tabColors?.themeColorWheel?.blueBold || veryDarkColor);
     setMealType('');
     setDayOfWeek('');
     setNotes('');
     setFrequency('');
     setCleaningLocation('');
     setCustomCleaningLocation('');
-    setCustomCleaningLocationColor(colors?.tabColors?.cleaning?.contrastOne || '#996B77');
+    setCustomCleaningLocationColor(colors?.tabColors?.themeColorWheel?.greenBold || veryDarkColor);
     setSelfCareType('');
     setDelegatedTo('');
     setDelegateType('');
