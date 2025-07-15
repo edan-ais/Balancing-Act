@@ -10,12 +10,40 @@ import {
   Switch,
   Dimensions,
 } from 'react-native';
-import { X, Plus, Minus } from 'lucide-react-native';
+import { X, Plus, Minus, Leaf, CloudRain, Coffee, Palette } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 // Get window dimensions for consistent modal sizing
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
+
+// Function to get the appropriate icon component based on theme
+const getThemeIcon = (theme) => {
+  if (!theme) return Plus; // Default fallback
+  
+  // Check if the theme has an addTaskIcon property
+  if (theme.addTaskIcon) {
+    const iconName = theme.addTaskIcon.toLowerCase();
+    
+    // Map the theme's icon name to the appropriate Lucide icon component
+    if (iconName.includes('leaf')) return Leaf;
+    if (iconName.includes('rain') || iconName.includes('cloud')) return CloudRain;
+    if (iconName.includes('coffee')) return Coffee;
+    if (iconName.includes('palette')) return Palette;
+  }
+  
+  // Based on theme ID
+  if (theme.id) {
+    const themeId = theme.id.toLowerCase();
+    if (themeId.includes('autumn')) return Leaf;
+    if (themeId.includes('rain')) return CloudRain;
+    if (themeId.includes('latte') || themeId.includes('coffee')) return Coffee;
+    if (themeId.includes('balance')) return Palette;
+  }
+  
+  // Default to plus icon if no match
+  return Plus;
+};
 
 interface AddTaskFormProps {
   visible: boolean;
@@ -31,6 +59,7 @@ interface AddTaskFormProps {
   pastelColor?: string;
   shadowColor?: string;
   customTags?: any; // Custom tags collection for each category and tag type
+  theme?: any; // The current theme object
 }
 
 export default function AddTaskForm({
@@ -46,7 +75,8 @@ export default function AddTaskForm({
   mediumColor = '#4A5568',
   pastelColor = '#E2E8F0',
   shadowColor = '#C8D0E0',
-  customTags = {}
+  customTags = {},
+  theme
 }: AddTaskFormProps) {
   const [title, setTitle] = useState('');
   const [taskType, setTaskType] = useState<string>('task'); // Default to 'task'
@@ -70,6 +100,9 @@ export default function AddTaskForm({
   const [reminderEnabled, setReminderEnabled] = useState(false);
   const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
   const [errors, setErrors] = useState<string[]>([]);
+  
+  // Get the theme-specific icon component
+  const ThemeIcon = getThemeIcon(theme);
   
   // Use theme colors if provided, otherwise use props
   const themeColors = colors || {};
@@ -1047,7 +1080,8 @@ export default function AddTaskForm({
                     onPress={addSubtask} 
                     style={[styles.addSubtaskButton, { backgroundColor: highlightColor }]}
                   >
-                    <Plus size={16} color="#FFFFFF" />
+                    {/* Use theme icon for adding subtasks */}
+                    <ThemeIcon size={16} color="#FFFFFF" />
                   </TouchableOpacity>
                 </View>
 
