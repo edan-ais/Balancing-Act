@@ -91,14 +91,7 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
         }
       }
     } catch (error) {
-      // Provide user-friendly error messages
-      if (result.error.includes('Invalid login credentials')) {
-        setError(isSignUp ? 'Failed to create account. Please try again.' : 'Invalid email or password. Please check your credentials.');
-      } else if (result.error.includes('User already registered')) {
-        setError('An account with this email already exists. Try signing in instead.');
-      } else {
-        setError(result.error);
-      }
+      Alert.alert('Error', error.message || 'An unexpected error occurred during authentication.');
     } finally {
       setLoading(false);
     }

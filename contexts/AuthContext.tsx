@@ -47,12 +47,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   };
 
   const signIn = async (email: string, password: string) => {
-
-      // Create user profile after successful signup
-      if (data.user) {
-        await createUserProfile(data.user.id);
-      }
-
     const { error } = await supabase.auth.signInWithPassword({
       email,
       password,

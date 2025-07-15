@@ -34,7 +34,14 @@ export function TabProvider({ children }: { children: ReactNode }) {
         .eq('id', user.id)
         .single();
 
-      if (error && error.code !== 'PGRST116') { // Ignore "not found" errors
+      if (error) {
+        // If table doesn't exist, use default tabs
+        if (error.code === '42P01' || error.code === 'PGRST116') {
+          console.log('User profiles table not found, using default tabs');
+          return;
+        }
+        throw error;
+      }
         console.error('Error loading user tabs:', error);
         return;
       }
