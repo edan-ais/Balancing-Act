@@ -105,52 +105,58 @@ export default function TaskItem({
   const bgAltColor = tabColors.bgAlt || effectivePastelColor;
   const lightColor = tabColors.light || effectivePastelColor;
 
-  // Helper to get tag color - using the flat structure
+  // Helper to get tag color - using the new themeColorWheel
   const getTagColor = (tagType: string, tagValue: string) => {
     // For custom tags, use their specific custom color
     if (tagValue === 'custom') {
-      // FIX 1: Type-safe approach for custom colors
       if (tagType === 'priority') {
-        return task.customPriorityColor || veryDarkColor;
+        return task.customPriorityColor || colors?.tabColors?.themeColorWheel?.redBold || veryDarkColor;
       } else if (tagType === 'goalType') {
-        return task.customGoalTypeColor || veryDarkColor;
+        return task.customGoalTypeColor || colors?.tabColors?.themeColorWheel?.blueBold || veryDarkColor;
       } else if (tagType === 'cleaningLocation') {
-        return task.customCleaningLocationColor || veryDarkColor;
+        return task.customCleaningLocationColor || colors?.tabColors?.themeColorWheel?.greenBold || veryDarkColor;
       } else {
         return veryDarkColor;
       }
     }
     
-    // Convert option to proper format for lookup in theme
-    let lookupKey;
+    // Use theme color wheel for predefined tag types
+    const colorWheel = colors?.tabColors?.themeColorWheel || {};
+    
+    // Map tag values to color wheel colors based on existing tag types
     if (tagType === 'priority') {
-      lookupKey = `priority${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-      if (tagValue === 'quick-win') {
-        lookupKey = 'priorityQuickWin';
-      }
-    } else if (tagType === 'goalType') {
-      if (tagValue === 'TBD') {
-        lookupKey = 'goalTbd';
-      } else if (tagValue === 'Not Priority') {
-        lookupKey = 'goalNotPriority';
-      } else {
-        lookupKey = `goal${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-      }
-    } else if (tagType === 'dayOfWeek') {
-      lookupKey = `day${tagValue}`;
-    } else if (tagType === 'cleaningLocation') {
-      lookupKey = `cleaning${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-    } else if (tagType === 'delegateType') {
-      lookupKey = `delegate${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
-    } else if (tagType === 'selfCareType') {
-      lookupKey = `selfCare${tagValue.charAt(0).toUpperCase() + tagValue.slice(1)}`;
+      if (tagValue === 'high') return colorWheel.redBold || veryDarkColor;
+      if (tagValue === 'medium') return colorWheel.orangeBold || veryDarkColor;
+      if (tagValue === 'low') return colorWheel.yellowBold || veryDarkColor;
+      if (tagValue === 'quick-win') return colorWheel.greenBold || veryDarkColor;
+    } 
+    else if (tagType === 'goalType') {
+      if (tagValue === 'Personal') return colorWheel.purpleBold || veryDarkColor;
+      if (tagValue === 'Career') return colorWheel.blueBold || veryDarkColor;
+      if (tagValue === 'Financial') return colorWheel.greenBold || veryDarkColor;
+      if (tagValue === 'TBD') return colorWheel.grayBold || veryDarkColor;
+      if (tagValue === 'Not Priority') return colorWheel.grayBold || veryDarkColor;
+    }
+    else if (tagType === 'dayOfWeek') {
+      if (tagValue === 'Monday') return colorWheel.redBold || veryDarkColor;
+      if (tagValue === 'Tuesday') return colorWheel.orangeBold || veryDarkColor;
+      if (tagValue === 'Wednesday') return colorWheel.yellowBold || veryDarkColor;
+      if (tagValue === 'Thursday') return colorWheel.greenBold || veryDarkColor;
+      if (tagValue === 'Friday') return colorWheel.blueBold || veryDarkColor;
+      if (tagValue === 'Saturday') return colorWheel.purpleBold || veryDarkColor;
+      if (tagValue === 'Sunday') return colorWheel.pinkBold || veryDarkColor;
+    }
+    else if (tagType === 'cleaningLocation') {
+      if (tagValue === 'Kitchen') return colorWheel.redBold || veryDarkColor;
+      if (tagValue === 'Bathroom') return colorWheel.blueBold || veryDarkColor;
+      if (tagValue === 'Bedroom') return colorWheel.purpleBold || veryDarkColor;
+      if (tagValue === 'LivingRoom') return colorWheel.greenBold || veryDarkColor;
+      if (tagValue === 'Office') return colorWheel.brownBold || veryDarkColor;
+      if (tagValue === 'Outdoor') return colorWheel.indigoBold || veryDarkColor;
     }
     
-    // Add Selected suffix to get the selected color
-    lookupKey = `${lookupKey}Selected`;
-    
-    // Return the color from the tab's colors or default to tab's main colors
-    return tabColors[lookupKey] || veryDarkColor;
+    // Fallback to first available color or veryDarkColor
+    return colorWheel.grayBold || veryDarkColor;
   };
 
   // Helper to get text color based on background color
@@ -165,44 +171,26 @@ export default function TaskItem({
 
   // Function to get priority tag color
   const getPriorityColor = (priority?: string) => {
-    if (!priority) return tabColors.priorityDefaultSelected || veryDarkColor;
-    
+    if (!priority) return colors?.tabColors?.themeColorWheel?.grayBold || veryDarkColor;
     return getTagColor('priority', priority);
   };
 
   // Function to get goal type tag color
   const getGoalTypeColor = (goalType?: string) => {
-    if (!goalType) return tabColors.goalDefaultSelected || veryDarkColor;
-    
+    if (!goalType) return colors?.tabColors?.themeColorWheel?.grayBold || veryDarkColor;
     return getTagColor('goalType', goalType);
   };
 
   // Function to get day of week color
   const getDayOfWeekColor = (day?: string) => {
-    if (!day) return veryDarkColor;
-    
+    if (!day) return colors?.tabColors?.themeColorWheel?.grayBold || veryDarkColor;
     return getTagColor('dayOfWeek', day);
   };
 
   // Function to get cleaning location color
   const getCleaningLocationColor = (location?: string) => {
-    if (!location) return tabColors.cleaningDefaultSelected || veryDarkColor;
-    
+    if (!location) return colors?.tabColors?.themeColorWheel?.grayBold || veryDarkColor;
     return getTagColor('cleaningLocation', location);
-  };
-
-  // Function to get self-care type color
-  const getSelfCareTypeColor = (type?: string) => {
-    if (!type) return tabColors.selfCareDefaultSelected || veryDarkColor;
-    
-    return getTagColor('selfCareType', type);
-  };
-
-  // Function to get delegate type color
-  const getDelegateTypeColor = (type?: string) => {
-    if (!type) return tabColors.delegateDefaultSelected || veryDarkColor;
-    
-    return getTagColor('delegateType', type);
   };
 
   // Get a lighter version of the color for borders
@@ -273,7 +261,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customGoalTypeColor || (tabColors.goalCustomSelected || veryDarkColor) }
+            { backgroundColor: task.customGoalTypeColor || (colors?.tabColors?.themeColorWheel?.blueBold || veryDarkColor) }
           ]}>
             <Text style={styles.priorityText}>
               {task.customGoalTypeText.toUpperCase()}
@@ -301,7 +289,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customPriorityColor || (tabColors.priorityCustomSelected || veryDarkColor) }
+            { backgroundColor: task.customPriorityColor || (colors?.tabColors?.themeColorWheel?.redBold || veryDarkColor) }
           ]}>
             <Text style={styles.priorityText}>
               {task.customPriorityText.toUpperCase()}
@@ -341,7 +329,7 @@ export default function TaskItem({
         return (
           <View style={[
             styles.priorityTag,
-            { backgroundColor: task.customCleaningLocationColor || (tabColors.cleaningCustomSelected || veryDarkColor) }
+            { backgroundColor: task.customCleaningLocationColor || (colors?.tabColors?.themeColorWheel?.greenBold || veryDarkColor) }
           ]}>
             <Text style={styles.priorityText}>
               {task.customCleaningLocation.toUpperCase()}
@@ -356,32 +344,6 @@ export default function TaskItem({
         ]}>
           <Text style={styles.priorityText}>
             {task.cleaningLocation.toUpperCase()}
-          </Text>
-        </View>
-      );
-    }
-    // For self-care with type
-    else if (task.category === 'self-care' && task.selfCareType) {
-      return (
-        <View style={[
-          styles.priorityTag,
-          { backgroundColor: getSelfCareTypeColor(task.selfCareType) }
-        ]}>
-          <Text style={styles.priorityText}>
-            {task.selfCareType.toUpperCase()}
-          </Text>
-        </View>
-      );
-    }
-    // For delegation with type
-    else if (task.category === 'delegation' && task.delegateType) {
-      return (
-        <View style={[
-          styles.priorityTag,
-          { backgroundColor: getDelegateTypeColor(task.delegateType) }
-        ]}>
-          <Text style={styles.priorityText}>
-            {task.delegateType.toUpperCase()}
           </Text>
         </View>
       );
