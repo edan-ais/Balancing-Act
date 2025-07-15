@@ -4,28 +4,28 @@ export const autumnTheme = {
   backgroundImage: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
   addTaskIcon: 'leaf', // Custom fall leaf icon
   tabColors: {
-    daily: { // Maple Burgundy
-      veryDark: '#85200D', // Maple Burgundy
-      shadow: '#9A3A25',
-      dark: '#AB4D37',
-      medium: '#C77D6A',
-      pastel: '#E5BEB6',
-      bgAlt: '#F8E9E6',
-      highlight: '#CC6D5A',
+    daily: { // Maple Burgundy - now deeper and more burgundy
+      veryDark: '#7D0A0A', // Deeper Maple Burgundy
+      shadow: '#8F2222',
+      dark: '#A13838',
+      medium: '#BE6969',
+      pastel: '#E1B6B6',
+      bgAlt: '#F7E6E6',
+      highlight: '#B54444',
       bg: '#FDF7F7',
-      accent: '#F0DCD9',
-      crimsonBold: '#7C3020', // Deep maple
-      crimsonLight: '#F2E6E4',
-      amberBold: '#9A4F30', // Maple amber
-      amberLight: '#F5EBE6',
-      oliveBold: '#A05030', // Rusty maple
-      oliveLight: '#F6EBE6',
-      rustBold: '#8E3B25', // Autumn maple
-      rustLight: '#F3E7E3',
-      plumBold: '#7A2E1A', // Dark maple
-      plumLight: '#F1E5E2',
-      slateBold: '#863525', // Red maple
-      slateLight: '#F2E6E4'
+      accent: '#F0DAD9',
+      crimsonBold: '#6E0E0E', // Deep burgundy maple
+      crimsonLight: '#F1E4E4',
+      amberBold: '#7A1818', // Rich burgundy
+      amberLight: '#F2E5E5',
+      oliveBold: '#761212', // Dark burgundy
+      oliveLight: '#F1E4E4',
+      rustBold: '#8A1E1E', // Auburn burgundy
+      rustLight: '#F3E6E6',
+      plumBold: '#690505', // Deep wine burgundy
+      plumLight: '#F0E3E3',
+      slateBold: '#7C1414', // Russet burgundy
+      slateLight: '#F2E5E5'
     },
     meals: { // Clay Earth
       veryDark: '#A3422C', // Clay Earth
