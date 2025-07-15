@@ -14,19 +14,7 @@ export const rainstormTheme = {
       medium: '#6D8CB3',
       bgAlt: '#EEF4FC',
       pastel: '#E1E8F0',
-      bg: '#F7FAFF',
-      rainyRedBold: '#B83B3B',
-      rainyRedLight: '#F8E9E9',
-      muddyBold: '#906B3E',
-      muddyLight: '#F4F0E9',
-      forestBold: '#50883C',
-      forestLight: '#ECF3E9',
-      thunderBold: '#C3773B',
-      thunderLight: '#F9F1E9',
-      lightningBold: '#855C87',
-      lightningLight: '#F3ECF3',
-      cloudBold: '#657280',
-      cloudLight: '#EFF1F3'
+      bg: '#F7FAFF'
     },
     future: {
       veryDark: '#0F2442',
@@ -37,17 +25,7 @@ export const rainstormTheme = {
       medium: '#7C95BB',
       bgAlt: '#EEF3FA',
       pastel: '#E3E9F2',
-      bg: '#F7FAFF',
-      irisBold: '#75558D',
-      irisLight: '#F1ECF4',
-      rustBold: '#9C4B4B',
-      rustLight: '#F5EBEB',
-      evergreenBold: '#36745E',
-      evergreenLight: '#E9F1ED',
-      soilBold: '#8A683F',
-      soilLight: '#F3EFEA',
-      mistBold: '#657280',
-      mistLight: '#EFF1F3'
+      bg: '#F7FAFF'
     },
     calendar: {
       veryDark: '#1C3254',
@@ -69,23 +47,7 @@ export const rainstormTheme = {
       medium: '#8A91A1',
       bgAlt: '#F0F1F5',
       pastel: '#E9EAEF',
-      bg: '#F8F9FB',
-      brickBold: '#A15555',
-      brickLight: '#F6ECEC',
-      sandBold: '#7B6B43',
-      sandLight: '#F2EFEA',
-      mossBold: '#4F7347',
-      mossLight: '#ECF1EA',
-      tealBold: '#3F7380',
-      tealLight: '#EAF1F3',
-      twilightBold: '#73426B',
-      twilightLight: '#F1EAEF',
-      denimBold: '#486A8D',
-      denimLight: '#EBF0F4',
-      barkBold: '#7D5E40',
-      barkLight: '#F2EDEA',
-      stormBold: '#657280',
-      stormLight: '#EFF1F3'
+      bg: '#F8F9FB'
     },
     cleaning: {
       veryDark: '#3D5375',
@@ -96,17 +58,7 @@ export const rainstormTheme = {
       medium: '#AABFDD',
       bgAlt: '#F1F6FC',
       pastel: '#EDF2F9',
-      bg: '#F9FBFF',
-      plantBold: '#5F8064',
-      plantLight: '#EEF2EF',
-      mirrorBold: '#7C96A8',
-      mirrorLight: '#F1F4F6',
-      blanketBold: '#8A7969',
-      blanketLight: '#F3F1EF',
-      roseBold: '#9D7277',
-      roseLight: '#F5F0F1',
-      grayBold: '#657280',
-      grayLight: '#EFF1F3'
+      bg: '#F9FBFF'
     },
     selfCare: {
       veryDark: '#4A5570',
@@ -128,17 +80,48 @@ export const rainstormTheme = {
       medium: '#AAACC7',
       bgAlt: '#F3F4F9',
       pastel: '#EEEFF6',
-      bg: '#FAFBFD',
-      twilightAltBold: '#665B83',
-      twilightAltLight: '#EFEDF3',
-      woodBold: '#8D6F58',
-      woodLight: '#F4F0EC',
-      sageBold: '#5A8377',
-      sageLight: '#EDF3F1',
-      berryBold: '#8B6A6E',
-      berryLight: '#F3EFF0',
-      fogBold: '#657280',
-      fogLight: '#EFF1F3'
+      bg: '#FAFBFD'
+    },
+    themeColorWheel: {
+      // Red - cool rain-washed red
+      redBold: '#9B4A56',
+      redLight: '#F5EBED',
+      
+      // Orange - muted stormy orange
+      orangeBold: '#A7694D',
+      orangeLight: '#F6EFEC',
+      
+      // Yellow - cool cloudy yellow
+      yellowBold: '#9A8A4D',
+      yellowLight: '#F5F3EB',
+      
+      // Green - rainy forest green
+      greenBold: '#456E5F',
+      greenLight: '#EBF0EE',
+      
+      // Blue - stormy blue
+      blueBold: '#3D6A8F',
+      blueLight: '#EAF0F4',
+      
+      // Indigo - twilight indigo
+      indigoBold: '#4A5A8C',
+      indigoLight: '#EBEDF4',
+      
+      // Purple - rain-soaked purple
+      purpleBold: '#5D5886',
+      purpleLight: '#EDEDF3',
+      
+      // Pink - cool misty pink
+      pinkBold: '#8D647A',
+      pinkLight: '#F3EEF1',
+      
+      // Brown - wet earth brown
+      brownBold: '#6D5D56',
+      brownLight: '#F0EDEC',
+      
+      // Gray - rain cloud gray
+      grayBold: '#5E6977',
+      grayLight: '#EDEFF1'
     }
   }
 };
