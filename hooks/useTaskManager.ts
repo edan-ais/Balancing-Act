@@ -41,6 +41,7 @@ export function useTaskManager(): TaskManager {
         .order('created_at', { ascending: true });
 
       if (error) {
+      }
       if (error && error.code !== 'PGRST116') { // Ignore "not found" errors
         return;
       }
