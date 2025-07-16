@@ -1,5 +1,33 @@
-// Balance Theme - Enhanced color scheme
-export const balanceTheme = {
+export interface TabColorSet {
+  veryDark: string;
+  shadow: string;
+  dark: string;
+  medium: string;
+  pastel: string;
+  bgAlt: string;
+  highlight: string;
+  bg: string;
+  accent: string;
+}
+
+export interface TabColors {
+  daily: TabColorSet;
+  future: TabColorSet;
+  calendar: TabColorSet;
+  meals: TabColorSet;
+  cleaning: TabColorSet;
+  selfCare: TabColorSet;
+  delegate: TabColorSet;
+}
+
+export interface Theme {
+  name: string;
+  id: string;
+  backgroundImage?: string;
+  tabColors: TabColors;
+}
+
+const balanceTheme: Theme = {
   name: 'Balance Theme',
   id: 'balance',
   backgroundImage: 'https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
@@ -83,3 +111,31 @@ export const balanceTheme = {
     }
   }
 };
+
+export const getColorWheelFromTheme = (theme: Theme) => {
+  return {
+    redBold: theme.tabColors.selfCare.dark,
+    redLight: theme.tabColors.selfCare.pastel,
+    orangeBold: theme.tabColors.meals.dark,
+    orangeLight: theme.tabColors.meals.pastel,
+    yellowBold: theme.tabColors.calendar.dark,
+    yellowLight: theme.tabColors.calendar.pastel,
+    greenBold: theme.tabColors.future.dark,
+    greenLight: theme.tabColors.future.pastel,
+    blueBold: theme.tabColors.daily.dark,
+    blueLight: theme.tabColors.daily.pastel,
+    indigoBold: theme.tabColors.cleaning.dark,
+    indigoLight: theme.tabColors.cleaning.pastel,
+    purpleBold: theme.tabColors.delegate.dark,
+    purpleLight: theme.tabColors.delegate.pastel,
+    pinkBold: theme.tabColors.meals.highlight,
+    pinkLight: theme.tabColors.meals.bgAlt,
+    brownBold: theme.tabColors.cleaning.highlight,
+    brownLight: theme.tabColors.cleaning.bgAlt,
+    grayBold: theme.tabColors.daily.medium,
+    grayLight: theme.tabColors.daily.bgAlt,
+  };
+};
+
+export const themes: Theme[] = [balanceTheme];
+export const defaultTheme = balanceTheme;

@@ -8,7 +8,7 @@ const supabaseUrl = process.env.EXPO_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.EXPO_PUBLIC_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  console.error('Missing Supabase environment variables. Check your .env file or environment configuration.');
+  console.error('Missing Supabase environment variables');
 }
 
 const createSupabaseStorage = () => {
@@ -61,12 +61,5 @@ export const supabase = createClient(
       detectSessionInUrl: false,
       storage: createSupabaseStorage(),
     },
-    global: {
-      headers: {
-        'X-Client-Info': 'bolt-expo-starter',
-      },
-    },
   }
 );
-
-export type SupabaseClient = typeof supabase;
