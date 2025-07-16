@@ -24,7 +24,7 @@
       "metro": {
         "transformer": {
           "getTransformOptions": {
-            "unstable_disableModuleResoluation": false
+            "unstable_disableModuleResolution": false
           }
         }
       }
