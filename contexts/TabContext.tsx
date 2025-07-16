@@ -77,4 +77,3 @@ export function useTabContext() {
   }
   return context;
 }
-</boltContext>
