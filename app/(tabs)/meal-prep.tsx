@@ -4,7 +4,7 @@ import { Plus, ChefHat, Coffee, Sandwich, Utensils, Apple, Chrome as Home } from
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
-import TaskItem from '@/components/TaskItem';
+import TaskItem, { Task } from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';

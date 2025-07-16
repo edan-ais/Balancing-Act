@@ -34,9 +34,10 @@ export interface Task {
   selfCareType?: string;
   // Delegation specific
   reminderEnabled?: boolean;
+  scheduledDate?: Date;
 }
 
-interface TaskItemProps {
+export interface TaskItemProps {
   task: Task;
   onToggle: (id: string) => void;
   onDelete: (id: string) => void;

@@ -4,7 +4,7 @@ import { Plus, Chrome as Home, Sun, RefreshCw, Moon, CloudSnow } from 'lucide-re
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
-import TaskItem from '@/components/TaskItem';
+import TaskItem, { Task } from '@/components/TaskItem';
 import AddTaskForm from '@/components/AddTaskForm';
 import EditTaskForm from '@/components/EditTaskForm';
 import { useTaskManager } from '@/hooks/useTaskManager';
@@ -68,8 +68,8 @@ export default function RepetitiveCleaning() {
   ];
 
   // Group tasks by cleaning location within each frequency
-  const getTasksGroupedByLocation = (tasks) => {
-    const locationGroups = {};
+  const getTasksGroupedByLocation = (tasks: Task[]) => {
+    const locationGroups: Record<string, Task[]> = {};
     
     tasks.forEach(task => {
       const locationKey = task.cleaningLocation || 'other';

@@ -41,17 +41,17 @@ interface CustomTag {
 }
 
 // Interface for custom tags by category and type
-interface CustomTags {
+export interface CustomTags {
   [category: string]: {
     [tagType: string]: CustomTag[];
   };
 }
 
 // Updated interface to match the pattern in DailyTasks
-interface AddTaskFormProps {
+export interface AddTaskFormProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (task: any) => void;
+  onSubmit: (task: Partial<Task>) => void;
   category: string;
   selectedDate?: Date; // For calendar tasks
   colors: TabColorSet & { 
@@ -322,7 +322,7 @@ export default function AddTaskForm({
   };
 
   // Get available options for a tag type (including custom saved ones)
-  const getTagOptions = (tagType: string): string[] => {
+  const getTagOptions = (tagType: string) => {
     const savedCustomTags = customTags[category]?.[tagType] || [];
     
     // Default options based on tag type
@@ -414,7 +414,7 @@ export default function AddTaskForm({
       return;
     }
 
-    const newTask = {
+    const newTask: Partial<Task> = {
       title: state.title.trim(),
       isHabit: state.taskType === 'habit',
       habitGoal: state.taskType === 'habit' && state.habitGoal ? parseInt(state.habitGoal) : undefined,

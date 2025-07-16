@@ -5,6 +5,7 @@ import { CalendarDays, Calendar, ChefHat, Sparkles, Target, Heart, Users } from 
 import { View, Text, ScrollView, TouchableOpacity, Animated, Dimensions } from 'react-native';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
+import type { LucideIcon } from 'lucide-react-native';
 
 // Map route names to color keys
 const routeToColorMap = {
@@ -18,7 +19,12 @@ const routeToColorMap = {
 };
 
 // Tab configuration mapping
-const tabConfig = {
+const tabConfig: Record<string, {
+  name: string;
+  title: string;
+  icon: LucideIcon;
+  colorKey: string;
+}> = {
   'index': {
     name: 'index',
     title: 'Daily',
@@ -70,7 +76,18 @@ const allTabIds = Object.keys(tabConfig);
 const screenWidth = Dimensions.get('window').width;
 
 // Individual Tab Item component to properly use hooks
-const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, selectedTabsSet, visibleRoutes }) => {
+interface TabItemProps {
+  route: any;
+  index: number;
+  isFocused: boolean;
+  descriptor: any;
+  navigation: any;
+  tabColors: any;
+  selectedTabsSet: Set<string>;
+  visibleRoutes: any[];
+}
+
+const TabItem: React.FC<TabItemProps> = ({ route, index, isFocused, descriptor, navigation, tabColors, selectedTabsSet, visibleRoutes }) => {
   const { options } = descriptor;
   const label = options.tabBarLabel || options.title || route.name;
   const isVisible = selectedTabsSet.has(route.name);
@@ -244,7 +261,13 @@ const TabItem = ({ route, index, isFocused, descriptor, navigation, tabColors, s
 };
 
 // Custom TabBar component to enable horizontal scrolling
-const CustomTabBar = ({ state, descriptors, navigation }) => {
+interface CustomTabBarProps {
+  state: any;
+  descriptors: any;
+  navigation: any;
+}
+
+const CustomTabBar: React.FC<CustomTabBarProps> = ({ state, descriptors, navigation }) => {
   const { selectedTabs } = useTabContext();
   const { currentTheme } = useTheme();
   const tabColors = currentTheme.tabColors;

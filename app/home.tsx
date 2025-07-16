@@ -8,9 +8,10 @@ import AuthModal from '@/components/AuthModal';
 import { useTabContext } from '@/contexts/TabContext';
 import { useTheme } from '@/contexts/ThemeContext';
 import { useAuth } from '@/contexts/AuthContext';
+import type { LucideIcon } from 'lucide-react-native';
 
 // Mapping between tab IDs and theme color keys
-const tabToThemeKeyMap = {
+const tabToThemeKeyMap: Record<string, string> = {
   'index': 'daily',
   'goals': 'future',    // "goals" tab uses "future" theme colors
   'weekly': 'calendar', // "weekly" tab uses "calendar" theme colors
@@ -20,7 +21,15 @@ const tabToThemeKeyMap = {
   'delegation': 'delegate'
 };
 
-const tabOptions = [
+interface TabOption {
+  id: string;
+  title: string;
+  subtitle: string;
+  icon: LucideIcon;
+  themeKey: string;
+}
+
+const tabOptions: TabOption[] = [
   {
     id: 'index',
     title: 'Daily Tasks',
@@ -73,7 +82,7 @@ const tabOptions = [
 ];
 
 // Helper function to get theme icon component
-const getThemeIconComponent = (themeId: string) => {
+const getThemeIconComponent = (themeId: string): LucideIcon => {
   switch (themeId) {
     case 'balance':
       return Palette;
@@ -97,7 +106,7 @@ export default function HomeScreen() {
   const router = useRouter();
 
   // Helper function to get tab colors from the theme
-  const getTabThemeColors = (tab) => {
+  const getTabThemeColors = (tab: TabOption) => {
     // Get the appropriate theme key for this tab
     const themeKey = tab.themeKey;
     
