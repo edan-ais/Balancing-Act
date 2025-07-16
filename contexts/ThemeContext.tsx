@@ -1,7 +1,7 @@
-import React, { createContext, useContext, useState, ReactNode, useEffect } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useEffect, useRef, useCallback, useMemo } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { Theme, defaultTheme, themes } from '@/constants/themes';
+import { Theme, defaultTheme, themes, TabColors, TabColorSet } from '@/constants/themes';
 
 interface ThemeContextType {
   currentTheme: Theme;
@@ -17,19 +17,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
   const [currentTheme, setCurrentTheme] = useState<Theme>(defaultTheme);
   const [currentTab, setCurrentTab] = useState<string>('daily'); // Default to 'daily' tab
   const { user } = useAuth();
+  const isMountedRef = useRef(true);
 
-  // Load user preferences when user logs in
+  // Setup mounted ref
   useEffect(() => {
-    if (user) {
-      loadUserPreferences();
-    } else {
-      // Reset to defaults when user logs out
-      setCurrentTheme(defaultTheme);
-    }
-  }, [user]);
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-  const loadUserPreferences = async () => {
-    if (!user) return;
+  // Memoize loadUserPreferences to avoid recreation on each render
+  const loadUserPreferences = useCallback(async () => {
+    if (!user || !isMountedRef.current) return;
 
     try {
       const { data, error } = await supabase
@@ -48,7 +48,7 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (data?.current_theme) {
+      if (data?.current_theme && isMountedRef.current) {
         const theme = themes.find(t => t.id === data.current_theme);
         if (theme) {
           setCurrentTheme(theme);
@@ -57,10 +57,23 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error loading user preferences:', error);
     }
-  };
+  }, [user]);
 
-  const saveUserPreferences = async (themeId: string) => {
-    if (!user) return;
+  // Load user preferences when user logs in
+  useEffect(() => {
+    if (user) {
+      loadUserPreferences();
+    } else {
+      // Reset to defaults when user logs out
+      if (isMountedRef.current) {
+        setCurrentTheme(defaultTheme);
+      }
+    }
+  }, [user, loadUserPreferences]);
+
+  // Memoize saveUserPreferences to avoid recreation on each render
+  const saveUserPreferences = useCallback(async (themeId: string) => {
+    if (!user || !isMountedRef.current) return;
 
     try {
       const { error } = await supabase
@@ -76,9 +89,12 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error saving user preferences:', error);
     }
-  };
+  }, [user]);
 
-  const setTheme = (themeId: string) => {
+  // Memoize the theme setter function
+  const setTheme = useCallback((themeId: string) => {
+    if (!isMountedRef.current) return;
+    
     const theme = themes.find(t => t.id === themeId);
     if (theme) {
       setCurrentTheme(theme);
@@ -88,12 +104,19 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         saveUserPreferences(themeId);
       }
     }
-  };
+  }, [user, saveUserPreferences]);
+
+  // Memoize the tab setter function
+  const handleSetCurrentTab = useCallback((tab: string) => {
+    if (isMountedRef.current) {
+      setCurrentTab(tab);
+    }
+  }, []);
 
   // Apply the background image when the theme changes
   useEffect(() => {
     // Only run DOM manipulation in web environment
-    if (typeof document === 'undefined') return;
+    if (typeof document === 'undefined' || !isMountedRef.current) return;
     
     // Check if there's a tab-specific background for the current tab
     const tabBackground = currentTheme.tabBackgrounds?.[currentTab];
@@ -110,30 +133,48 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     } else {
       // Reset background if no image is specified
       document.body.style.backgroundImage = 'none';
+      
       // Use the background color from the current tab if available
-      if (currentTheme.tabColors && currentTab && currentTheme.tabColors[currentTab]) {
-        document.body.style.backgroundColor = currentTheme.tabColors[currentTab].bg;
+      if (currentTheme.tabColors && currentTab) {
+        // Skip themeColorWheel as it doesn't have bg property
+        if (currentTab !== 'themeColorWheel') {
+          // Now TypeScript knows this is a TabColorSet with a bg property
+          const tabColors = currentTheme.tabColors[currentTab as keyof Omit<TabColors, 'themeColorWheel'>];
+          if (tabColors) {
+            // Safe to access bg property
+            document.body.style.backgroundColor = (tabColors as TabColorSet).bg;
+          } else {
+            document.body.style.backgroundColor = '#ffffff'; // Default fallback
+          }
+        } else {
+          // For themeColorWheel, use a default color
+          document.body.style.backgroundColor = '#ffffff';
+        }
       } else {
         document.body.style.backgroundColor = '#ffffff'; // Default fallback
       }
     }
     
-    // Clean up function to reset background when component unmounts
+    // Clean up function to reset background when component unmounts or theme changes
     return () => {
-      if (typeof document !== 'undefined') {
+      if (typeof document !== 'undefined' && isMountedRef.current) {
+        // Only reset if component is still mounted (prevents unnecessary DOM operations)
         document.body.style.backgroundImage = 'none';
       }
     };
   }, [currentTheme, currentTab]);
 
+  // Memoize the context value
+  const contextValue = useMemo(() => ({
+    currentTheme,
+    setTheme,
+    availableThemes: themes,
+    currentTab,
+    setCurrentTab: handleSetCurrentTab
+  }), [currentTheme, setTheme, currentTab, handleSetCurrentTab]);
+
   return (
-    <ThemeContext.Provider value={{ 
-      currentTheme, 
-      setTheme, 
-      availableThemes: themes,
-      currentTab,
-      setCurrentTab
-    }}>
+    <ThemeContext.Provider value={contextValue}>
       {children}
     </ThemeContext.Provider>
   );
