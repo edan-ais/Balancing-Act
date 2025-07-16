@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useRef, useCallback, useMemo } from 'react';
 import { Session, User } from '@supabase/supabase-js';
 import { supabase } from '@/lib/supabase';
 
@@ -17,44 +17,51 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const isMountedRef = useRef(true);
 
   useEffect(() => {
+    isMountedRef.current = true;
+    
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setSession(session);
-      setUser(session?.user ?? null);
-      setLoading(false);
+      if (isMountedRef.current) {
+        setSession(session);
+        setUser(session?.user ?? null);
+        setLoading(false);
+      }
     });
 
     // Listen for auth changes
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       async (event, session) => {
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+        if (isMountedRef.current) {
+          setSession(session);
+          setUser(session?.user ?? null);
+          setLoading(false);
+          
+          // If this is a new sign up, create the user profile
+          if (event === 'SIGNED_IN' && session?.user?.app_metadata?.provider === 'email') {
+            const createdAt = new Date(session.user.created_at);
+            const now = new Date();
+            // If account was created in the last minute, assume it's a new signup
+            if (now.getTime() - createdAt.getTime() < 60000) {
+              await createUserProfile(session.user.id);
+            }
+          }
+        }
       }
     );
 
-    return () => subscription.unsubscribe();
+    return () => {
+      isMountedRef.current = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
-  const signUp = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signUp({
-      email,
-      password,
-    });
-    return { error };
-  };
-
-  const signIn = async (email: string, password: string) => {
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    return { error };
-  };
-
-  const createUserProfile = async (userId: string) => {
+  // Create user profile after successful signup
+  const createUserProfile = useCallback(async (userId: string) => {
+    if (!isMountedRef.current) return;
+    
     try {
       const { error } = await supabase
         .from('user_profiles')
@@ -70,21 +77,64 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error creating user profile:', error);
     }
-  };
+  }, []);
 
-  const signOut = async () => {
-    await supabase.auth.signOut();
-  };
+  // Memoize auth functions to prevent unnecessary re-renders
+  const signUp = useCallback(async (email: string, password: string) => {
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email,
+        password,
+      });
+      
+      // If signup was successful and the component is still mounted
+      if (!error && data.user && isMountedRef.current) {
+        // Create user profile
+        await createUserProfile(data.user.id);
+      }
+      
+      return { error };
+    } catch (err) {
+      console.error('Error during sign up:', err);
+      return { error: err };
+    }
+  }, [createUserProfile]);
+
+  const signIn = useCallback(async (email: string, password: string) => {
+    try {
+      const { error } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+      return { error };
+    } catch (err) {
+      console.error('Error during sign in:', err);
+      return { error: err };
+    }
+  }, []);
+
+  const signOut = useCallback(async () => {
+    if (isMountedRef.current) {
+      try {
+        await supabase.auth.signOut();
+      } catch (error) {
+        console.error('Error signing out:', error);
+      }
+    }
+  }, []);
+
+  // Memoize context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    user,
+    session,
+    loading,
+    signUp,
+    signIn,
+    signOut,
+  }), [user, session, loading, signUp, signIn, signOut]);
 
   return (
-    <AuthContext.Provider value={{
-      user,
-      session,
-      loading,
-      signUp,
-      signIn,
-      signOut,
-    }}>
+    <AuthContext.Provider value={contextValue}>
       {children}
     </AuthContext.Provider>
   );
