@@ -13,65 +13,51 @@ import {
 import { X, Plus, Minus, Leaf, CloudRain, Coffee, Palette } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Theme, TabColorSet, ColorWheelSet } from '@/constants/themes';
+import type { Task } from '@/components/TaskItem';
 
-// Get window dimensions for consistent modal sizing
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
-// Helper function to get theme icon component
 const getThemeIcon = (themeId: string | undefined) => {
   switch (themeId) {
-    case 'balance':
-      return Palette;
-    case 'latte':
-      return Coffee;
-    case 'rainstorm':
-      return CloudRain;
-    case 'autumn':
-      return Leaf;
-    default:
-      return Plus;
+    case 'balance': return Palette;
+    case 'latte': return Coffee;
+    case 'rainstorm': return CloudRain;
+    case 'autumn': return Leaf;
+    default: return Plus;
   }
 };
 
-// Interface for custom tags
 interface CustomTag {
   text: string;
   color: string;
 }
 
-// Interface for custom tags by category and type
 export interface CustomTags {
   [category: string]: {
     [tagType: string]: CustomTag[];
   };
 }
 
-// Updated interface to match the pattern in DailyTasks
 export interface AddTaskFormProps {
   visible: boolean;
   onClose: () => void;
   onSubmit: (task: Partial<Task>) => void;
   category: string;
-  selectedDate?: Date; // For calendar tasks
-  colors: TabColorSet & { 
-    themeColorWheel?: ColorWheelSet; 
-  };
+  selectedDate?: Date;
+  colors: TabColorSet & { themeColorWheel?: ColorWheelSet };
   customTags?: CustomTags;
   theme?: Theme;
 }
 
-// Define action types for the reducer
 type ActionType = 
   | { type: 'SET_FIELD', field: string, value: any }
   | { type: 'ADD_SUBTASK' }
   | { type: 'UPDATE_SUBTASK', id: string, title: string }
   | { type: 'REMOVE_SUBTASK', id: string }
   | { type: 'SET_ERRORS', errors: string[] }
-  | { type: 'CLEAR_ERRORS' }
   | { type: 'RESET_FORM' };
 
-// Define the form state interface
 interface FormState {
   title: string;
   taskType: string;
@@ -97,7 +83,6 @@ interface FormState {
   errors: string[];
 }
 
-// Initial state for the form
 const initialState: FormState = {
   title: '',
   taskType: 'task',
@@ -123,25 +108,15 @@ const initialState: FormState = {
   errors: []
 };
 
-// Reducer function to handle all form state changes
 const formReducer = (state: FormState, action: ActionType): FormState => {
   switch (action.type) {
     case 'SET_FIELD':
       return { ...state, [action.field]: action.value };
-    
     case 'ADD_SUBTASK':
       return {
         ...state,
-        subtasks: [
-          ...state.subtasks,
-          {
-            id: Date.now().toString(),
-            title: '',
-            completed: false
-          }
-        ]
+        subtasks: [...state.subtasks, { id: Date.now().toString(), title: '', completed: false }]
       };
-    
     case 'UPDATE_SUBTASK':
       return {
         ...state,
@@ -149,22 +124,15 @@ const formReducer = (state: FormState, action: ActionType): FormState => {
           subtask.id === action.id ? { ...subtask, title: action.title } : subtask
         )
       };
-    
     case 'REMOVE_SUBTASK':
       return {
         ...state,
         subtasks: state.subtasks.filter(subtask => subtask.id !== action.id)
       };
-    
     case 'SET_ERRORS':
       return { ...state, errors: action.errors };
-    
-    case 'CLEAR_ERRORS':
-      return { ...state, errors: [] };
-    
     case 'RESET_FORM':
       return { ...initialState };
-      
     default:
       return state;
   }
@@ -180,14 +148,10 @@ export default function AddTaskForm({
   customTags = {},
   theme
 }: AddTaskFormProps) {
-  // Use reducer for form state management
   const [state, dispatch] = useReducer(formReducer, initialState);
   
-  // Helper function to update any form field
   const setField = (field: string, value: any) => {
     dispatch({ type: 'SET_FIELD', field, value });
-    
-    // Clear related errors when updating a field
     if (state.errors.length > 0) {
       const updatedErrors = state.errors.filter(e => !e.toLowerCase().includes(field.toLowerCase()));
       if (updatedErrors.length !== state.errors.length) {
@@ -196,7 +160,6 @@ export default function AddTaskForm({
     }
   };
 
-  // Initialize custom colors with theme colors
   useEffect(() => {
     if (!state.customPriorityColor) {
       setField('customPriorityColor', colors.themeColorWheel?.redBold || colors.veryDark);
@@ -209,20 +172,14 @@ export default function AddTaskForm({
     }
   }, [colors]);
   
-  // Get the theme-specific icon component  
   const ThemeIcon = getThemeIcon(theme?.id);
 
-  // Helper to get tag color - using the themeColorWheel
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
-    // Required tags use tab's colors
     if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
       return isSelected ? colors.veryDark : colors.bgAlt;
     }
 
-    // For non-required tags, use the themeColorWheel
     const colorWheel = colors.themeColorWheel || {};
-    
-    // Check for saved custom tags first
     const savedCustomTags = customTags[category]?.[tagType] || [];
     const matchingCustomTag = savedCustomTags.find((tag: CustomTag) => tag.text === tagValue);
     
@@ -230,21 +187,13 @@ export default function AddTaskForm({
       return isSelected ? matchingCustomTag.color : colors.bgAlt;
     }
     
-    // Handle custom tag option
     if (tagValue === 'custom') {
-      if (tagType === 'priority' && isSelected) {
-        return state.customPriorityColor;
-      } 
-      else if (tagType === 'goalType' && isSelected) {
-        return state.customGoalTypeColor;
-      }
-      else if (tagType === 'cleaningLocation' && isSelected) {
-        return state.customCleaningLocationColor;
-      }
+      if (tagType === 'priority' && isSelected) return state.customPriorityColor;
+      if (tagType === 'goalType' && isSelected) return state.customGoalTypeColor;
+      if (tagType === 'cleaningLocation' && isSelected) return state.customCleaningLocationColor;
       return isSelected ? colors.veryDark : colors.bgAlt;
     }
     
-    // Use the color wheel mapping for specific tag types and values
     const tagColorMap: Record<string, Record<string, { bold: keyof ColorWheelSet, light: keyof ColorWheelSet }>> = {
       priority: {
         high: { bold: 'redBold', light: 'redLight' },
@@ -276,34 +225,24 @@ export default function AddTaskForm({
       },
     };
     
-    // Check if we have a mapping for this tag type and value
     const mapping = tagColorMap[tagType]?.[tagValue];
     if (mapping) {
       const colorKey = isSelected ? mapping.bold : mapping.light;
       return colorWheel[colorKey as keyof typeof colorWheel] || (isSelected ? colors.veryDark : colors.bgAlt);
     }
     
-    // Fallback to default colors
-    return isSelected ? colorWheel.grayBold || colors.veryDark : colorWheel.grayLight || colors.bgAlt;
+    return colorWheel.grayBold || colors.veryDark;
   };
 
-  // Helper to get text color based on background color
   const getTextColor = (backgroundColor: string) => {
-    // For standard cases where we know the intent
-    if (backgroundColor === colors.bgAlt || backgroundColor.toUpperCase().startsWith('#F')) {
-      return colors.veryDark; // Dark text on light backgrounds
-    } else {
-      return '#FFFFFF'; // White text on dark backgrounds
-    }
+    return backgroundColor === colors.bgAlt || backgroundColor.toUpperCase().startsWith('#F') 
+      ? colors.veryDark 
+      : '#FFFFFF';
   };
 
-  // Get predefined color options for custom color selection
   const getColorOptions = () => {
-    // Use the theme color wheel for color options
     const colorWheel = colors.themeColorWheel || {};
-    
-    // Extract all the bold colors from the color wheel
-    const colorOptions = [
+    return [
       colorWheel.redBold,
       colorWheel.orangeBold,
       colorWheel.yellowBold,
@@ -314,18 +253,12 @@ export default function AddTaskForm({
       colorWheel.pinkBold,
       colorWheel.brownBold,
       colorWheel.grayBold,
-      colors.veryDark // Add veryDarkColor as a fallback
-    ].filter(Boolean); // Filter out undefined values
-    
-    // Filter out any duplicates
-    return [...new Set(colorOptions)];
+      colors.veryDark
+    ].filter(Boolean);
   };
 
-  // Get available options for a tag type (including custom saved ones)
   const getTagOptions = (tagType: string) => {
     const savedCustomTags = customTags[category]?.[tagType] || [];
-    
-    // Default options based on tag type
     let defaultOptions: string[] = [];
     
     if (tagType === 'priority') {
@@ -336,10 +269,7 @@ export default function AddTaskForm({
       defaultOptions = ['kitchen', 'bathroom', 'bedroom'];
     }
     
-    // Add saved custom tags
     const savedOptions = savedCustomTags.map((tag: CustomTag) => tag.text);
-    
-    // Always include the "custom" option as the last one
     return [...defaultOptions, ...savedOptions, 'custom'];
   };
 
@@ -351,50 +281,33 @@ export default function AddTaskForm({
   const validateForm = (): string[] => {
     const validationErrors: string[] = [];
 
-    // Check if title is provided
     if (!state.title.trim()) {
       validationErrors.push('Task name is required');
     }
 
-    // Category-specific validation
     switch (category) {
       case 'meal-prep':
-        if (!state.mealType) {
-          validationErrors.push('Meal type is required for meal prep tasks');
-        }
+        if (!state.mealType) validationErrors.push('Meal type is required for meal prep tasks');
         break;
-
       case 'cleaning':
-        if (!state.frequency) {
-          validationErrors.push('Frequency is required for cleaning tasks');
-        }
+        if (!state.frequency) validationErrors.push('Frequency is required for cleaning tasks');
         if (state.cleaningLocation === 'custom' && !state.customCleaningLocation.trim()) {
           validationErrors.push('Custom location text is required');
         }
         break;
-
       case 'self-care':
-        if (!state.selfCareType) {
-          validationErrors.push('Self-care type is required for self-care tasks');
-        }
+        if (!state.selfCareType) validationErrors.push('Self-care type is required for self-care tasks');
         break;
-
       case 'delegation':
-        if (!state.delegateType) {
-          validationErrors.push('Delegate type is required for delegation tasks');
-        }
-        if (!state.delegatedTo.trim()) {
-          validationErrors.push('Person to delegate to is required');
-        }
+        if (!state.delegateType) validationErrors.push('Delegate type is required for delegation tasks');
+        if (!state.delegatedTo.trim()) validationErrors.push('Person to delegate to is required');
         break;
     }
 
-    // Habit-specific validation - only if it's a habit
     if (state.taskType === 'habit' && (!state.habitGoal || parseInt(state.habitGoal) <= 0)) {
       validationErrors.push('Valid habit goal is required for habits');
     }
 
-    // Validate custom tag text is provided when custom option is selected
     if (state.priority === 'custom' && !state.customPriorityText.trim()) {
       validationErrors.push('Custom priority text is required');
     }
@@ -436,15 +349,14 @@ export default function AddTaskForm({
       delegateType: state.delegateType || undefined,
       reminderEnabled: state.reminderEnabled,
       subtasks: state.subtasks.length > 0 ? state.subtasks : undefined,
-      scheduledDate: selectedDate, // For calendar tasks
-      category: category, // Add category to make tracking easier
+      scheduledDate: selectedDate,
+      category: category,
     };
 
     onSubmit(newTask);
     handleClose();
   };
 
-  // Helper function to render tag options
   const renderTagOptions = (tagType: string, value: string, setter: (value: string) => void, options: string[]) => {
     return (
       <View style={styles.optionGrid}>
@@ -452,7 +364,6 @@ export default function AddTaskForm({
           const bgColor = getTagColor(tagType, option, value === option);
           const textColor = getTextColor(bgColor);
           
-          // Get display text for the option
           const savedCustomTags = customTags[category]?.[tagType] || [];
           const matchingCustomTag = savedCustomTags.find((tag: CustomTag) => tag.text === option);
           let displayText = option;
@@ -470,16 +381,10 @@ export default function AddTaskForm({
           return (
             <TouchableOpacity
               key={option}
-              style={[
-                styles.optionButton,
-                { backgroundColor: bgColor }
-              ]}
+              style={[styles.optionButton, { backgroundColor: bgColor }]}
               onPress={() => setter(option)}
             >
-              <Text style={[
-                styles.optionText,
-                { color: textColor }
-              ]}>
+              <Text style={[styles.optionText, { color: textColor }]}>
                 {displayText}
               </Text>
             </TouchableOpacity>
@@ -489,7 +394,6 @@ export default function AddTaskForm({
     );
   };
 
-  // Render simplified color picker for a tag type
   const renderColorPicker = (tagType: string, selectedColor: string, setColorFunction: (color: string) => void) => {
     const colorOptions = getColorOptions();
     
@@ -522,8 +426,8 @@ export default function AddTaskForm({
           styles.modalContainer, 
           { 
             backgroundColor: colors.bg,
-            height: windowHeight * 0.65, // Shorter fixed height
-            width: Math.min(windowWidth * 0.9, 450), // Control width for better layout
+            height: windowHeight * 0.65,
+            width: Math.min(windowWidth * 0.9, 450),
           }
         ]}>
           <View style={[styles.header, { 
@@ -541,7 +445,6 @@ export default function AddTaskForm({
             contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
             showsVerticalScrollIndicator={true}
           >
-            {/* Error Messages */}
             {state.errors.length > 0 && (
               <View style={[styles.errorCard, { 
                 backgroundColor: '#FED7D7',
@@ -571,7 +474,6 @@ export default function AddTaskForm({
                 multiline
               />
 
-              {/* Task Type as Tags - Daily and Calendar tabs */}
               {(category === 'daily' || category === 'weekly') && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Task Type *</Text>
@@ -615,7 +517,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Daily Tasks - Priority */}
               {category === 'daily' && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Priority</Text>
@@ -651,7 +552,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Goals Tasks - Goal Type */}
               {category === 'goals' && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Goal Type</Text>
@@ -687,7 +587,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Meal Prep Tasks */}
               {category === 'meal-prep' && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Meal Type *</Text>
@@ -722,7 +621,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Cleaning Tasks */}
               {category === 'cleaning' && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Frequency *</Text>
@@ -766,7 +664,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Self-Care Tasks */}
               {category === 'self-care' && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Self-Care Type *</Text>
@@ -779,7 +676,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Delegation Tasks */}
               {category === 'delegation' && (
                 <>
                   <Text style={[styles.label, { color: colors.veryDark }]}>Delegate To *</Text>
@@ -815,7 +711,6 @@ export default function AddTaskForm({
                 </>
               )}
 
-              {/* Calendar Tasks - Show selected date */}
               {category === 'weekly' && selectedDate && (
                 <View style={[styles.dateInfo, { 
                   borderColor: colors.pastel,
@@ -832,7 +727,6 @@ export default function AddTaskForm({
                 </View>
               )}
 
-              {/* Subtasks Section */}
               <View style={styles.subtasksSection}>
                 <View style={styles.subtasksHeader}>
                   <Text style={[styles.label, { color: colors.veryDark, marginTop: 0 }]}>Subtasks</Text>
@@ -894,208 +788,41 @@ export default function AddTaskForm({
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContainer: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: 'Quicksand-Bold',
-  },
-  closeButton: {
-    padding: 4,
-  },
-  errorCard: {
-    marginTop: 16,
-    marginBottom: 8,
-    padding: 12,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  errorTitle: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 8,
-  },
-  errorText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
-    marginBottom: 4,
-  },
-  formSection: {
-    paddingVertical: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 8,
-    marginTop: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    fontFamily: 'Quicksand-Regular',
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  switchRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  optionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
-  },
-  optionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 8,
-  },
-  optionText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Medium',
-  },
-  dateInfo: {
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 16,
-    borderWidth: 1,
-  },
-  dateInfoText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-    textAlign: 'center',
-  },
-  habitGoalSection: {
-    marginTop: 16,
-  },
-  counterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start',
-    paddingLeft: 8,
-  },
-  counterButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 44,
-    height: 44,
-  },
-  counterText: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-Bold',
-    paddingHorizontal: 20,
-  },
-  colorWheelContainer: {
-    marginBottom: 16,
-  },
-  colorWheel: {
-    flexDirection: 'row',
-    padding: 8,
-  },
-  colorOption: {
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    marginHorizontal: 4,
-  },
-  selectedColor: {
-    borderWidth: 2,
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-  },
-  subtasksSection: {
-    marginTop: 16,
-  },
-  subtasksHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  addSubtaskButton: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  subtaskRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  subtaskInput: {
-    flex: 1,
-    marginRight: 8,
-  },
-  removeSubtaskButton: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 12,
-    borderTopWidth: 1,
-  },
-  cancelButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  submitButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-    flexDirection: 'row',
-    justifyContent: 'center',
-    gap: 8,
-  },
-  submitText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-  },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContainer: { borderRadius: 16, overflow: 'hidden' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1 },
+  title: { fontSize: 20, fontFamily: 'Quicksand-Bold' },
+  closeButton: { padding: 4 },
+  errorCard: { marginTop: 16, marginBottom: 8, padding: 12, borderRadius: 8, borderLeftWidth: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 },
+  errorTitle: { fontSize: 16, fontFamily: 'Quicksand-SemiBold', marginBottom: 8 },
+  errorText: { fontSize: 14, fontFamily: 'Quicksand-Regular', marginBottom: 4 },
+  formSection: { paddingVertical: 8 },
+  label: { fontSize: 16, fontFamily: 'Quicksand-SemiBold', marginBottom: 8, marginTop: 16 },
+  input: { borderWidth: 1, borderRadius: 8, padding: 12, fontSize: 16, fontFamily: 'Quicksand-Regular' },
+  textArea: { height: 80, textAlignVertical: 'top' },
+  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 },
+  optionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+  optionButton: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginBottom: 8 },
+  optionText: { fontSize: 14, fontFamily: 'Quicksand-Medium' },
+  dateInfo: { padding: 12, borderRadius: 8, marginTop: 16, borderWidth: 1 },
+  dateInfoText: { fontSize: 14, fontFamily: 'Quicksand-SemiBold', textAlign: 'center' },
+  habitGoalSection: { marginTop: 16 },
+  counterContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8 },
+  counterButton: { padding: 12, borderRadius: 8, alignItems: 'center', justifyContent: 'center', width: 44, height: 44 },
+  counterText: { fontSize: 18, fontFamily: 'Quicksand-Bold', paddingHorizontal: 20 },
+  colorWheelContainer: { marginBottom: 16 },
+  colorWheel: { flexDirection: 'row', padding: 8 },
+  colorOption: { width: 28, height: 28, borderRadius: 14, marginHorizontal: 4 },
+  selectedColor: { borderWidth: 2, borderColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2, elevation: 3 },
+  subtasksSection: { marginTop: 16 },
+  subtasksHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  addSubtaskButton: { padding: 8, borderRadius: 20 },
+  subtaskRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  subtaskInput: { flex: 1, marginRight: 8 },
+  removeSubtaskButton: { padding: 8, borderRadius: 20 },
+  footer: { flexDirection: 'row', paddingHorizontal: 20, paddingVertical: 16, gap: 12, borderTopWidth: 1 },
+  cancelButton: { flex: 1, padding: 16, borderRadius: 12, alignItems: 'center' },
+  cancelText: { fontSize: 16, fontFamily: 'Quicksand-SemiBold' },
+  submitButton: { flex: 1, padding: 16, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 },
+  submitText: { fontSize: 16, fontFamily: 'Quicksand-SemiBold' },
 });
