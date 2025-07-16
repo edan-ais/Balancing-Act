@@ -1,9 +1,8 @@
-// Balance Theme - Enhanced color scheme with expanded options
+// Balance Theme - Enhanced color scheme
 export const balanceTheme = {
   name: 'Balance Theme',
   id: 'balance',
   backgroundImage: 'https://images.pexels.com/photos/1103970/pexels-photo-1103970.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
-  addTaskIcon: 'palette', // Add task icon for all tabs in this theme
   tabColors: {
     daily: {
       veryDark: '#1A2870',
@@ -81,47 +80,6 @@ export const balanceTheme = {
       highlight: '#2DCCBB',
       bg: '#F2FFFE',
       accent: '#C9F0EE'
-    },
-    themeColorWheel: {
-      // Red
-      redBold: '#FF3B30',
-      redLight: '#FFE8E7',
-      
-      // Orange
-      orangeBold: '#FF9500',
-      orangeLight: '#FFF4E5',
-      
-      // Yellow
-      yellowBold: '#FFCC00',
-      yellowLight: '#FFFBE5',
-      
-      // Green
-      greenBold: '#34C759',
-      greenLight: '#E8F8ED',
-      
-      // Blue
-      blueBold: '#007AFF',
-      blueLight: '#E5F0FF',
-      
-      // Indigo
-      indigoBold: '#5856D6',
-      indigoLight: '#ECEEFF',
-      
-      // Purple
-      purpleBold: '#AF52DE',
-      purpleLight: '#F5EBFA',
-      
-      // Pink
-      pinkBold: '#FF2D55',
-      pinkLight: '#FFE8EC',
-      
-      // Brown
-      brownBold: '#A2845E',
-      brownLight: '#F5F1EB',
-      
-      // Gray
-      grayBold: '#8E8E93',
-      grayLight: '#F2F2F2'
     }
   }
 };

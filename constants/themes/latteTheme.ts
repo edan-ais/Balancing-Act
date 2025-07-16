@@ -1,9 +1,8 @@
-// Latte Theme - Warm and diverse coffee-inspired color scheme with expanded options
+// Latte Theme - Warm coffee-inspired color scheme
 export const latteTheme = {
   name: 'Latte Theme',
   id: 'latte',
   backgroundImage: 'https://images.pexels.com/photos/302899/pexels-photo-302899.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
-  addTaskIcon: 'coffee', // Added coffee icon for the Latte theme
   tabColors: {
     daily: {
       veryDark: '#100A06',
@@ -72,56 +71,15 @@ export const latteTheme = {
       bg: '#F6FAF4'
     },
     delegate: {
-      veryDark: '#756A5B', // Darker veryDark
-      shadow: '#8F8573', // Darker shadow
-      dark: '#A9A091', // Darker dark
-      medium: '#C0B8AA', // Darker medium
-      accent: '#D9D0C2', // Darker accent
-      highlight: '#E6CDA8', // Darker highlight
-      bgAlt: '#F1EDE5', // Darker bgAlt
-      pastel: '#F2EFEA', // Darker pastel
-      bg: '#F8F6F3' // Darker bg
-    },
-    themeColorWheel: {
-      // Red - rich espresso red
-      redBold: '#9F3A36',
-      redLight: '#F6EAEA',
-      
-      // Orange - warm caramel orange
-      orangeBold: '#C17F46',
-      orangeLight: '#F8F1EA',
-      
-      // Yellow - golden honey yellow
-      yellowBold: '#C6A03F',
-      yellowLight: '#F9F5EA',
-      
-      // Green - rich matcha green
-      greenBold: '#5B7D55',
-      greenLight: '#EDF1EC',
-      
-      // Blue - muted coffee-shop blue
-      blueBold: '#4D6D89',
-      blueLight: '#EBF0F4',
-      
-      // Indigo - deep coffee indigo
-      indigoBold: '#4F527A',
-      indigoLight: '#ECEDF2',
-      
-      // Purple - rich mocha purple
-      purpleBold: '#725682',
-      purpleLight: '#F0ECF2',
-      
-      // Pink - cinnamon rose pink
-      pinkBold: '#A45A76',
-      pinkLight: '#F6ECF0',
-      
-      // Brown - deep roast brown
-      brownBold: '#6E4E3A',
-      brownLight: '#F0EBE8',
-      
-      // Gray - coffee shop gray
-      grayBold: '#6D655A',
-      grayLight: '#EFEDEA'
+      veryDark: '#756A5B',
+      shadow: '#8F8573',
+      dark: '#A9A091',
+      medium: '#C0B8AA',
+      accent: '#D9D0C2',
+      highlight: '#E6CDA8',
+      bgAlt: '#F1EDE5',
+      pastel: '#F2EFEA',
+      bg: '#F8F6F3'
     }
   }
 };

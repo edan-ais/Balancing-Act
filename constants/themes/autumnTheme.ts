@@ -1,11 +1,11 @@
+// Autumn Theme - Warm autumn-inspired color scheme
 export const autumnTheme = {
   name: 'Autumn Harvest Theme',
   id: 'autumn',
   backgroundImage: 'https://images.pexels.com/photos/33109/fall-autumn-red-season.jpg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
-  addTaskIcon: 'leaf', // Custom fall leaf icon
   tabColors: {
-    daily: { // Burgundy
-      veryDark: '#450617', // Very deep burgundy
+    daily: {
+      veryDark: '#450617',
       shadow: '#67112A',
       dark: '#8A1C3D',
       medium: '#B3506D',
@@ -15,8 +15,8 @@ export const autumnTheme = {
       bg: '#FEFBFC',
       accent: '#F2DFE5'
     },
-    future: { // Copper
-      veryDark: '#7D3516', // Deep copper
+    future: {
+      veryDark: '#7D3516',
       shadow: '#984725',
       dark: '#B65A34',
       medium: '#D27A5A',
@@ -26,8 +26,8 @@ export const autumnTheme = {
       bg: '#FEFCFB',
       accent: '#F3DCD3'
     },
-    calendar: { // Burnt Orange
-      veryDark: '#A03800', // Deep burnt orange
+    calendar: {
+      veryDark: '#A03800',
       shadow: '#C64B00',
       dark: '#DD5D0E',
       medium: '#F18337',
@@ -37,8 +37,8 @@ export const autumnTheme = {
       bg: '#FFFCFA',
       accent: '#F9E3D1'
     },
-    meals: { // Darker Mustard
-      veryDark: '#6D5600', // Very deep mustard
+    meals: {
+      veryDark: '#6D5600',
       shadow: '#886D00',
       dark: '#A48300',
       medium: '#C19E00',
@@ -48,8 +48,8 @@ export const autumnTheme = {
       bg: '#FEFDFB',
       accent: '#F3EBC5'
     },
-    cleaning: { // Enhanced Sage
-      veryDark: '#5A6E4B', // Deep sage
+    cleaning: {
+      veryDark: '#5A6E4B',
       shadow: '#6B7F5C',
       dark: '#7E9170',
       medium: '#9DAF90',
@@ -59,8 +59,8 @@ export const autumnTheme = {
       bg: '#FBFCFA',
       accent: '#DEE4D7'
     },
-    selfCare: { // Kale Green
-      veryDark: '#0E301A', // Deep kale
+    selfCare: {
+      veryDark: '#0E301A',
       shadow: '#1A4226',
       dark: '#265431',
       medium: '#4D7855',
@@ -70,8 +70,8 @@ export const autumnTheme = {
       bg: '#F7FBF8',
       accent: '#D5E6D9'
     },
-    delegate: { // Chestnut
-      veryDark: '#482D1D', // Deep chestnut
+    delegate: {
+      veryDark: '#482D1D',
       shadow: '#5E3E2C',
       dark: '#724F3B',
       medium: '#967260',
@@ -80,47 +80,6 @@ export const autumnTheme = {
       highlight: '#866554',
       bg: '#FBF9F8',
       accent: '#E5DAD4'
-    },
-    themeColorWheel: {
-      // Red - muted autumn red
-      redBold: '#9E2B2B',
-      redLight: '#F6E9E9',
-      
-      // Orange - warm autumn orange
-      orangeBold: '#C05A1F',
-      orangeLight: '#F9EFE6',
-      
-      // Yellow - golden autumn yellow
-      yellowBold: '#A88A23',
-      yellowLight: '#F8F4E6',
-      
-      // Green - forest moss green
-      greenBold: '#556F44',
-      greenLight: '#EEF2EA',
-      
-      // Blue - muted autumn sky blue
-      blueBold: '#4D6F8C',
-      blueLight: '#ECF0F4',
-      
-      // Indigo - dusty autumn indigo
-      indigoBold: '#4A5683',
-      indigoLight: '#ECEFF4',
-      
-      // Purple - aged autumn purple
-      purpleBold: '#6D4E87',
-      purpleLight: '#F0ECF4',
-      
-      // Pink - muted rose pink
-      pinkBold: '#A65C77',
-      pinkLight: '#F6EEF1',
-      
-      // Brown - rich autumn brown
-      brownBold: '#785336',
-      brownLight: '#F2EDE9',
-      
-      // Gray - warm stone gray
-      grayBold: '#6A6359',
-      grayLight: '#F1EFED'
     }
   }
 };

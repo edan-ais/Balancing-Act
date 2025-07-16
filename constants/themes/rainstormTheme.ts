@@ -1,9 +1,8 @@
-// Rainstorm Theme - Cool and diverse rain-inspired color scheme with expanded options
+// Rainstorm Theme - Cool rain-inspired color scheme
 export const rainstormTheme = {
   name: 'Rainstorm Theme',
   id: 'rainstorm',
   backgroundImage: 'https://images.pexels.com/photos/1529360/pexels-photo-1529360.jpeg?auto=compress&cs=tinysrgb&w=1920&h=1080&fit=crop',
-  addTaskIcon: 'cloud-rain', // Added rain cloud icon for the Rainstorm theme
   tabColors: {
     daily: {
       veryDark: '#0A1930',
@@ -81,47 +80,6 @@ export const rainstormTheme = {
       bgAlt: '#F3F4F9',
       pastel: '#EEEFF6',
       bg: '#FAFBFD'
-    },
-    themeColorWheel: {
-      // Red - cool rain-washed red
-      redBold: '#9B4A56',
-      redLight: '#F5EBED',
-      
-      // Orange - muted stormy orange
-      orangeBold: '#A7694D',
-      orangeLight: '#F6EFEC',
-      
-      // Yellow - cool cloudy yellow
-      yellowBold: '#9A8A4D',
-      yellowLight: '#F5F3EB',
-      
-      // Green - rainy forest green
-      greenBold: '#456E5F',
-      greenLight: '#EBF0EE',
-      
-      // Blue - stormy blue
-      blueBold: '#3D6A8F',
-      blueLight: '#EAF0F4',
-      
-      // Indigo - twilight indigo
-      indigoBold: '#4A5A8C',
-      indigoLight: '#EBEDF4',
-      
-      // Purple - rain-soaked purple
-      purpleBold: '#5D5886',
-      purpleLight: '#EDEDF3',
-      
-      // Pink - cool misty pink
-      pinkBold: '#8D647A',
-      pinkLight: '#F3EEF1',
-      
-      // Brown - wet earth brown
-      brownBold: '#6D5D56',
-      brownLight: '#F0EDEC',
-      
-      // Gray - rain cloud gray
-      grayBold: '#5E6977',
-      grayLight: '#EDEFF1'
     }
   }
 };

@@ -13,7 +13,9 @@ import {
 import { X, Plus, Minus, Save } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import type { Task } from '@/components/TaskItem';
-import type { TabColorSet, ColorWheelSet } from '@/constants/themes';
+import type { TabColorSet } from '@/constants/themes';
+import { getColorWheelFromTheme } from '@/constants/themes';
+import { useTheme } from '@/contexts/ThemeContext';
 
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
@@ -23,7 +25,7 @@ interface EditTaskFormProps {
   onClose: () => void;
   onSubmit: (task: Task) => void;
   initialTask: Task | null;
-  colors: TabColorSet & { themeColorWheel?: ColorWheelSet };
+  colors: TabColorSet;
 }
 
 type ActionType = 
@@ -149,6 +151,7 @@ export default function EditTaskForm({
   colors
 }: EditTaskFormProps) {
   const [state, dispatch] = useReducer(formReducer, initialState);
+  const { currentTheme } = useTheme();
   
   const setField = (field: string, value: any) => {
     dispatch({ type: 'SET_FIELD', field, value });
@@ -160,6 +163,8 @@ export default function EditTaskForm({
     }
   };
 
+  const colorWheel = getColorWheelFromTheme(currentTheme);
+
   useEffect(() => {
     if (initialTask && visible) {
       dispatch({ type: 'LOAD_TASK', task: initialTask });
@@ -168,22 +173,20 @@ export default function EditTaskForm({
 
   useEffect(() => {
     if (!state.customPriorityColor) {
-      setField('customPriorityColor', colors.themeColorWheel?.redBold || colors.veryDark);
+      setField('customPriorityColor', colorWheel.redBold);
     }
     if (!state.customGoalTypeColor) {
-      setField('customGoalTypeColor', colors.themeColorWheel?.blueBold || colors.veryDark);
+      setField('customGoalTypeColor', colorWheel.blueBold);
     }
     if (!state.customCleaningLocationColor) {
-      setField('customCleaningLocationColor', colors.themeColorWheel?.greenBold || colors.veryDark);
+      setField('customCleaningLocationColor', colorWheel.greenBold);
     }
-  }, [colors]);
+  }, [colorWheel]);
 
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
     if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
       return isSelected ? colors.veryDark : colors.bgAlt;
     }
-
-    const colorWheel = colors.themeColorWheel || {};
     
     if (tagValue === 'custom') {
       if (tagType === 'priority' && isSelected) return state.customPriorityColor;
@@ -192,44 +195,43 @@ export default function EditTaskForm({
       return isSelected ? colors.veryDark : colors.bgAlt;
     }
     
-    const tagColorMap: Record<string, Record<string, { bold: keyof ColorWheelSet, light: keyof ColorWheelSet }>> = {
+    const tagColorMap: Record<string, Record<string, string>> = {
       priority: {
-        high: { bold: 'redBold', light: 'redLight' },
-        medium: { bold: 'orangeBold', light: 'orangeLight' },
-        low: { bold: 'yellowBold', light: 'yellowLight' },
-        'quick-win': { bold: 'greenBold', light: 'greenLight' },
+        high: colorWheel.redBold,
+        medium: colorWheel.orangeBold,
+        low: colorWheel.yellowBold,
+        'quick-win': colorWheel.greenBold,
       },
       goalType: {
-        Personal: { bold: 'purpleBold', light: 'purpleLight' },
-        Career: { bold: 'blueBold', light: 'blueLight' },
-        Financial: { bold: 'greenBold', light: 'greenLight' },
-        TBD: { bold: 'grayBold', light: 'grayLight' },
-        'Not Priority': { bold: 'grayBold', light: 'grayLight' },
-        Wish: { bold: 'pinkBold', light: 'pinkLight' },
+        Personal: colorWheel.purpleBold,
+        Career: colorWheel.blueBold,
+        Financial: colorWheel.greenBold,
+        TBD: colorWheel.grayBold,
+        'Not Priority': colorWheel.grayBold,
+        Wish: colorWheel.pinkBold,
       },
       dayOfWeek: {
-        Mon: { bold: 'redBold', light: 'redLight' },
-        Tue: { bold: 'orangeBold', light: 'orangeLight' },
-        Wed: { bold: 'yellowBold', light: 'yellowLight' },
-        Thu: { bold: 'greenBold', light: 'greenLight' },
-        Fri: { bold: 'blueBold', light: 'blueLight' },
-        Sat: { bold: 'purpleBold', light: 'purpleLight' },
-        Sun: { bold: 'pinkBold', light: 'pinkLight' },
+        Mon: colorWheel.redBold,
+        Tue: colorWheel.orangeBold,
+        Wed: colorWheel.yellowBold,
+        Thu: colorWheel.greenBold,
+        Fri: colorWheel.blueBold,
+        Sat: colorWheel.purpleBold,
+        Sun: colorWheel.pinkBold,
       },
       cleaningLocation: {
-        kitchen: { bold: 'redBold', light: 'redLight' },
-        bathroom: { bold: 'blueBold', light: 'blueLight' },
-        bedroom: { bold: 'purpleBold', light: 'purpleLight' },
+        kitchen: colorWheel.redBold,
+        bathroom: colorWheel.blueBold,
+        bedroom: colorWheel.purpleBold,
       },
     };
     
-    const mapping = tagColorMap[tagType]?.[tagValue];
-    if (mapping) {
-      const colorKey = isSelected ? mapping.bold : mapping.light;
-      return colorWheel[colorKey as keyof typeof colorWheel] || (isSelected ? colors.veryDark : colors.bgAlt);
+    const tagColor = tagColorMap[tagType]?.[tagValue];
+    if (tagColor) {
+      return isSelected ? tagColor : colors.bgAlt;
     }
     
-    return colorWheel.grayBold || colors.veryDark;
+    return isSelected ? colorWheel.grayBold : colors.bgAlt;
   };
 
   const getTextColor = (backgroundColor: string) => {
@@ -239,7 +241,6 @@ export default function EditTaskForm({
   };
 
   const getColorOptions = () => {
-    const colorWheel = colors.themeColorWheel || {};
     return [
       colorWheel.redBold,
       colorWheel.orangeBold,

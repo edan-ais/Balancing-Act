@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Animated } from 'react-native';
 import { Check, X, ChevronUp, ChevronDown, Pencil } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
+import { getColorWheelFromTheme } from '@/constants/themes';
+import { useTheme } from '@/contexts/ThemeContext';
 
 export interface Task {
   id: string;
@@ -61,6 +63,7 @@ export default function TaskItem({
   colors
 }: TaskItemProps) {
   const [scaleAnim] = useState(new Animated.Value(1));
+  const { currentTheme } = useTheme();
 
   const getTagColor = (tagType: string, tagValue: string) => {
     if (tagValue === 'custom') {
@@ -69,7 +72,7 @@ export default function TaskItem({
       if (tagType === 'cleaningLocation') return task.customCleaningLocationColor || colors?.veryDark;
     }
     
-    const colorWheel = colors?.themeColorWheel || {};
+    const colorWheel = getColorWheelFromTheme(currentTheme);
     const tagColorMap: Record<string, Record<string, string>> = {
       priority: {
         high: colorWheel.redBold,

@@ -15,29 +15,6 @@ export interface TabColorSet {
   accent: string;
 }
 
-export interface ColorWheelSet {
-  redBold: string;
-  redLight: string;
-  orangeBold: string;
-  orangeLight: string;
-  yellowBold: string;
-  yellowLight: string;
-  greenBold: string;
-  greenLight: string;
-  blueBold: string;
-  blueLight: string;
-  indigoBold: string;
-  indigoLight: string;
-  purpleBold: string;
-  purpleLight: string;
-  pinkBold: string;
-  pinkLight: string;
-  brownBold: string;
-  brownLight: string;
-  grayBold: string;
-  grayLight: string;
-}
-
 export interface TabColors {
   daily: TabColorSet;
   future: TabColorSet;
@@ -46,7 +23,6 @@ export interface TabColors {
   cleaning: TabColorSet;
   selfCare: TabColorSet;
   delegate: TabColorSet;
-  themeColorWheel: ColorWheelSet;
 }
 
 export interface Theme {
@@ -55,6 +31,32 @@ export interface Theme {
   backgroundImage?: string;
   tabColors: TabColors;
 }
+
+// Helper function to get color wheel colors from theme tabs
+export const getColorWheelFromTheme = (theme: Theme) => {
+  return {
+    redBold: theme.tabColors.selfCare.dark,
+    redLight: theme.tabColors.selfCare.pastel,
+    orangeBold: theme.tabColors.meals.dark,
+    orangeLight: theme.tabColors.meals.pastel,
+    yellowBold: theme.tabColors.calendar.dark,
+    yellowLight: theme.tabColors.calendar.pastel,
+    greenBold: theme.tabColors.future.dark,
+    greenLight: theme.tabColors.future.pastel,
+    blueBold: theme.tabColors.daily.dark,
+    blueLight: theme.tabColors.daily.pastel,
+    indigoBold: theme.tabColors.cleaning.dark,
+    indigoLight: theme.tabColors.cleaning.pastel,
+    purpleBold: theme.tabColors.delegate.dark,
+    purpleLight: theme.tabColors.delegate.pastel,
+    pinkBold: theme.tabColors.meals.highlight,
+    pinkLight: theme.tabColors.meals.bgAlt,
+    brownBold: theme.tabColors.cleaning.highlight,
+    brownLight: theme.tabColors.cleaning.bgAlt,
+    grayBold: theme.tabColors.daily.medium,
+    grayLight: theme.tabColors.daily.bgAlt,
+  };
+};
 
 export const themes: Theme[] = [balanceTheme, latteTheme, rainstormTheme, autumnTheme];
 export const defaultTheme = balanceTheme;
