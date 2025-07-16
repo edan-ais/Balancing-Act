@@ -11,14 +11,43 @@
     "ios": {
       "supportsTablet": true
     },
+    "android": {
+      "adaptiveIcon": {
+        "foregroundImage": "./assets/images/adaptive-icon.png",
+        "backgroundColor": "#ffffff"
+      }
+    },
     "web": {
       "bundler": "metro",
       "output": "single",
-      "favicon": "./assets/images/favicon.png"
+      "favicon": "./assets/images/favicon.png",
+      "metro": {
+        "transformer": {
+          "getTransformOptions": {
+            "unstable_disableModuleResoluation": false
+          }
+        }
+      }
     },
-    "plugins": ["expo-router", "expo-font", "expo-web-browser"],
+    "plugins": [
+      "expo-router",
+      "expo-font", 
+      "expo-web-browser",
+      "expo-camera",
+      "expo-blur",
+      "expo-haptics",
+      "expo-linear-gradient"
+    ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "devClient": true
+    },
+    "extra": {
+      "devServerPort": 8081,
+      "disableMetroCache": true,
+      "eas": {
+        "projectId": "your-eas-project-id"
+      }
     }
   }
 }
