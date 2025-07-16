@@ -4,13 +4,14 @@ CREATE TABLE IF NOT EXISTS user_profiles (
   selected_tabs jsonb DEFAULT '["index", "goals", "weekly", "meal-prep", "cleaning", "self-care", "delegation"]'::jsonb,
   current_theme text DEFAULT 'balance',
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  CONSTRAINT valid_selected_tabs CHECK (jsonb_typeof(selected_tabs) = 'array')
 );
 
 -- Create tasks table
 CREATE TABLE IF NOT EXISTS tasks (
-  id uuid PRIMARY KEY DEFAULT gen_random_uuid(),
-  user_id uuid REFERENCES user_profiles(id) ON DELETE CASCADE NOT NULL,
+  id text PRIMARY KEY, -- Changed to text to match your JS implementation
+  user_id uuid REFERENCES auth.users(id) ON DELETE CASCADE NOT NULL,
   title text NOT NULL,
   category text NOT NULL,
   completed boolean DEFAULT false,
@@ -37,8 +38,14 @@ CREATE TABLE IF NOT EXISTS tasks (
   scheduled_date timestamptz,
   subtasks jsonb DEFAULT '[]'::jsonb,
   created_at timestamptz DEFAULT now(),
-  updated_at timestamptz DEFAULT now()
+  updated_at timestamptz DEFAULT now(),
+  CONSTRAINT valid_subtasks CHECK (jsonb_typeof(subtasks) = 'array')
 );
+
+-- Create indexes for performance
+CREATE INDEX IF NOT EXISTS idx_tasks_user_id ON tasks(user_id);
+CREATE INDEX IF NOT EXISTS idx_tasks_category ON tasks(user_id, category);
+CREATE INDEX IF NOT EXISTS idx_tasks_completed ON tasks(user_id, completed);
 
 -- Enable Row Level Security
 ALTER TABLE user_profiles ENABLE ROW LEVEL SECURITY;
@@ -94,8 +101,11 @@ USING (user_id = auth.uid());
 CREATE OR REPLACE FUNCTION create_user_profile()
 RETURNS TRIGGER AS $$
 BEGIN
-  INSERT INTO user_profiles (id)
-  VALUES (NEW.id);
+  -- Only create if doesn't exist
+  IF NOT EXISTS (SELECT 1 FROM user_profiles WHERE id = NEW.id) THEN
+    INSERT INTO user_profiles (id)
+    VALUES (NEW.id);
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
