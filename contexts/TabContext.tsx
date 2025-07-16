@@ -1,7 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+import React, { createContext, useContext, useState, ReactNode, useRef, useCallback, useMemo, useEffect } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useAuth } from '@/contexts/AuthContext';
-import { useEffect } from 'react';
+
+// Default tabs array - defined as a constant outside the component
+const DEFAULT_TABS = ['index', 'goals', 'weekly', 'meal-prep', 'cleaning', 'self-care', 'delegation'];
 
 interface TabContextType {
   selectedTabs: string[];
@@ -11,21 +13,21 @@ interface TabContextType {
 const TabContext = createContext<TabContextType | undefined>(undefined);
 
 export function TabProvider({ children }: { children: ReactNode }) {
-  const [selectedTabs, setSelectedTabs] = useState<string[]>(['index', 'goals', 'weekly', 'meal-prep', 'cleaning', 'self-care', 'delegation']);
+  const [selectedTabs, setSelectedTabs] = useState<string[]>(DEFAULT_TABS);
   const { user } = useAuth();
+  const isMountedRef = useRef(true);
 
-  // Load user's selected tabs when user logs in
+  // Set up mounted ref
   useEffect(() => {
-    if (user) {
-      loadUserTabs();
-    } else {
-      // Reset to defaults when user logs out
-      setSelectedTabs(['index', 'goals', 'weekly', 'meal-prep', 'cleaning', 'self-care', 'delegation']);
-    }
-  }, [user]);
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
 
-  const loadUserTabs = async () => {
-    if (!user) return;
+  // Memoize loadUserTabs to avoid recreation on each render
+  const loadUserTabs = useCallback(async () => {
+    if (!user || !isMountedRef.current) return;
 
     try {
       const { data, error } = await supabase
@@ -44,16 +46,30 @@ export function TabProvider({ children }: { children: ReactNode }) {
         return;
       }
 
-      if (data?.selected_tabs && Array.isArray(data.selected_tabs)) {
+      // Only update state if component is still mounted and we have valid data
+      if (isMountedRef.current && data?.selected_tabs && Array.isArray(data.selected_tabs)) {
         setSelectedTabs(data.selected_tabs);
       }
     } catch (error) {
       console.error('Error loading user tabs:', error);
     }
-  };
+  }, [user]);
 
-  const saveUserTabs = async (tabs: string[]) => {
-    if (!user) return;
+  // Load user's selected tabs when user logs in
+  useEffect(() => {
+    if (user) {
+      loadUserTabs();
+    } else {
+      // Reset to defaults when user logs out
+      if (isMountedRef.current) {
+        setSelectedTabs(DEFAULT_TABS);
+      }
+    }
+  }, [user, loadUserTabs]);
+
+  // Memoize saveUserTabs to avoid recreation on each render
+  const saveUserTabs = useCallback(async (tabs: string[]) => {
+    if (!user || !isMountedRef.current) return;
 
     try {
       const { error } = await supabase
@@ -69,19 +85,28 @@ export function TabProvider({ children }: { children: ReactNode }) {
     } catch (error) {
       console.error('Error saving user tabs:', error);
     }
-  };
+  }, [user]);
 
-  const setSelectedTabsWithSync = (tabs: string[]) => {
+  // Memoize the tab setter function
+  const setSelectedTabsWithSync = useCallback((tabs: string[]) => {
+    if (!isMountedRef.current) return;
+    
     setSelectedTabs(tabs);
     
     // Save to Supabase if user is logged in
     if (user) {
       saveUserTabs(tabs);
     }
-  };
+  }, [user, saveUserTabs]);
+
+  // Memoize the context value to prevent unnecessary re-renders
+  const contextValue = useMemo(() => ({
+    selectedTabs,
+    setSelectedTabs: setSelectedTabsWithSync
+  }), [selectedTabs, setSelectedTabsWithSync]);
 
   return (
-    <TabContext.Provider value={{ selectedTabs, setSelectedTabs: setSelectedTabsWithSync }}>
+    <TabContext.Provider value={contextValue}>
       {children}
     </TabContext.Provider>
   );
