@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { AlertTriangle, ArrowRight } from 'lucide-react-native';
+import { TriangleAlert as AlertTriangle, ArrowRight } from 'lucide-react-native';
 import NeumorphicCard from './NeumorphicCard';
 
 interface EmergencyOverrideProps {

@@ -1,6 +1,6 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, ChevronLeft, ChevronRight, Home } from 'lucide-react-native';
+import { Plus, ChevronLeft, ChevronRight, Chrome as Home } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
