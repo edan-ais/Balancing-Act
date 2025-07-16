@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useReducer, useEffect } from 'react';
 import {
   View,
   Text,
@@ -10,511 +10,394 @@ import {
   Switch,
   Dimensions,
 } from 'react-native';
-import { X, Plus, Minus } from 'lucide-react-native';
+import { X, Plus, Minus, Save } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import type { Task } from '@/components/TaskItem';
+import type { TabColorSet, ColorWheelSet } from '@/constants/themes';
 
-// Get window dimensions for consistent modal sizing
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
 interface EditTaskFormProps {
   visible: boolean;
   onClose: () => void;
-  onSubmit: (task: any) => void;
-  initialTask: any; // The task to edit
-  colors?: any; // Theme colors
-  accentColor?: string;
-  darkColor?: string;
-  bgColor?: string;
-  mediumColor?: string;
-  pastelColor?: string;
-  shadowColor?: string;
-  customTags?: any; // Custom tags collection for each category and tag type
+  onSubmit: (task: Task) => void;
+  initialTask: Task | null;
+  colors: TabColorSet & { themeColorWheel?: ColorWheelSet };
 }
+
+type ActionType = 
+  | { type: 'SET_FIELD', field: string, value: any }
+  | { type: 'ADD_SUBTASK' }
+  | { type: 'UPDATE_SUBTASK', id: string, title: string }
+  | { type: 'REMOVE_SUBTASK', id: string }
+  | { type: 'SET_ERRORS', errors: string[] }
+  | { type: 'LOAD_TASK', task: Task }
+  | { type: 'RESET_FORM' };
+
+interface FormState {
+  title: string;
+  taskType: string;
+  habitGoal: string;
+  priority: string;
+  customPriorityText: string;
+  customPriorityColor: string;
+  goalType: string;
+  customGoalTypeText: string;
+  customGoalTypeColor: string;
+  mealType: string;
+  dayOfWeek: string;
+  notes: string;
+  frequency: string;
+  cleaningLocation: string;
+  customCleaningLocation: string;
+  customCleaningLocationColor: string;
+  selfCareType: string;
+  delegatedTo: string;
+  delegateType: string;
+  reminderEnabled: boolean;
+  subtasks: { id: string; title: string; completed: boolean }[];
+  errors: string[];
+}
+
+const initialState: FormState = {
+  title: '',
+  taskType: 'task',
+  habitGoal: '1',
+  priority: '',
+  customPriorityText: '',
+  customPriorityColor: '',
+  goalType: '',
+  customGoalTypeText: '',
+  customGoalTypeColor: '',
+  mealType: '',
+  dayOfWeek: '',
+  notes: '',
+  frequency: '',
+  cleaningLocation: '',
+  customCleaningLocation: '',
+  customCleaningLocationColor: '',
+  selfCareType: '',
+  delegatedTo: '',
+  delegateType: '',
+  reminderEnabled: false,
+  subtasks: [],
+  errors: []
+};
+
+const formReducer = (state: FormState, action: ActionType): FormState => {
+  switch (action.type) {
+    case 'SET_FIELD':
+      return { ...state, [action.field]: action.value };
+    case 'ADD_SUBTASK':
+      return {
+        ...state,
+        subtasks: [...state.subtasks, { id: Date.now().toString(), title: '', completed: false }]
+      };
+    case 'UPDATE_SUBTASK':
+      return {
+        ...state,
+        subtasks: state.subtasks.map(subtask => 
+          subtask.id === action.id ? { ...subtask, title: action.title } : subtask
+        )
+      };
+    case 'REMOVE_SUBTASK':
+      return {
+        ...state,
+        subtasks: state.subtasks.filter(subtask => subtask.id !== action.id)
+      };
+    case 'SET_ERRORS':
+      return { ...state, errors: action.errors };
+    case 'LOAD_TASK':
+      return {
+        ...state,
+        title: action.task.title,
+        taskType: action.task.isHabit ? 'habit' : 'task',
+        habitGoal: action.task.habitGoal?.toString() || '1',
+        priority: action.task.priority || '',
+        customPriorityText: action.task.customPriorityText || '',
+        customPriorityColor: action.task.customPriorityColor || '',
+        goalType: action.task.goalType || '',
+        customGoalTypeText: action.task.customGoalTypeText || '',
+        customGoalTypeColor: action.task.customGoalTypeColor || '',
+        mealType: action.task.mealType || '',
+        dayOfWeek: action.task.dayOfWeek || '',
+        notes: action.task.notes || '',
+        frequency: action.task.frequency || '',
+        cleaningLocation: action.task.cleaningLocation || '',
+        customCleaningLocation: action.task.customCleaningLocation || '',
+        customCleaningLocationColor: action.task.customCleaningLocationColor || '',
+        selfCareType: action.task.selfCareType || '',
+        delegatedTo: action.task.delegatedTo || '',
+        delegateType: action.task.delegateType || '',
+        reminderEnabled: action.task.reminderEnabled || false,
+        subtasks: action.task.subtasks || [],
+        errors: []
+      };
+    case 'RESET_FORM':
+      return { ...initialState };
+    default:
+      return state;
+  }
+};
 
 export default function EditTaskForm({
   visible,
   onClose,
   onSubmit,
   initialTask,
-  colors,
-  accentColor = '#4055C5',
-  darkColor = '#2B6CB0',
-  bgColor = '#F5F7FA',
-  mediumColor = '#4A5568',
-  pastelColor = '#E2E8F0',
-  shadowColor = '#C8D0E0',
-  customTags = {}
+  colors
 }: EditTaskFormProps) {
-  const [title, setTitle] = useState('');
-  const [taskType, setTaskType] = useState<string>('task'); // Default to 'task'
-  const [habitGoal, setHabitGoal] = useState('1');
-  const [priority, setPriority] = useState<string>('');
-  const [customPriorityText, setCustomPriorityText] = useState('');
-  const [customPriorityColor, setCustomPriorityColor] = useState(colors?.tabColors?.daily?.contrastOne || '#4A5568');
-  const [goalType, setGoalType] = useState<string>('');
-  const [customGoalTypeText, setCustomGoalTypeText] = useState('');
-  const [customGoalTypeColor, setCustomGoalTypeColor] = useState(colors?.tabColors?.future?.contrastOne || '#4A5568');
-  const [mealType, setMealType] = useState<string>('');
-  const [dayOfWeek, setDayOfWeek] = useState<string>('');
-  const [notes, setNotes] = useState('');
-  const [frequency, setFrequency] = useState<string>('');
-  const [cleaningLocation, setCleaningLocation] = useState<string>('');
-  const [customCleaningLocation, setCustomCleaningLocation] = useState('');
-  const [customCleaningLocationColor, setCustomCleaningLocationColor] = useState(colors?.tabColors?.cleaning?.contrastOne || '#996B77');
-  const [selfCareType, setSelfCareType] = useState<string>('');
-  const [delegatedTo, setDelegatedTo] = useState('');
-  const [delegateType, setDelegateType] = useState<string>('');
-  const [reminderEnabled, setReminderEnabled] = useState(false);
-  const [subtasks, setSubtasks] = useState<{ id: string; title: string; completed: boolean }[]>([]);
-  const [errors, setErrors] = useState<string[]>([]);
+  const [state, dispatch] = useReducer(formReducer, initialState);
   
-  // Use theme colors if provided, otherwise use props
-  const themeColors = colors || {};
-  const effectiveAccentColor = colors?.accent || accentColor;
-  const effectiveDarkColor = colors?.dark || darkColor;
-  const effectiveBgColor = colors?.bg || bgColor;
-  const effectiveMediumColor = colors?.medium || mediumColor;
-  const effectivePastelColor = colors?.pastel || pastelColor;
-  const effectiveShadowColor = colors?.shadow || shadowColor;
-  
-  // Map category to appropriate tab color key
-  const getCategoryColorKey = () => {
-    if (!initialTask) return 'daily';
-    
-    switch (initialTask.category) {
-      case 'daily': return 'daily';
-      case 'future': return 'future';
-      case 'weekly': return 'calendar';
-      case 'meal-prep': return 'meals';
-      case 'cleaning': return 'cleaning';
-      case 'self-care': return 'selfCare';
-      case 'delegation': return 'delegate';
-      case 'goals': return 'future'; // Goals can use future colors
-      default: return 'daily'; // Fallback to daily colors
-    }
-  };
-  
-  // Get the appropriate theme colors based on category
-  const tabColorKey = getCategoryColorKey();
-  const tabColors = colors?.tabColors?.[tabColorKey] || {};
-  
-  // Use the tab colors from the theme or fallback to effective colors
-  const veryDarkColor = tabColors.veryDark || effectiveDarkColor;
-  const highlightColor = tabColors.highlight || effectiveAccentColor;
-  const bgAltColor = tabColors.bgAlt || effectivePastelColor;
-  const lightColor = tabColors.light || effectivePastelColor;
-
-  // Helper to get tag color
-  const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
-    // Required tags use tab's colors
-    if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
-      return isSelected ? veryDarkColor : bgAltColor;
-    }
-
-    // For non-required tags, use their specific color from the tab section in theme
-    const tabColorKey = getCategoryColorKey();
-    const tabColors = colors?.tabColors?.[tabColorKey] || {};
-    
-    // Handle custom tag option
-    if (tagValue === 'custom') {
-      if (tagType === 'priority' && isSelected) {
-        return customPriorityColor;
-      } 
-      else if (tagType === 'goalType' && isSelected) {
-        return customGoalTypeColor;
+  const setField = (field: string, value: any) => {
+    dispatch({ type: 'SET_FIELD', field, value });
+    if (state.errors.length > 0) {
+      const updatedErrors = state.errors.filter(e => !e.toLowerCase().includes(field.toLowerCase()));
+      if (updatedErrors.length !== state.errors.length) {
+        dispatch({ type: 'SET_ERRORS', errors: updatedErrors });
       }
-      else if (tagType === 'cleaningLocation' && isSelected) {
-        return customCleaningLocationColor;
-      }
-      return isSelected ? veryDarkColor : bgAltColor;
-    }
-    
-    // Check for saved custom tags first
-    const category = initialTask?.category || 'daily';
-    const savedCustomTags = customTags[category]?.[tagType] || [];
-    const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === tagValue);
-    
-    if (matchingCustomTag) {
-      return isSelected ? matchingCustomTag.color : bgAltColor;
-    }
-    
-    // Priority tags
-    if (tagType === 'priority') {
-      if (tagValue === 'high' && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if (tagValue === 'high' && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if (tagValue === 'medium' && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if (tagValue === 'medium' && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if (tagValue === 'low' && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if (tagValue === 'low' && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
-      else if (tagValue === 'quick-win' && isSelected) {
-        return tabColors.contrastFour || veryDarkColor;
-      }
-      else if (tagValue === 'quick-win' && !isSelected) {
-        return tabColors.contrastFourLight || bgAltColor;
-      }
-    }
-    
-    // Goal Type tags
-    else if (tagType === 'goalType') {
-      if ((tagValue === 'TBD' || tagValue === 'tbd') && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if ((tagValue === 'TBD' || tagValue === 'tbd') && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if ((tagValue === 'Not Priority' || tagValue === 'notPriority') && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if ((tagValue === 'Not Priority' || tagValue === 'notPriority') && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if ((tagValue === 'Wish' || tagValue === 'wish') && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if ((tagValue === 'Wish' || tagValue === 'wish') && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
-    }
-    
-    // Day of Week tags
-    else if (tagType === 'dayOfWeek') {
-      if (tagValue === 'Mon' && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if (tagValue === 'Mon' && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if (tagValue === 'Tue' && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if (tagValue === 'Tue' && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if (tagValue === 'Wed' && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if (tagValue === 'Wed' && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
-      else if (tagValue === 'Thu' && isSelected) {
-        return tabColors.contrastFour || veryDarkColor;
-      }
-      else if (tagValue === 'Thu' && !isSelected) {
-        return tabColors.contrastFourLight || bgAltColor;
-      }
-      else if (tagValue === 'Fri' && isSelected) {
-        return tabColors.contrastFive || veryDarkColor;
-      }
-      else if (tagValue === 'Fri' && !isSelected) {
-        return tabColors.contrastFiveLight || bgAltColor;
-      }
-      else if (tagValue === 'Sat' && isSelected) {
-        return tabColors.contrastSix || veryDarkColor;
-      }
-      else if (tagValue === 'Sat' && !isSelected) {
-        return tabColors.contrastSixLight || bgAltColor;
-      }
-      else if (tagValue === 'Sun' && isSelected) {
-        return tabColors.contrastSeven || veryDarkColor;
-      }
-      else if (tagValue === 'Sun' && !isSelected) {
-        return tabColors.contrastSevenLight || bgAltColor;
-      }
-    }
-    
-    // Cleaning Location tags
-    else if (tagType === 'cleaningLocation') {
-      if (tagValue === 'kitchen' && isSelected) {
-        return tabColors.contrastOne || veryDarkColor;
-      }
-      else if (tagValue === 'kitchen' && !isSelected) {
-        return tabColors.contrastOneLight || bgAltColor;
-      }
-      else if (tagValue === 'bathroom' && isSelected) {
-        return tabColors.contrastTwo || veryDarkColor;
-      }
-      else if (tagValue === 'bathroom' && !isSelected) {
-        return tabColors.contrastTwoLight || bgAltColor;
-      }
-      else if (tagValue === 'bedroom' && isSelected) {
-        return tabColors.contrastThree || veryDarkColor;
-      }
-      else if (tagValue === 'bedroom' && !isSelected) {
-        return tabColors.contrastThreeLight || bgAltColor;
-      }
-    }
-    
-    // Default to theme colors if no specific color is found
-    return isSelected ? veryDarkColor : bgAltColor;
-  };
-
-  // Helper to get text color based on background color
-  const getTextColor = (backgroundColor: string) => {
-    // For standard cases where we know the intent
-    if (backgroundColor === bgAltColor || backgroundColor.toUpperCase().startsWith('#F')) {
-      return veryDarkColor; // Dark text on light backgrounds
-    } else {
-      return '#FFFFFF'; // White text on dark backgrounds
     }
   };
 
-  // Get predefined color options for custom color selection
-  const getColorOptions = (tagType: string) => {
-    // Get the appropriate tab colors based on the category
-    const tabColorKey = getCategoryColorKey();
-    const tabColors = colors?.tabColors?.[tabColorKey] || {};
-    
-    // Create a fixed array of contrast colors with fallbacks
-    const colorOptions = [
-      tabColors.contrastOne || '#B83232',
-      tabColors.contrastTwo || '#996633',
-      tabColors.contrastThree || '#547133',
-      tabColors.contrastFour || '#B8671D',
-      tabColors.contrastFive || '#6E416F',
-      tabColors.contrastSix || '#666F7A',
-      tabColors.contrastSeven || '#BD5B35',
-      tabColors.contrastEight || '#4B7994',
-      veryDarkColor
-    ];
-    
-    // Filter out any duplicates
-    return [...new Set(colorOptions)];
-  };
-
-  // Get available options for a tag type (including custom saved ones)
-  const getTagOptions = (tagType: string) => {
-    const category = initialTask?.category || 'daily';
-    const savedCustomTags = customTags[category]?.[tagType] || [];
-    
-    // Default options based on tag type
-    let defaultOptions = [];
-    
-    if (tagType === 'priority') {
-      defaultOptions = ['high', 'medium', 'low', 'quick-win'];
-    } else if (tagType === 'goalType') {
-      defaultOptions = ['TBD', 'Not Priority', 'Wish'];
-    } else if (tagType === 'cleaningLocation') {
-      defaultOptions = ['kitchen', 'bathroom', 'bedroom'];
-    }
-    
-    // Add saved custom tags
-    const savedOptions = savedCustomTags.map((tag: any) => tag.text);
-    
-    // Always include the "custom" option as the last one
-    return [...defaultOptions, ...savedOptions, 'custom'];
-  };
-
-  // Load initial task data
   useEffect(() => {
-    if (initialTask) {
-      setTitle(initialTask.title || '');
-      setTaskType(initialTask.isHabit ? 'habit' : 'task');
-      setHabitGoal(initialTask.habitGoal?.toString() || '1');
-      setPriority(initialTask.priority || '');
-      setCustomPriorityText(initialTask.customPriorityText || '');
-      setCustomPriorityColor(initialTask.customPriorityColor || colors?.tabColors?.daily?.contrastOne || '#4A5568');
-      setGoalType(initialTask.goalType || '');
-      setCustomGoalTypeText(initialTask.customGoalTypeText || '');
-      setCustomGoalTypeColor(initialTask.customGoalTypeColor || colors?.tabColors?.future?.contrastOne || '#4A5568');
-      setMealType(initialTask.mealType || '');
-      setDayOfWeek(initialTask.dayOfWeek || '');
-      setNotes(initialTask.notes || '');
-      setFrequency(initialTask.frequency || '');
-      setCleaningLocation(initialTask.cleaningLocation || '');
-      setCustomCleaningLocation(initialTask.customCleaningLocation || '');
-      setCustomCleaningLocationColor(initialTask.customCleaningLocationColor || colors?.tabColors?.cleaning?.contrastOne || '#996B77');
-      setSelfCareType(initialTask.selfCareType || '');
-      setDelegatedTo(initialTask.delegatedTo || '');
-      setDelegateType(initialTask.delegateType || '');
-      setReminderEnabled(initialTask.reminderEnabled || false);
-      setSubtasks(initialTask.subtasks || []);
-      setErrors([]);
+    if (initialTask && visible) {
+      dispatch({ type: 'LOAD_TASK', task: initialTask });
     }
-  }, [initialTask, colors]);
+  }, [initialTask, visible]);
 
-  const resetForm = () => {
-    setTitle('');
-    setTaskType('task');
-    setHabitGoal('1');
-    setPriority('');
-    setCustomPriorityText('');
-    setCustomPriorityColor(colors?.tabColors?.daily?.contrastOne || '#4A5568');
-    setGoalType('');
-    setCustomGoalTypeText('');
-    setCustomGoalTypeColor(colors?.tabColors?.future?.contrastOne || '#4A5568');
-    setMealType('');
-    setDayOfWeek('');
-    setNotes('');
-    setFrequency('');
-    setCleaningLocation('');
-    setCustomCleaningLocation('');
-    setCustomCleaningLocationColor(colors?.tabColors?.cleaning?.contrastOne || '#996B77');
-    setSelfCareType('');
-    setDelegatedTo('');
-    setDelegateType('');
-    setReminderEnabled(false);
-    setSubtasks([]);
-    setErrors([]);
+  useEffect(() => {
+    if (!state.customPriorityColor) {
+      setField('customPriorityColor', colors.themeColorWheel?.redBold || colors.veryDark);
+    }
+    if (!state.customGoalTypeColor) {
+      setField('customGoalTypeColor', colors.themeColorWheel?.blueBold || colors.veryDark);
+    }
+    if (!state.customCleaningLocationColor) {
+      setField('customCleaningLocationColor', colors.themeColorWheel?.greenBold || colors.veryDark);
+    }
+  }, [colors]);
+
+  const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
+    if (['taskType', 'mealType', 'frequency', 'selfCareType', 'delegateType'].includes(tagType)) {
+      return isSelected ? colors.veryDark : colors.bgAlt;
+    }
+
+    const colorWheel = colors.themeColorWheel || {};
+    
+    if (tagValue === 'custom') {
+      if (tagType === 'priority' && isSelected) return state.customPriorityColor;
+      if (tagType === 'goalType' && isSelected) return state.customGoalTypeColor;
+      if (tagType === 'cleaningLocation' && isSelected) return state.customCleaningLocationColor;
+      return isSelected ? colors.veryDark : colors.bgAlt;
+    }
+    
+    const tagColorMap: Record<string, Record<string, { bold: keyof ColorWheelSet, light: keyof ColorWheelSet }>> = {
+      priority: {
+        high: { bold: 'redBold', light: 'redLight' },
+        medium: { bold: 'orangeBold', light: 'orangeLight' },
+        low: { bold: 'yellowBold', light: 'yellowLight' },
+        'quick-win': { bold: 'greenBold', light: 'greenLight' },
+      },
+      goalType: {
+        Personal: { bold: 'purpleBold', light: 'purpleLight' },
+        Career: { bold: 'blueBold', light: 'blueLight' },
+        Financial: { bold: 'greenBold', light: 'greenLight' },
+        TBD: { bold: 'grayBold', light: 'grayLight' },
+        'Not Priority': { bold: 'grayBold', light: 'grayLight' },
+        Wish: { bold: 'pinkBold', light: 'pinkLight' },
+      },
+      dayOfWeek: {
+        Mon: { bold: 'redBold', light: 'redLight' },
+        Tue: { bold: 'orangeBold', light: 'orangeLight' },
+        Wed: { bold: 'yellowBold', light: 'yellowLight' },
+        Thu: { bold: 'greenBold', light: 'greenLight' },
+        Fri: { bold: 'blueBold', light: 'blueLight' },
+        Sat: { bold: 'purpleBold', light: 'purpleLight' },
+        Sun: { bold: 'pinkBold', light: 'pinkLight' },
+      },
+      cleaningLocation: {
+        kitchen: { bold: 'redBold', light: 'redLight' },
+        bathroom: { bold: 'blueBold', light: 'blueLight' },
+        bedroom: { bold: 'purpleBold', light: 'purpleLight' },
+      },
+    };
+    
+    const mapping = tagColorMap[tagType]?.[tagValue];
+    if (mapping) {
+      const colorKey = isSelected ? mapping.bold : mapping.light;
+      return colorWheel[colorKey as keyof typeof colorWheel] || (isSelected ? colors.veryDark : colors.bgAlt);
+    }
+    
+    return colorWheel.grayBold || colors.veryDark;
+  };
+
+  const getTextColor = (backgroundColor: string) => {
+    return backgroundColor === colors.bgAlt || backgroundColor.toUpperCase().startsWith('#F') 
+      ? colors.veryDark 
+      : '#FFFFFF';
+  };
+
+  const getColorOptions = () => {
+    const colorWheel = colors.themeColorWheel || {};
+    return [
+      colorWheel.redBold,
+      colorWheel.orangeBold,
+      colorWheel.yellowBold,
+      colorWheel.greenBold,
+      colorWheel.blueBold,
+      colorWheel.indigoBold,
+      colorWheel.purpleBold,
+      colorWheel.pinkBold,
+      colorWheel.brownBold,
+      colorWheel.grayBold,
+      colors.veryDark
+    ].filter(Boolean);
+  };
+
+  const getTagOptions = (tagType: string) => {
+    let defaultOptions: string[] = [];
+    
+    if (tagType === 'priority') {
+      defaultOptions = ['high', 'medium', 'low', 'quick-win', 'custom'];
+    } else if (tagType === 'goalType') {
+      defaultOptions = ['TBD', 'Not Priority', 'Wish', 'custom'];
+    } else if (tagType === 'cleaningLocation') {
+      defaultOptions = ['kitchen', 'bathroom', 'bedroom', 'custom'];
+    }
+    
+    return defaultOptions;
+  };
+
+  const handleClose = () => {
+    dispatch({ type: 'RESET_FORM' });
+    onClose();
   };
 
   const validateForm = (): string[] => {
     const validationErrors: string[] = [];
 
-    // Check if title is provided
-    if (!title.trim()) {
+    if (!state.title.trim()) {
       validationErrors.push('Task name is required');
     }
 
-    // Category-specific validation
-    if (initialTask) {
-      switch (initialTask.category) {
-        case 'meal-prep':
-          if (!mealType) {
-            validationErrors.push('Meal type is required for meal prep tasks');
-          }
-          break;
+    if (!initialTask) return validationErrors;
 
-        case 'cleaning':
-          if (!frequency) {
-            validationErrors.push('Frequency is required for cleaning tasks');
-          }
-          if (cleaningLocation === 'custom' && !customCleaningLocation.trim()) {
-            validationErrors.push('Custom location text is required');
-          }
-          break;
-
-        case 'self-care':
-          if (!selfCareType) {
-            validationErrors.push('Self-care type is required for self-care tasks');
-          }
-          break;
-
-        case 'delegation':
-          if (!delegateType) {
-            validationErrors.push('Delegate type is required for delegation tasks');
-          }
-          if (!delegatedTo.trim()) {
-            validationErrors.push('Person to delegate to is required');
-          }
-          break;
-      }
+    switch (initialTask.category) {
+      case 'meal-prep':
+        if (!state.mealType) validationErrors.push('Meal type is required for meal prep tasks');
+        break;
+      case 'cleaning':
+        if (!state.frequency) validationErrors.push('Frequency is required for cleaning tasks');
+        if (state.cleaningLocation === 'custom' && !state.customCleaningLocation.trim()) {
+          validationErrors.push('Custom location text is required');
+        }
+        break;
+      case 'self-care':
+        if (!state.selfCareType) validationErrors.push('Self-care type is required for self-care tasks');
+        break;
+      case 'delegation':
+        if (!state.delegateType) validationErrors.push('Delegate type is required for delegation tasks');
+        if (!state.delegatedTo.trim()) validationErrors.push('Person to delegate to is required');
+        break;
     }
 
-    // Habit-specific validation - only if it's a habit
-    if (taskType === 'habit' && (!habitGoal || parseInt(habitGoal) <= 0)) {
+    if (state.taskType === 'habit' && (!state.habitGoal || parseInt(state.habitGoal) <= 0)) {
       validationErrors.push('Valid habit goal is required for habits');
     }
 
-    // Validate custom tag text is provided when custom option is selected
-    if (priority === 'custom' && !customPriorityText.trim()) {
+    if (state.priority === 'custom' && !state.customPriorityText.trim()) {
       validationErrors.push('Custom priority text is required');
     }
     
-    if (goalType === 'custom' && !customGoalTypeText.trim()) {
+    if (state.goalType === 'custom' && !state.customGoalTypeText.trim()) {
       validationErrors.push('Custom goal type text is required');
     }
 
     return validationErrors;
   };
 
-  const handleClose = () => {
-    resetForm();
-    onClose();
-  };
-
   const handleSubmit = () => {
     if (!initialTask) return;
-    
+
     const validationErrors = validateForm();
     
     if (validationErrors.length > 0) {
-      setErrors(validationErrors);
+      dispatch({ type: 'SET_ERRORS', errors: validationErrors });
       return;
     }
 
-    const updatedTask = {
+    const updatedTask: Task = {
       ...initialTask,
-      title: title.trim(),
-      isHabit: taskType === 'habit',
-      habitGoal: taskType === 'habit' && habitGoal ? parseInt(habitGoal) : undefined,
-      priority: priority || undefined,
-      customPriorityText: priority === 'custom' ? customPriorityText : undefined,
-      customPriorityColor: priority === 'custom' ? customPriorityColor : undefined,
-      goalType: goalType || undefined,
-      customGoalTypeText: goalType === 'custom' ? customGoalTypeText : undefined,
-      customGoalTypeColor: goalType === 'custom' ? customGoalTypeColor : undefined,
-      mealType: mealType || undefined,
-      dayOfWeek: dayOfWeek || undefined,
-      notes: notes || undefined,
-      frequency: frequency || undefined,
-      cleaningLocation: cleaningLocation || undefined,
-      customCleaningLocation: cleaningLocation === 'custom' ? customCleaningLocation : undefined,
-      customCleaningLocationColor: cleaningLocation === 'custom' ? customCleaningLocationColor : undefined,
-      selfCareType: selfCareType || undefined,
-      delegatedTo: delegatedTo || undefined,
-      delegateType: delegateType || undefined,
-      reminderEnabled,
-      subtasks: subtasks.length > 0 ? subtasks : undefined,
+      title: state.title.trim(),
+      isHabit: state.taskType === 'habit',
+      habitGoal: state.taskType === 'habit' && state.habitGoal ? parseInt(state.habitGoal) : undefined,
+      priority: state.priority || undefined,
+      customPriorityText: state.priority === 'custom' ? state.customPriorityText : undefined,
+      customPriorityColor: state.priority === 'custom' ? state.customPriorityColor : undefined,
+      goalType: state.goalType || undefined,
+      customGoalTypeText: state.goalType === 'custom' ? state.customGoalTypeText : undefined,
+      customGoalTypeColor: state.goalType === 'custom' ? state.customGoalTypeColor : undefined,
+      mealType: state.mealType || undefined,
+      dayOfWeek: state.dayOfWeek || undefined,
+      notes: state.notes || undefined,
+      frequency: state.frequency || undefined,
+      cleaningLocation: state.cleaningLocation || undefined,
+      customCleaningLocation: state.cleaningLocation === 'custom' ? state.customCleaningLocation : undefined,
+      customCleaningLocationColor: state.cleaningLocation === 'custom' ? state.customCleaningLocationColor : undefined,
+      selfCareType: state.selfCareType || undefined,
+      delegatedTo: state.delegatedTo || undefined,
+      delegateType: state.delegateType || undefined,
+      reminderEnabled: state.reminderEnabled,
+      subtasks: state.subtasks.length > 0 ? state.subtasks : undefined,
     };
 
     onSubmit(updatedTask);
     handleClose();
   };
 
-  const addSubtask = () => {
-    const newSubtask = {
-      id: Date.now().toString(),
-      title: '',
-      completed: false,
-    };
-    setSubtasks([...subtasks, newSubtask]);
+  const renderTagOptions = (tagType: string, value: string, setter: (value: string) => void, options: string[]) => {
+    return (
+      <View style={styles.optionGrid}>
+        {options.map((option) => {
+          const bgColor = getTagColor(tagType, option, value === option);
+          const textColor = getTextColor(bgColor);
+          
+          let displayText = option;
+          
+          if (option === 'quick-win') {
+            displayText = 'Quick Win';
+          } else if (option !== 'custom') {
+            displayText = option.charAt(0).toUpperCase() + option.slice(1);
+          } else {
+            displayText = 'Custom';
+          }
+          
+          return (
+            <TouchableOpacity
+              key={option}
+              style={[styles.optionButton, { backgroundColor: bgColor }]}
+              onPress={() => setter(option)}
+            >
+              <Text style={[styles.optionText, { color: textColor }]}>
+                {displayText.toUpperCase()}
+              </Text>
+            </TouchableOpacity>
+          );
+        })}
+      </View>
+    );
   };
 
-  const removeSubtask = (id: string) => {
-    setSubtasks(subtasks.filter(subtask => subtask.id !== id));
-  };
-
-  const updateSubtask = (id: string, title: string) => {
-    setSubtasks(subtasks.map(subtask => 
-      subtask.id === id ? { ...subtask, title } : subtask
-    ));
-  };
-
-  const incrementHabitGoal = () => {
-    const currentGoal = parseInt(habitGoal) || 0;
-    setHabitGoal((currentGoal + 1).toString());
-  };
-
-  const decrementHabitGoal = () => {
-    const currentGoal = parseInt(habitGoal) || 0;
-    if (currentGoal > 1) {
-      setHabitGoal((currentGoal - 1).toString());
-    }
-  };
-
-  // Render custom color picker for a tag type
-  const renderColorPicker = (tagType: string, selectedColor: string, setColorFunction: (color: string) => void) => {
-    const colorOptions = getColorOptions(tagType);
+  const renderColorPicker = (selectedColor: string, setColorFunction: (color: string) => void) => {
+    const colorOptions = getColorOptions();
     
     return (
       <>
-        <Text style={[styles.label, { color: veryDarkColor }]}>Custom Color</Text>
+        <Text style={[styles.label, { color: colors.veryDark }]}>Custom Color</Text>
         <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.colorWheelContainer}>
           <View style={styles.colorWheel}>
-            {colorOptions.map((color: string, index: number) => (
+            {colorOptions.map((color, index) => (
               <TouchableOpacity
                 key={index}
                 style={[
@@ -539,18 +422,18 @@ export default function EditTaskForm({
         <View style={[
           styles.modalContainer, 
           { 
-            backgroundColor: effectiveBgColor,
-            height: windowHeight * 0.65, // Shorter fixed height
-            width: Math.min(windowWidth * 0.9, 450), // Control width for better layout
+            backgroundColor: colors.bg,
+            height: windowHeight * 0.65,
+            width: Math.min(windowWidth * 0.9, 450),
           }
         ]}>
           <View style={[styles.header, { 
-            borderBottomColor: effectivePastelColor,
-            backgroundColor: bgAltColor 
+            borderBottomColor: colors.pastel,
+            backgroundColor: colors.bgAlt 
           }]}>
-            <Text style={[styles.title, { color: veryDarkColor }]}>Edit Task</Text>
+            <Text style={[styles.title, { color: colors.veryDark }]}>Edit Task</Text>
             <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-              <X size={24} color={veryDarkColor} />
+              <X size={24} color={colors.veryDark} />
             </TouchableOpacity>
           </View>
 
@@ -559,14 +442,13 @@ export default function EditTaskForm({
             contentContainerStyle={{ paddingBottom: 20, paddingHorizontal: 16 }}
             showsVerticalScrollIndicator={true}
           >
-            {/* Error Messages */}
-            {errors.length > 0 && (
+            {state.errors.length > 0 && (
               <View style={[styles.errorCard, { 
                 backgroundColor: '#FED7D7',
                 borderLeftColor: '#E53E3E',
               }]}>
                 <Text style={[styles.errorTitle, { color: '#C53030' }]}>Please fix the following:</Text>
-                {errors.map((error, index) => (
+                {state.errors.map((error, index) => (
                   <Text key={index} style={[styles.errorText, { color: '#C53030' }]}>
                     • {error}
                   </Text>
@@ -575,69 +457,56 @@ export default function EditTaskForm({
             )}
 
             <View style={styles.formSection}>
-              <Text style={[styles.label, { color: veryDarkColor }]}>Task Name *</Text>
+              <Text style={[styles.label, { color: colors.veryDark }]}>Task Name *</Text>
               <TextInput
                 style={[styles.input, { 
-                  borderColor: errors.some(e => e.includes('Task name')) ? '#E53E3E' : effectivePastelColor, 
-                  backgroundColor: effectiveBgColor,
-                  color: veryDarkColor
+                  borderColor: state.errors.some(e => e.includes('Task name')) ? '#E53E3E' : colors.pastel, 
+                  backgroundColor: colors.bg,
+                  color: colors.veryDark
                 }]}
-                value={title}
-                onChangeText={(text) => {
-                  setTitle(text);
-                  if (errors.length > 0) {
-                    setErrors(errors.filter(e => !e.includes('Task name')));
-                  }
-                }}
+                value={state.title}
+                onChangeText={(text) => setField('title', text)}
                 placeholder="Enter task name"
-                placeholderTextColor={effectiveMediumColor}
+                placeholderTextColor={colors.medium}
                 multiline
               />
 
-              {/* Task Type as Tags - Daily and Calendar tabs */}
               {(initialTask.category === 'daily' || initialTask.category === 'weekly') && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Task Type *</Text>
-                  <View style={styles.optionGrid}>
-                    {['task', 'habit'].map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionButton,
-                          { 
-                            backgroundColor: getTagColor('taskType', option, taskType === option),
-                          }
-                        ]}
-                        onPress={() => setTaskType(option)}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          { color: taskType === option ? '#FFFFFF' : veryDarkColor }
-                        ]}>
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Task Type *</Text>
+                  {renderTagOptions(
+                    'taskType',
+                    state.taskType,
+                    (value) => setField('taskType', value),
+                    ['task', 'habit']
+                  )}
 
-                  {taskType === 'habit' && (
+                  {state.taskType === 'habit' && (
                     <View style={styles.habitGoalSection}>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Daily Goal</Text>
+                      <Text style={[styles.label, { color: colors.veryDark }]}>Daily Goal</Text>
                       <View style={styles.counterContainer}>
                         <TouchableOpacity
-                          style={[styles.counterButton, { backgroundColor: effectivePastelColor }]}
-                          onPress={decrementHabitGoal}
+                          style={[styles.counterButton, { backgroundColor: colors.pastel }]}
+                          onPress={() => {
+                            const currentGoal = parseInt(state.habitGoal) || 0;
+                            if (currentGoal > 1) {
+                              setField('habitGoal', (currentGoal - 1).toString());
+                            }
+                          }}
                         >
-                          <Minus size={16} color={veryDarkColor} />
+                          <Minus size={16} color={colors.veryDark} />
                         </TouchableOpacity>
-                        <Text style={[styles.counterText, { color: veryDarkColor }]}>
-                          {habitGoal}
+                        <Text style={[styles.counterText, { color: colors.veryDark }]}>
+                          {state.habitGoal}
                         </Text>
                         <TouchableOpacity
-                          style={[styles.counterButton, { backgroundColor: effectivePastelColor }]}
-                          onPress={incrementHabitGoal}
+                          style={[styles.counterButton, { backgroundColor: colors.pastel }]}
+                          onPress={() => {
+                            const currentGoal = parseInt(state.habitGoal) || 0;
+                            setField('habitGoal', (currentGoal + 1).toString());
+                          }}
                         >
-                          <Plus size={16} color={veryDarkColor} />
+                          <Plus size={16} color={colors.veryDark} />
                         </TouchableOpacity>
                       </View>
                     </View>
@@ -645,468 +514,226 @@ export default function EditTaskForm({
                 </>
               )}
 
-              {/* Daily Tasks - Priority */}
               {initialTask.category === 'daily' && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Priority</Text>
-                  <View style={styles.optionGrid}>
-                    {getTagOptions('priority').map((option) => {
-                      const bgColor = getTagColor('priority', option, priority === option);
-                      const textColor = getTextColor(bgColor);
-                      
-                      // Use custom text for saved custom tags
-                      const category = initialTask?.category || 'daily';
-                      const savedCustomTags = customTags[category]?.priority || [];
-                      const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === option);
-                      const displayText = matchingCustomTag ? matchingCustomTag.text : 
-                                          option === 'quick-win' ? 'Quick Win' : 
-                                          option.charAt(0).toUpperCase() + option.slice(1);
-                      
-                      return (
-                        <TouchableOpacity
-                          key={option}
-                          style={[
-                            styles.optionButton,
-                            { backgroundColor: bgColor }
-                          ]}
-                          onPress={() => {
-                            setPriority(option);
-                            if (errors.length > 0) {
-                              setErrors(errors.filter(e => !e.includes('Priority')));
-                            }
-                          }}
-                        >
-                          <Text style={[
-                            styles.optionText,
-                            { color: textColor }
-                          ]}>
-                            {displayText}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Priority</Text>
+                  {renderTagOptions(
+                    'priority',
+                    state.priority,
+                    (value) => setField('priority', value),
+                    getTagOptions('priority')
+                  )}
 
-                  {priority === 'custom' && (
+                  {state.priority === 'custom' && (
                     <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Priority Text</Text>
+                      <Text style={[styles.label, { color: colors.veryDark }]}>Custom Priority Text</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom priority text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
+                          borderColor: state.errors.some(e => e.includes('Custom priority text')) ? '#E53E3E' : colors.pastel, 
+                          backgroundColor: colors.bg,
+                          color: colors.veryDark
                         }]}
-                        value={customPriorityText}
-                        onChangeText={(text) => {
-                          setCustomPriorityText(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom priority text')));
-                          }
-                        }}
+                        value={state.customPriorityText}
+                        onChangeText={(text) => setField('customPriorityText', text)}
                         placeholder="Enter custom priority"
-                        placeholderTextColor={effectiveMediumColor}
+                        placeholderTextColor={colors.medium}
                       />
                       
-                      {renderColorPicker('priority', customPriorityColor, setCustomPriorityColor)}
+                      {renderColorPicker(
+                        state.customPriorityColor, 
+                        (color) => setField('customPriorityColor', color)
+                      )}
                     </>
                   )}
                 </>
               )}
 
-              {/* Goals - Goal Type */}
               {initialTask.category === 'goals' && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Goal Type</Text>
-                  <View style={styles.optionGrid}>
-                    {getTagOptions('goalType').map((option) => {
-                      const bgColor = getTagColor('goalType', option, goalType === option);
-                      const textColor = getTextColor(bgColor);
-                      
-                      // Use custom text for saved custom tags
-                      const category = initialTask?.category || 'goals';
-                      const savedCustomTags = customTags[category]?.goalType || [];
-                      const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === option);
-                      const displayText = matchingCustomTag ? matchingCustomTag.text : 
-                                          option.charAt(0).toUpperCase() + option.slice(1);
-                      
-                      return (
-                        <TouchableOpacity
-                          key={option}
-                          style={[
-                            styles.optionButton,
-                            { backgroundColor: bgColor }
-                          ]}
-                          onPress={() => {
-                            setGoalType(option);
-                            if (errors.length > 0) {
-                              setErrors(errors.filter(e => !e.includes('Goal type')));
-                            }
-                          }}
-                        >
-                          <Text style={[
-                            styles.optionText,
-                            { color: textColor }
-                          ]}>
-                            {displayText}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Goal Type</Text>
+                  {renderTagOptions(
+                    'goalType',
+                    state.goalType,
+                    (value) => setField('goalType', value),
+                    getTagOptions('goalType')
+                  )}
 
-                  {goalType === 'custom' && (
+                  {state.goalType === 'custom' && (
                     <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Goal Type</Text>
+                      <Text style={[styles.label, { color: colors.veryDark }]}>Custom Goal Type Text</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom goal type text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
+                          borderColor: state.errors.some(e => e.includes('Custom goal type text')) ? '#E53E3E' : colors.pastel, 
+                          backgroundColor: colors.bg,
+                          color: colors.veryDark
                         }]}
-                        value={customGoalTypeText}
-                        onChangeText={(text) => {
-                          setCustomGoalTypeText(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom goal type text')));
-                          }
-                        }}
+                        value={state.customGoalTypeText}
+                        onChangeText={(text) => setField('customGoalTypeText', text)}
                         placeholder="Enter custom goal type"
-                        placeholderTextColor={effectiveMediumColor}
+                        placeholderTextColor={colors.medium}
                       />
                       
-                      {renderColorPicker('goalType', customGoalTypeColor, setCustomGoalTypeColor)}
+                      {renderColorPicker(
+                        state.customGoalTypeColor, 
+                        (color) => setField('customGoalTypeColor', color)
+                      )}
                     </>
                   )}
                 </>
               )}
 
-              {/* Meal Prep */}
               {initialTask.category === 'meal-prep' && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Meal Type *</Text>
-                  <View style={styles.optionGrid}>
-                    {['breakfast', 'lunch', 'dinner', 'snack'].map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionButton,
-                          { 
-                            backgroundColor: getTagColor('mealType', option, mealType === option),
-                            borderColor: errors.some(e => e.includes('Meal type')) ? '#E53E3E' : 'transparent',
-                            borderWidth: errors.some(e => e.includes('Meal type')) ? 1 : 0
-                          }
-                        ]}
-                        onPress={() => {
-                          setMealType(option);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Meal type')));
-                          }
-                        }}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          { 
-                            color: mealType === option ? '#FFFFFF' : veryDarkColor
-                          }
-                        ]}>
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Meal Type *</Text>
+                  {renderTagOptions(
+                    'mealType',
+                    state.mealType,
+                    (value) => setField('mealType', value),
+                    ['breakfast', 'lunch', 'dinner', 'snack']
+                  )}
 
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Day of Week</Text>
-                  <View style={styles.optionGrid}>
-                    {['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'].map((day) => {
-                      const bgColor = getTagColor('dayOfWeek', day, dayOfWeek === day);
-                      const textColor = getTextColor(bgColor);
-                      
-                      return (
-                        <TouchableOpacity
-                          key={day}
-                          style={[
-                            styles.optionButton,
-                            { backgroundColor: bgColor }
-                          ]}
-                          onPress={() => setDayOfWeek(day)}
-                        >
-                          <Text style={[
-                            styles.optionText,
-                            { color: textColor }
-                          ]}>
-                            {day}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Day of Week</Text>
+                  {renderTagOptions(
+                    'dayOfWeek',
+                    state.dayOfWeek,
+                    (value) => setField('dayOfWeek', value),
+                    ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun']
+                  )}
 
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Notes</Text>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Notes</Text>
                   <TextInput
                     style={[styles.input, styles.textArea, { 
-                      borderColor: effectivePastelColor, 
-                      backgroundColor: effectiveBgColor,
-                      color: veryDarkColor
+                      borderColor: colors.pastel, 
+                      backgroundColor: colors.bg,
+                      color: colors.veryDark
                     }]}
-                    value={notes}
-                    onChangeText={setNotes}
-                    placeholder="Add any notes or details"
-                    placeholderTextColor={effectiveMediumColor}
+                    value={state.notes}
+                    onChangeText={(text) => setField('notes', text)}
+                    placeholder="Add cooking notes, ingredients, etc."
+                    placeholderTextColor={colors.medium}
                     multiline
-                    numberOfLines={3}
                   />
                 </>
               )}
 
-              {/* Cleaning */}
               {initialTask.category === 'cleaning' && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Frequency *</Text>
-                  <View style={styles.optionGrid}>
-                    {['daily', 'weekly', 'monthly', 'seasonal'].map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionButton,
-                          { 
-                            backgroundColor: getTagColor('frequency', option, frequency === option),
-                            borderColor: errors.some(e => e.includes('Frequency')) ? '#E53E3E' : 'transparent',
-                            borderWidth: errors.some(e => e.includes('Frequency')) ? 1 : 0
-                          }
-                        ]}
-                        onPress={() => {
-                          setFrequency(option);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Frequency')));
-                          }
-                        }}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          { 
-                            color: frequency === option ? '#FFFFFF' : veryDarkColor
-                          }
-                        ]}>
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Frequency *</Text>
+                  {renderTagOptions(
+                    'frequency',
+                    state.frequency,
+                    (value) => setField('frequency', value),
+                    ['daily', 'weekly', 'monthly', 'seasonal']
+                  )}
 
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Location</Text>
-                  <View style={styles.optionGrid}>
-                    {getTagOptions('cleaningLocation').map((option) => {
-                      const bgColor = getTagColor('cleaningLocation', option, cleaningLocation === option);
-                      const textColor = getTextColor(bgColor);
-                      
-                      // Use custom text for saved custom tags
-                      const category = initialTask?.category || 'cleaning';
-                      const savedCustomTags = customTags[category]?.cleaningLocation || [];
-                      const matchingCustomTag = savedCustomTags.find((tag: any) => tag.text === option);
-                      const displayText = matchingCustomTag ? matchingCustomTag.text : 
-                                          option.charAt(0).toUpperCase() + option.slice(1);
-                      
-                      return (
-                        <TouchableOpacity
-                          key={option}
-                          style={[
-                            styles.optionButton,
-                            { backgroundColor: bgColor }
-                          ]}
-                          onPress={() => {
-                            setCleaningLocation(option);
-                          }}
-                        >
-                          <Text style={[
-                            styles.optionText,
-                            { color: textColor }
-                          ]}>
-                            {displayText}
-                          </Text>
-                        </TouchableOpacity>
-                      );
-                    })}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Location</Text>
+                  {renderTagOptions(
+                    'cleaningLocation',
+                    state.cleaningLocation,
+                    (value) => setField('cleaningLocation', value),
+                    getTagOptions('cleaningLocation')
+                  )}
 
-                  {cleaningLocation === 'custom' && (
+                  {state.cleaningLocation === 'custom' && (
                     <>
-                      <Text style={[styles.label, { color: veryDarkColor }]}>Custom Location</Text>
+                      <Text style={[styles.label, { color: colors.veryDark }]}>Custom Location Text</Text>
                       <TextInput
                         style={[styles.input, { 
-                          borderColor: errors.some(e => e.includes('Custom location text')) ? '#E53E3E' : effectivePastelColor, 
-                          backgroundColor: effectiveBgColor,
-                          color: veryDarkColor
+                          borderColor: state.errors.some(e => e.includes('Custom location text')) ? '#E53E3E' : colors.pastel, 
+                          backgroundColor: colors.bg,
+                          color: colors.veryDark
                         }]}
-                        value={customCleaningLocation}
-                        onChangeText={(text) => {
-                          setCustomCleaningLocation(text);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Custom location text')));
-                          }
-                        }}
+                        value={state.customCleaningLocation}
+                        onChangeText={(text) => setField('customCleaningLocation', text)}
                         placeholder="Enter custom location"
-                        placeholderTextColor={effectiveMediumColor}
+                        placeholderTextColor={colors.medium}
                       />
                       
-                      {renderColorPicker('cleaningLocation', customCleaningLocationColor, setCustomCleaningLocationColor)}
+                      {renderColorPicker(
+                        state.customCleaningLocationColor, 
+                        (color) => setField('customCleaningLocationColor', color)
+                      )}
                     </>
                   )}
                 </>
               )}
 
-              {/* Self-Care */}
               {initialTask.category === 'self-care' && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Self-Care Type *</Text>
-                  <View style={styles.optionGrid}>
-                    {['physical', 'mental', 'rest', 'joy'].map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionButton,
-                          { 
-                            backgroundColor: getTagColor('selfCareType', option, selfCareType === option),
-                            borderColor: errors.some(e => e.includes('Self-care type')) ? '#E53E3E' : 'transparent',
-                            borderWidth: errors.some(e => e.includes('Self-care type')) ? 1 : 0
-                          }
-                        ]}
-                        onPress={() => {
-                          setSelfCareType(option);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Self-care type')));
-                          }
-                        }}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          { 
-                            color: selfCareType === option ? '#FFFFFF' : veryDarkColor
-                          }
-                        ]}>
-                          {option === 'physical' ? 'Physical Health' :
-                           option === 'mental' ? 'Mental Health' :
-                           option === 'rest' ? 'Rest & Recovery' :
-                           option === 'joy' ? 'Joy & Connection' :
-                           option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Self-Care Type *</Text>
+                  {renderTagOptions(
+                    'selfCareType',
+                    state.selfCareType,
+                    (value) => setField('selfCareType', value),
+                    ['physical', 'mental', 'rest', 'joy']
+                  )}
                 </>
               )}
 
-              {/* Delegation */}
               {initialTask.category === 'delegation' && (
                 <>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Delegate To *</Text>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Delegate To *</Text>
                   <TextInput
                     style={[styles.input, { 
-                      borderColor: errors.some(e => e.includes('Person to delegate')) ? '#E53E3E' : effectivePastelColor, 
-                      backgroundColor: effectiveBgColor,
-                      color: veryDarkColor
+                      borderColor: state.errors.some(e => e.includes('Person to delegate')) ? '#E53E3E' : colors.pastel, 
+                      backgroundColor: colors.bg,
+                      color: colors.veryDark
                     }]}
-                    value={delegatedTo}
-                    onChangeText={(text) => {
-                      setDelegatedTo(text);
-                      if (errors.length > 0) {
-                        setErrors(errors.filter(e => !e.includes('Person to delegate')));
-                      }
-                    }}
-                    placeholder="Who will handle this task?"
-                    placeholderTextColor={effectiveMediumColor}
+                    value={state.delegatedTo}
+                    onChangeText={(text) => setField('delegatedTo', text)}
+                    placeholder="Enter person's name"
+                    placeholderTextColor={colors.medium}
                   />
 
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Delegate Type *</Text>
-                  <View style={styles.optionGrid}>
-                    {['partner', 'family', 'friends', 'kids'].map((option) => (
-                      <TouchableOpacity
-                        key={option}
-                        style={[
-                          styles.optionButton,
-                          { 
-                            backgroundColor: getTagColor('delegateType', option, delegateType === option),
-                            borderColor: errors.some(e => e.includes('Delegate type')) ? '#E53E3E' : 'transparent',
-                            borderWidth: errors.some(e => e.includes('Delegate type')) ? 1 : 0
-                          }
-                        ]}
-                        onPress={() => {
-                          setDelegateType(option);
-                          if (errors.length > 0) {
-                            setErrors(errors.filter(e => !e.includes('Delegate type')));
-                          }
-                        }}
-                      >
-                        <Text style={[
-                          styles.optionText,
-                          { 
-                            color: delegateType === option ? '#FFFFFF' : veryDarkColor
-                          }
-                        ]}>
-                          {option.charAt(0).toUpperCase() + option.slice(1)}
-                        </Text>
-                      </TouchableOpacity>
-                    ))}
-                  </View>
+                  <Text style={[styles.label, { color: colors.veryDark }]}>Delegate Type *</Text>
+                  {renderTagOptions(
+                    'delegateType',
+                    state.delegateType,
+                    (value) => setField('delegateType', value),
+                    ['partner', 'family', 'friends', 'kids']
+                  )}
 
                   <View style={styles.switchRow}>
-                    <Text style={[styles.label, { color: veryDarkColor }]}>Enable Reminders</Text>
+                    <Text style={[styles.label, { color: colors.veryDark, marginTop: 0 }]}>Enable Reminder</Text>
                     <Switch
-                      value={reminderEnabled}
-                      onValueChange={setReminderEnabled}
-                      trackColor={{ false: effectivePastelColor, true: highlightColor }}
-                      thumbColor="#ffffff"
+                      value={state.reminderEnabled}
+                      onValueChange={(value) => setField('reminderEnabled', value)}
+                      trackColor={{ false: colors.pastel, true: colors.highlight }}
+                      thumbColor={state.reminderEnabled ? '#FFFFFF' : colors.medium}
                     />
                   </View>
                 </>
               )}
 
-              {/* Calendar Tasks */}
-              {initialTask.category === 'weekly' && initialTask.scheduledDate && (
-                <View style={[styles.dateInfo, { 
-                  backgroundColor: highlightColor,
-                  borderColor: veryDarkColor
-                }]}>
-                  <Text style={[styles.dateInfoText, { color: '#FFFFFF' }]}>
-                    Scheduled for: {new Date(initialTask.scheduledDate).toLocaleDateString('en-US', { 
-                      weekday: 'long', 
-                      year: 'numeric', 
-                      month: 'long', 
-                      day: 'numeric' 
-                    })}
-                  </Text>
-                </View>
-              )}
-
-              {/* Subtasks */}
               <View style={styles.subtasksSection}>
                 <View style={styles.subtasksHeader}>
-                  <Text style={[styles.label, { color: veryDarkColor }]}>Subtasks</Text>
-                  <TouchableOpacity 
-                    onPress={addSubtask} 
-                    style={[styles.addSubtaskButton, { backgroundColor: highlightColor }]}
+                  <Text style={[styles.label, { color: colors.veryDark, marginTop: 0 }]}>Subtasks</Text>
+                  <TouchableOpacity
+                    style={[styles.addSubtaskButton, { backgroundColor: colors.pastel }]}
+                    onPress={() => dispatch({ type: 'ADD_SUBTASK' })}
                   >
-                    <Plus size={16} color="#FFFFFF" />
+                    <Plus size={16} color={colors.veryDark} />
                   </TouchableOpacity>
                 </View>
 
-                {subtasks.map((subtask, index) => (
+                {state.subtasks.map((subtask) => (
                   <View key={subtask.id} style={styles.subtaskRow}>
                     <TextInput
                       style={[styles.input, styles.subtaskInput, { 
-                        borderColor: effectivePastelColor, 
-                        backgroundColor: effectiveBgColor,
-                        color: veryDarkColor
+                        borderColor: colors.pastel, 
+                        backgroundColor: colors.bg,
+                        color: colors.veryDark
                       }]}
                       value={subtask.title}
-                      onChangeText={(text) => updateSubtask(subtask.id, text)}
-                      placeholder={`Subtask ${index + 1}`}
-                      placeholderTextColor={effectiveMediumColor}
+                      onChangeText={(text) => dispatch({ type: 'UPDATE_SUBTASK', id: subtask.id, title: text })}
+                      placeholder="Enter subtask"
+                      placeholderTextColor={colors.medium}
                     />
                     <TouchableOpacity
-                      onPress={() => removeSubtask(subtask.id)}
                       style={[styles.removeSubtaskButton, { backgroundColor: '#FED7D7' }]}
+                      onPress={() => dispatch({ type: 'REMOVE_SUBTASK', id: subtask.id })}
                     >
-                      <Minus size={16} color="#E53E3E" />
+                      <X size={16} color="#E53E3E" />
                     </TouchableOpacity>
                   </View>
                 ))}
@@ -1115,20 +742,21 @@ export default function EditTaskForm({
           </ScrollView>
 
           <View style={[styles.footer, { 
-            borderTopColor: effectivePastelColor,
-            backgroundColor: bgAltColor
+            borderTopColor: colors.pastel,
+            backgroundColor: colors.bgAlt
           }]}>
             <TouchableOpacity 
-              style={[styles.cancelButton, { backgroundColor: effectivePastelColor }]} 
+              style={[styles.cancelButton, { backgroundColor: colors.pastel }]} 
               onPress={handleClose}
             >
-              <Text style={[styles.cancelText, { color: veryDarkColor }]}>Cancel</Text>
+              <Text style={[styles.cancelText, { color: colors.veryDark }]}>Cancel</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.submitButton, { backgroundColor: veryDarkColor }]}
+              style={[styles.submitButton, { backgroundColor: colors.veryDark }]}
               onPress={handleSubmit}
             >
-              <Text style={[styles.submitText, { color: "#FFFFFF" }]}>Update Task</Text>
+              <Save size={20} color="#FFFFFF" />
+              <Text style={[styles.submitText, { color: "#FFFFFF" }]}>Save Changes</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -1138,205 +766,39 @@ export default function EditTaskForm({
 }
 
 const styles = StyleSheet.create({
-  overlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  modalContainer: {
-    borderRadius: 16,
-    overflow: 'hidden',
-  },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    borderBottomWidth: 1,
-  },
-  title: {
-    fontSize: 20,
-    fontFamily: 'Quicksand-Bold',
-  },
-  closeButton: {
-    padding: 4,
-  },
-  errorCard: {
-    marginTop: 16,
-    marginBottom: 8,
-    padding: 12,
-    borderRadius: 8,
-    borderLeftWidth: 4,
-    shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-  },
-  errorTitle: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 8,
-  },
-  errorText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Regular',
-    marginBottom: 4,
-  },
-  formSection: {
-    paddingVertical: 8,
-  },
-  label: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-    marginBottom: 8,
-    marginTop: 16,
-  },
-  input: {
-    borderWidth: 1,
-    borderRadius: 8,
-    padding: 12,
-    fontSize: 16,
-    fontFamily: 'Quicksand-Regular',
-  },
-  textArea: {
-    height: 80,
-    textAlignVertical: 'top',
-  },
-  switchRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginTop: 16,
-  },
-  optionGrid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    gap: 8,
-    marginBottom: 8,
-  },
-  optionButton: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    borderRadius: 20,
-    marginBottom: 8,
-  },
-  optionText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-Medium',
-  },
-  dateInfo: {
-    padding: 12,
-    borderRadius: 8,
-    marginTop: 16,
-    borderWidth: 1,
-  },
-  dateInfoText: {
-    fontSize: 14,
-    fontFamily: 'Quicksand-SemiBold',
-    textAlign: 'center',
-  },
-  habitGoalSection: {
-    marginTop: 16,
-  },
-  counterContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'flex-start', // Left-aligned as requested
-    paddingLeft: 8,
-  },
-  counterButton: {
-    padding: 12,
-    borderRadius: 8,
-    alignItems: 'center',
-    justifyContent: 'center',
-    width: 44,
-    height: 44,
-  },
-  counterText: {
-    fontSize: 18,
-    fontFamily: 'Quicksand-Bold',
-    paddingHorizontal: 20,
-  },
-  colorWheelContainer: {
-    marginBottom: 16,
-  },
-  colorWheel: {
-    flexDirection: 'row',
-    padding: 8,
-  },
-  colorOption: {
-    width: 28, // Smaller color circles
-    height: 28, // Smaller color circles
-    borderRadius: 14, // Keep it circular
-    marginHorizontal: 4, // Less spacing between circles
-  },
-  selectedColor: {
-    borderWidth: 2, // Thinner border
-    borderColor: '#FFFFFF',
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-  },
-  subtasksSection: {
-    marginTop: 16,
-  },
-  subtasksHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  addSubtaskButton: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  subtaskRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  subtaskInput: {
-    flex: 1,
-    marginRight: 8,
-  },
-  removeSubtaskButton: {
-    padding: 8,
-    borderRadius: 20,
-  },
-  footer: {
-    flexDirection: 'row',
-    paddingHorizontal: 20,
-    paddingVertical: 16,
-    gap: 12,
-    borderTopWidth: 1,
-  },
-  cancelButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  cancelText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-  },
-  submitButton: {
-    flex: 1,
-    padding: 16,
-    borderRadius: 12,
-    alignItems: 'center',
-  },
-  submitText: {
-    fontSize: 16,
-    fontFamily: 'Quicksand-SemiBold',
-  },
+  overlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', padding: 20 },
+  modalContainer: { borderRadius: 16, overflow: 'hidden' },
+  header: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16, borderBottomWidth: 1 },
+  title: { fontSize: 20, fontFamily: 'Quicksand-Bold' },
+  closeButton: { padding: 4 },
+  errorCard: { marginTop: 16, marginBottom: 8, padding: 12, borderRadius: 8, borderLeftWidth: 4, shadowColor: '#000', shadowOffset: { width: 0, height: 2 }, shadowOpacity: 0.1, shadowRadius: 3, elevation: 2 },
+  errorTitle: { fontSize: 16, fontFamily: 'Quicksand-SemiBold', marginBottom: 8 },
+  errorText: { fontSize: 14, fontFamily: 'Quicksand-Regular', marginBottom: 4 },
+  formSection: { paddingVertical: 8 },
+  label: { fontSize: 16, fontFamily: 'Quicksand-SemiBold', marginBottom: 8, marginTop: 16 },
+  input: { borderWidth: 1, borderRadius: 8, padding: 12, fontSize: 16, fontFamily: 'Quicksand-Regular' },
+  textArea: { height: 80, textAlignVertical: 'top' },
+  switchRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginTop: 16 },
+  optionGrid: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 8 },
+  optionButton: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, marginBottom: 8 },
+  optionText: { fontSize: 14, fontFamily: 'Quicksand-Medium' },
+  habitGoalSection: { marginTop: 16 },
+  counterContainer: { flexDirection: 'row', alignItems: 'center', justifyContent: 'flex-start', paddingLeft: 8 },
+  counterButton: { padding: 12, borderRadius: 8, alignItems: 'center', justifyContent: 'center', width: 44, height: 44 },
+  counterText: { fontSize: 18, fontFamily: 'Quicksand-Bold', paddingHorizontal: 20 },
+  colorWheelContainer: { marginBottom: 16 },
+  colorWheel: { flexDirection: 'row', padding: 8 },
+  colorOption: { width: 28, height: 28, borderRadius: 14, marginHorizontal: 4 },
+  selectedColor: { borderWidth: 2, borderColor: '#FFFFFF', shadowColor: '#000', shadowOffset: { width: 0, height: 1 }, shadowOpacity: 0.2, shadowRadius: 2, elevation: 3 },
+  subtasksSection: { marginTop: 16 },
+  subtasksHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 8 },
+  addSubtaskButton: { padding: 8, borderRadius: 20 },
+  subtaskRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 8 },
+  subtaskInput: { flex: 1, marginRight: 8 },
+  removeSubtaskButton: { padding: 8, borderRadius: 20 },
+  footer: { flexDirection: 'row', paddingHorizontal: 20, paddingVertical: 16, gap: 12, borderTopWidth: 1 },
+  cancelButton: { flex: 1, padding: 16, borderRadius: 12, alignItems: 'center' },
+  cancelText: { fontSize: 16, fontFamily: 'Quicksand-SemiBold' },
+  submitButton: { flex: 1, padding: 16, borderRadius: 12, alignItems: 'center', flexDirection: 'row', justifyContent: 'center', gap: 8 },
+  submitText: { fontSize: 16, fontFamily: 'Quicksand-SemiBold' },
 });

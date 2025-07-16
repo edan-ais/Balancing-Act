@@ -53,20 +53,9 @@ export interface Theme {
   name: string;
   id: string;
   backgroundImage?: string;
-  addTaskIcon?: string;
-  tabBackgrounds?: {
-    [key: string]: string;
-  };
   tabColors: TabColors;
 }
 
-export const themes: Theme[] = [
-  balanceTheme,
-  latteTheme,
-  rainstormTheme,
-  autumnTheme
-];
-
+export const themes: Theme[] = [balanceTheme, latteTheme, rainstormTheme, autumnTheme];
 export const defaultTheme = balanceTheme;
-
 export { balanceTheme, latteTheme, rainstormTheme, autumnTheme };
