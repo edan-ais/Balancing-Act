@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import {
   View,
   Text,
@@ -26,7 +26,24 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const { signIn, signUp } = useAuth();
+  const isMountedRef = useRef(true);
+
+  // Set up mounted ref
+  useEffect(() => {
+    isMountedRef.current = true;
+    return () => {
+      isMountedRef.current = false;
+    };
+  }, []);
+
+  // Reset error when inputs change
+  useEffect(() => {
+    if (error) {
+      setError(null);
+    }
+  }, [email, password, confirmPassword, isSignUp]);
 
   const resetForm = () => {
     setEmail('');
@@ -34,6 +51,7 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
     setConfirmPassword('');
     setIsSignUp(false);
     setLoading(false);
+    setError(null);
   };
 
   const handleClose = () => {
@@ -41,44 +59,57 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
     onClose();
   };
 
-  const handleAuth = async () => {
+  const validateInputs = () => {
+    // Clear previous errors
+    setError(null);
+
+    // Check for empty fields
     if (!email.trim() || !password.trim()) {
-      Alert.alert('Error', 'Please fill in all fields');
-      return;
+      setError('Please fill in all fields');
+      return false;
     }
 
-    if (isSignUp && password !== confirmPassword) {
-      Alert.alert('Error', 'Passwords do not match');
-      return;
-    }
-
-    if (password.length < 6) {
-      Alert.alert('Error', 'Password must be at least 6 characters');
-      return;
-    }
-    // Basic email validation
+    // Validate email format
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       setError('Please enter a valid email address');
-      return;
+      return false;
     }
 
-    // Password validation
+    // Validate password length
     if (password.length < 6) {
       setError('Password must be at least 6 characters long');
+      return false;
+    }
+
+    // For sign up, check if passwords match
+    if (isSignUp && password !== confirmPassword) {
+      setError('Passwords do not match');
+      return false;
+    }
+
+    return true;
+  };
+
+  const handleAuth = async () => {
+    // Validate inputs before proceeding
+    if (!validateInputs()) {
       return;
     }
 
-
+    // Show loading indicator
     setLoading(true);
 
     try {
-      const { error } = isSignUp 
+      const { error: authError } = isSignUp 
         ? await signUp(email.trim(), password)
         : await signIn(email.trim(), password);
 
-      if (error) {
-        Alert.alert('Error', error.message);
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+
+      if (authError) {
+        setError(authError.message || 'Authentication failed');
       } else {
         if (isSignUp) {
           Alert.alert(
@@ -90,10 +121,16 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
           handleClose();
         }
       }
-    } catch (error) {
-      Alert.alert('Error', error.message || 'An unexpected error occurred during authentication.');
+    } catch (err: any) {
+      // Only update state if component is still mounted
+      if (!isMountedRef.current) return;
+      
+      setError(err.message || 'An unexpected error occurred during authentication.');
     } finally {
-      setLoading(false);
+      // Only update state if component is still mounted
+      if (isMountedRef.current) {
+        setLoading(false);
+      }
     }
   };
 
@@ -119,8 +156,18 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
                 }
               </Text>
 
+              {/* Error message display */}
+              {error ? (
+                <View style={[styles.errorContainer, { backgroundColor: '#FED7D7', borderColor: '#E53E3E' }]}>
+                  <Text style={[styles.errorText, { color: '#C53030' }]}>{error}</Text>
+                </View>
+              ) : null}
+
               <View style={styles.inputContainer}>
-                <View style={[styles.inputWrapper, { borderColor: colors.pastel }]}>
+                <View style={[
+                  styles.inputWrapper, 
+                  { borderColor: error && !email ? '#E53E3E' : colors.pastel }
+                ]}>
                   <Mail size={20} color={colors.medium} style={styles.inputIcon} />
                   <TextInput
                     style={[styles.input, { color: colors.veryDark }]}
@@ -134,7 +181,10 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
                   />
                 </View>
 
-                <View style={[styles.inputWrapper, { borderColor: colors.pastel }]}>
+                <View style={[
+                  styles.inputWrapper, 
+                  { borderColor: error && !password ? '#E53E3E' : colors.pastel }
+                ]}>
                   <Lock size={20} color={colors.medium} style={styles.inputIcon} />
                   <TextInput
                     style={[styles.input, { color: colors.veryDark }]}
@@ -148,7 +198,14 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
                 </View>
 
                 {isSignUp && (
-                  <View style={[styles.inputWrapper, { borderColor: colors.pastel }]}>
+                  <View style={[
+                    styles.inputWrapper, 
+                    { 
+                      borderColor: error && password !== confirmPassword 
+                        ? '#E53E3E' 
+                        : colors.pastel 
+                    }
+                  ]}>
                     <Lock size={20} color={colors.medium} style={styles.inputIcon} />
                     <TextInput
                       style={[styles.input, { color: colors.veryDark }]}
@@ -187,8 +244,15 @@ export default function AuthModal({ visible, onClose, colors }: AuthModalProps) 
               <TouchableOpacity
                 style={styles.switchModeButton}
                 onPress={() => setIsSignUp(!isSignUp)}
+                disabled={loading}
               >
-                <Text style={[styles.switchModeText, { color: colors.dark }]}>
+                <Text style={[
+                  styles.switchModeText, 
+                  { 
+                    color: colors.dark,
+                    opacity: loading ? 0.7 : 1 
+                  }
+                ]}>
                   {isSignUp 
                     ? 'Already have an account? Sign in'
                     : "Don't have an account? Sign up"
@@ -243,6 +307,16 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: 24,
     lineHeight: 22,
+  },
+  errorContainer: {
+    padding: 12,
+    borderRadius: 8,
+    marginBottom: 16,
+    borderLeftWidth: 4,
+  },
+  errorText: {
+    fontSize: 14,
+    fontFamily: 'Quicksand-Medium',
   },
   inputContainer: {
     marginBottom: 24,
