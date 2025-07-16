@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
 import { Plus, Heart, Smile, Moon, Activity, Music, Home } from 'lucide-react-native';
-import * as LucideIcons from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -19,28 +18,6 @@ export default function SelfCare() {
   const router = useRouter();
   const { currentTheme } = useTheme();
   const colors = currentTheme.tabColors.selfCare;
-
-  // Get the add task icon for the current theme dynamically
-  const getAddTaskIcon = () => {
-    if (currentTheme.addTaskIcon) {
-      // Convert kebab-case to PascalCase for Lucide icon names
-      const iconName = currentTheme.addTaskIcon
-        .split('-')
-        .map(part => part.charAt(0).toUpperCase() + part.slice(1))
-        .join('');
-      
-      // Dynamically get the icon component from Lucide
-      const IconComponent = LucideIcons[iconName];
-      
-      // Return the icon if it exists, otherwise fall back to Plus
-      if (IconComponent) {
-        return <IconComponent size={24} color={colors.pastel} />;
-      }
-    }
-    
-    // Default to Plus icon if no theme icon is specified or if the specified icon doesn't exist
-    return <Plus size={24} color={colors.pastel} />;
-  };
 
   const selfCareTasks = taskManager.tasks.filter(task => task.category === 'self-care');
 
@@ -191,7 +168,7 @@ export default function SelfCare() {
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        {getAddTaskIcon()}
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm

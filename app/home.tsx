@@ -72,34 +72,20 @@ const tabOptions = [
   }
 ];
 
-// Theme icons mapping
-const themeIcons = {
-  'balance': Palette,
-  'latte': Coffee,
-  'rainstorm': CloudRain,
-  'autumn': Leaf
-};
-
-// Function to dynamically get icon based on theme properties
-const getThemeIconComponent = (theme) => {
-  // First check if we have a direct mapping for the theme ID
-  if (themeIcons[theme.id]) {
-    return themeIcons[theme.id];
+// Helper function to get theme icon component
+const getThemeIconComponent = (themeId: string) => {
+  switch (themeId) {
+    case 'balance':
+      return Palette;
+    case 'latte':
+      return Coffee;
+    case 'rainstorm':
+      return CloudRain;
+    case 'autumn':
+      return Leaf;
+    default:
+      return Palette;
   }
-  
-  // If not, check if the theme has a specified addTaskIcon property that matches an icon name
-  if (theme.addTaskIcon) {
-    // Match theme.addTaskIcon to icon components
-    // This handles cases like "leaf-fall" by looking for a matching icon
-    const iconName = theme.addTaskIcon.toLowerCase();
-    if (iconName.includes('leaf')) return Leaf;
-    if (iconName.includes('palette')) return Palette;
-    if (iconName.includes('coffee')) return Coffee;
-    if (iconName.includes('rain') || iconName.includes('cloud')) return CloudRain;
-  }
-  
-  // Default to Palette if no match is found
-  return Palette;
 };
 
 export default function HomeScreen() {
@@ -182,7 +168,7 @@ export default function HomeScreen() {
           {availableThemes.map((theme) => {
             const isSelected = currentTheme.id === theme.id;
             const themeColors = theme.tabColors.daily;
-            const ThemeIconComponent = getThemeIconComponent(theme);
+            const ThemeIconComponent = getThemeIconComponent(theme.id);
             
             return (
               <TouchableOpacity

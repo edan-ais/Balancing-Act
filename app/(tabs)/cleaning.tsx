@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, ScrollView, TouchableOpacity } from 'react-native';
-import { Plus, Home, Sun, RefreshCw, Moon, CloudSnow, Spray, Coffee, Leaf, Palette, Wind } from 'lucide-react-native';
+import { Plus, Home, Sun, RefreshCw, Moon, CloudSnow } from 'lucide-react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import NeumorphicCard from '@/components/NeumorphicCard';
@@ -18,36 +18,6 @@ export default function RepetitiveCleaning() {
   const router = useRouter();
   const { currentTheme } = useTheme();
   const colors = currentTheme.tabColors.cleaning;
-
-  // Get the add task icon for the current theme
-  const getAddTaskIcon = () => {
-    // Use the icon defined in the theme if available
-    if (currentTheme.addTaskIcon) {
-      // The theme provides a string identifier for the icon
-      const iconName = currentTheme.addTaskIcon;
-      
-      // Return the appropriate icon component based on the name
-      switch (iconName) {
-        case 'coffee':
-          return <Coffee size={24} color={colors.pastel} />;
-        case 'leaf':
-          return <Leaf size={24} color={colors.pastel} />;
-        case 'palette':
-          return <Palette size={24} color={colors.pastel} />;
-        case 'wind':
-          return <Wind size={24} color={colors.pastel} />;
-        case 'spray':
-          return <Spray size={24} color={colors.pastel} />;
-        case 'plus':
-        default:
-          // Default to Plus icon
-          return <Plus size={24} color={colors.pastel} />;
-      }
-    }
-    
-    // Default to Plus icon if no theme icon is specified
-    return <Plus size={24} color={colors.pastel} />;
-  };
 
   const cleaningTasks = taskManager.tasks.filter(task => task.category === 'cleaning');
 
@@ -216,7 +186,7 @@ export default function RepetitiveCleaning() {
         }]}
         onPress={() => setShowAddForm(true)}
       >
-        {getAddTaskIcon()}
+        <Plus size={24} color={colors.pastel} />
       </TouchableOpacity>
 
       <AddTaskForm

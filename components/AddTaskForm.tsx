@@ -18,21 +18,20 @@ import type { Theme, TabColorSet, ColorWheelSet } from '@/constants/themes';
 const windowHeight = Dimensions.get('window').height;
 const windowWidth = Dimensions.get('window').width;
 
-// Function to get the appropriate icon component based on theme
-const getThemeIcon = (theme: Theme | undefined) => {
-  if (!theme) return Plus; // Default fallback
-  
-  // First check explicit icon setting, then infer from theme ID if needed
-  const iconNameSource = theme.addTaskIcon ? theme.addTaskIcon.toLowerCase() : 
-                         theme.id ? theme.id.toLowerCase() : '';
-  
-  if (iconNameSource.includes('leaf') || iconNameSource.includes('autumn')) return Leaf;
-  if (iconNameSource.includes('rain') || iconNameSource.includes('cloud')) return CloudRain;
-  if (iconNameSource.includes('latte') || iconNameSource.includes('coffee')) return Coffee;
-  if (iconNameSource.includes('palette') || iconNameSource.includes('balance')) return Palette;
-  
-  // Default to plus icon if no match
-  return Plus;
+// Helper function to get theme icon component
+const getThemeIcon = (themeId: string | undefined) => {
+  switch (themeId) {
+    case 'balance':
+      return Palette;
+    case 'latte':
+      return Coffee;
+    case 'rainstorm':
+      return CloudRain;
+    case 'autumn':
+      return Leaf;
+    default:
+      return Plus;
+  }
 };
 
 // Interface for custom tags
@@ -210,8 +209,8 @@ export default function AddTaskForm({
     }
   }, [colors]);
   
-  // Get the theme-specific icon component
-  const ThemeIcon = getThemeIcon(theme);
+  // Get the theme-specific icon component  
+  const ThemeIcon = getThemeIcon(theme?.id);
 
   // Helper to get tag color - using the themeColorWheel
   const getTagColor = (tagType: string, tagValue: string, isSelected: boolean = true) => {
