@@ -34,7 +34,6 @@
       "expo-font", 
       "expo-web-browser",
       "expo-camera",
-      "expo-blur",
       "expo-haptics",
       "expo-linear-gradient"
     ],
